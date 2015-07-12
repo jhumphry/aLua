@@ -24,7 +24,8 @@
 -- SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 with Ada.Text_IO; use Ada.Text_IO;
-with Ada.Long_Float_Text_IO;
+with Ada.Long_Float_Text_IO; use Ada.Long_Float_Text_IO;
+with Ada.Integer_Text_IO; use Ada.Integer_Text_IO;
 
 with Lua;
 
@@ -34,9 +35,19 @@ begin
    Put_Line("A simple example of using Lua from within Ada");
 
    Put("Lua version: ");
-   Ada.Long_Float_Text_IO.Put(Item => L.Version, Aft => 0, Exp => 0);
+   Put(Item => L.Version, Aft => 0, Exp => 0);
    New_Line;
 
    Put_Line("Lua state status: " & Lua.Thread_Status'Image(L.Status));
+   New_Line;
+
+   Put_Line("Basic stack manipulation.");
+   Put_Line("Pushing 3.0, 7.5, 2.3");
+   L.Push(3.0); L.Push(7.5); L.Push(2.3);
+   Put_Line("Stack now contains:");
+   for I in 1..3 loop
+      Put(-I); Put(":");
+      Put(L.ToNumber(-I), Aft => 0, Exp => 0); New_Line;
+   end loop;
 
 end Simple_Example;
