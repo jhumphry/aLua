@@ -13,6 +13,13 @@ package body Lua is
    function Version (L : State) return Long_Float is
       (Long_Float(Internal.lua_version(L.L).all));
 
+   ------------
+   -- Status --
+   ------------
+
+   function Status (L : State) return Thread_Status is
+      (Thread_Status'Val(Internal.lua_status(L.L)));
+
    ----------------
    -- Initialize --
    ----------------

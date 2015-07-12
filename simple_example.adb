@@ -32,7 +32,11 @@ procedure Simple_Example is
    L : Lua.State;
 begin
    Put_Line("A simple example of using Lua from within Ada");
+
    Put("Lua version: ");
    Ada.Long_Float_Text_IO.Put(Item => L.Version, Aft => 0, Exp => 0);
    New_Line;
+
+   Put_Line("Lua state status: " & Lua.Thread_Status'Image(L.Status));
+
 end Simple_Example;

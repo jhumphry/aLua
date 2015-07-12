@@ -29,10 +29,16 @@ private with System;
 
 package Lua is
 
+   type Thread_Status is (OK, YIELD, ERRRUN, ERRSYNTAX, ERRMEM, ERRGCMM, ERRERR);
+
    type State is tagged limited private;
    function Version (L : in State) return Long_Float;
+   function Status (L : in State) return Thread_Status;
 
 private
+
+   for Thread_Status use (OK => 0, YIELD => 1, ERRRUN => 2, ERRSYNTAX => 3,
+                          ERRMEM => 4, ERRGCMM => 5, ERRERR => 6);
 
    type State is new Ada.Finalization.Limited_Controlled with
       record

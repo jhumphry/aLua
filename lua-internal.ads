@@ -54,13 +54,13 @@ private package Lua.Internal is
    --  arg-macro: function lua_upvalueindex (i)
    --    return LUA_REGISTRYINDEX - (i);
 
-   LUA_OK : constant := 0;  --  /usr/include/lua.h:47
-   LUA_YIELD : constant := 1;  --  /usr/include/lua.h:48
-   LUA_ERRRUN : constant := 2;  --  /usr/include/lua.h:49
-   LUA_ERRSYNTAX : constant := 3;  --  /usr/include/lua.h:50
-   LUA_ERRMEM : constant := 4;  --  /usr/include/lua.h:51
-   LUA_ERRGCMM : constant := 5;  --  /usr/include/lua.h:52
-   LUA_ERRERR : constant := 6;  --  /usr/include/lua.h:53
+--     LUA_OK : constant := 0;  --  /usr/include/lua.h:47
+--     LUA_YIELD : constant := 1;  --  /usr/include/lua.h:48
+--     LUA_ERRRUN : constant := 2;  --  /usr/include/lua.h:49
+--     LUA_ERRSYNTAX : constant := 3;  --  /usr/include/lua.h:50
+--     LUA_ERRMEM : constant := 4;  --  /usr/include/lua.h:51
+--     LUA_ERRGCMM : constant := 5;  --  /usr/include/lua.h:52
+--     LUA_ERRERR : constant := 6;  --  /usr/include/lua.h:53
 
    LUA_TNONE : constant := (-1);  --  /usr/include/lua.h:62
 
