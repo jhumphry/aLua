@@ -1,0 +1,31 @@
+
+project aLua is
+
+   for Languages use ("Ada");
+   for Source_Dirs use ("./", "tests");
+   for Object_Dir use "build/";
+   for Exec_Dir use "exec/";
+   for Main use ("simple_example.adb");
+
+   package Ide is
+      for Vcs_Kind use "Git";
+   end Ide;
+
+   package Naming is
+      for Body_Suffix ("project file") use ".gpr";
+   end Naming;
+
+   package Builder is
+      for Default_Switches ("ada") use ("-j2", "-g");
+   end Builder;
+
+   package Compiler is
+      for Default_Switches ("ada") use ("-gnat12", "-gnato", "-g", "-fstack-check", "-gnatE", "-gnatf");
+   end Compiler;
+
+   package Linker is
+        for Default_Switches ("ada") use ("-g", "-llua", "-lm");
+   end Linker;
+
+end aLua;
+
