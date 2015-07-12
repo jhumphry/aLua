@@ -1,13 +1,41 @@
-pragma Ada_2005;
-pragma Style_Checks (Off);
+-- Lua.Internal
+
+-- Contains the raw interfaces with the Lua library written in C
+-- Generated from lua.h and then manually tidied up
+
+-- Copyright (c) 2015, James Humphry
+-- under the same terms as the original source
+
+-- The copyright notice of the original source follows:
+--*****************************************************************************
+--* Copyright (C) 1994-2015 Lua.org, PUC-Rio.
+--*
+--* Permission is hereby granted, free of charge, to any person obtaining
+--* a copy of this software and associated documentation files (the
+--* "Software"), to deal in the Software without restriction, including
+--* without limitation the rights to use, copy, modify, merge, publish,
+--* distribute, sublicense, and/or sell copies of the Software, and to
+--* permit persons to whom the Software is furnished to do so, subject to
+--* the following conditions:
+--*
+--* The above copyright notice and this permission notice shall be
+--* included in all copies or substantial portions of the Software.
+--*
+--* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+--* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+--* MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+--* IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+--* CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+--* TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+--* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+--*****************************************************************************
 
 with Interfaces.C; use Interfaces.C;
 with Interfaces.C.Extensions;
-with stddef_h;
 with System;
 with Interfaces.C.Strings;
 
-package lua_h is
+private package Lua.Internal is
 
 
    LUA_VERSION_MAJOR : aliased constant String := "5" & ASCII.NUL;  --  /usr/include/lua.h:19
@@ -145,43 +173,43 @@ package lua_h is
   --** Lua - A Scripting Language
   --** Lua.org, PUC-Rio, Brazil (http://www.lua.org)
   --** See Copyright Notice at the end of this file
-  -- 
+  --
 
-  -- mark for precompiled code ('<esc>Lua')  
-  -- option for multiple returns in 'lua_pcall' and 'lua_call'  
+  -- mark for precompiled code ('<esc>Lua')
+  -- option for multiple returns in 'lua_pcall' and 'lua_call'
   --** Pseudo-indices
   --** (-LUAI_MAXSTACK is the minimum valid index; we keep some free empty
   --** space after that to help overflow detection)
-  -- 
+  --
 
-  -- thread status  
+  -- thread status
    --  skipped empty struct lua_State
 
   --** basic types
-  -- 
+  --
 
-  -- minimum Lua stack available to a C function  
-  -- predefined values in the registry  
-  -- type of numbers in Lua  
+  -- minimum Lua stack available to a C function
+  -- predefined values in the registry
+  -- type of numbers in Lua
    subtype lua_Number is double;  -- /usr/include/lua.h:89
 
-  -- type for integer functions  
+  -- type for integer functions
    subtype lua_Integer is Long_Long_Integer;  -- /usr/include/lua.h:93
 
-  -- unsigned integer type  
+  -- unsigned integer type
    subtype lua_Unsigned is Extensions.unsigned_long_long;  -- /usr/include/lua.h:96
 
-  -- type for continuation-function contexts  
-   subtype lua_KContext is stddef_h.ptrdiff_t;  -- /usr/include/lua.h:99
+  -- type for continuation-function contexts
+   subtype lua_KContext is Interfaces.C.ptrdiff_t;  -- /usr/include/lua.h:99
 
   --** Type for C functions registered with Lua
-  -- 
+  --
 
    type lua_CFunction is access function (arg1 : System.Address) return int;
    pragma Convention (C, lua_CFunction);  -- /usr/include/lua.h:105
 
   --** Type for continuation functions
-  -- 
+  --
 
    type lua_KFunction is access function
         (arg1 : System.Address;
@@ -190,42 +218,42 @@ package lua_h is
    pragma Convention (C, lua_KFunction);  -- /usr/include/lua.h:110
 
   --** Type for functions that read/write blocks when loading/dumping Lua chunks
-  -- 
+  --
 
    type lua_Reader is access function
         (arg1 : System.Address;
          arg2 : System.Address;
-         arg3 : access stddef_h.size_t) return Interfaces.C.Strings.chars_ptr;
+         arg3 : access Interfaces.C.size_t) return Interfaces.C.Strings.chars_ptr;
    pragma Convention (C, lua_Reader);  -- /usr/include/lua.h:116
 
    type lua_Writer is access function
         (arg1 : System.Address;
          arg2 : System.Address;
-         arg3 : stddef_h.size_t;
+         arg3 : Interfaces.C.size_t;
          arg4 : System.Address) return int;
    pragma Convention (C, lua_Writer);  -- /usr/include/lua.h:118
 
   --** Type for memory-allocation functions
-  -- 
+  --
 
    type lua_Alloc is access function
-        (arg1 : System.Address;
-         arg2 : System.Address;
-         arg3 : stddef_h.size_t;
-         arg4 : stddef_h.size_t) return System.Address;
+        (ud : System.Address;
+         ptr : System.Address;
+         osize : Interfaces.C.size_t;
+         nsize : Interfaces.C.size_t) return System.Address;
    pragma Convention (C, lua_Alloc);  -- /usr/include/lua.h:124
 
   --** generic extra include file
-  -- 
+  --
 
   --** RCS ident string
-  -- 
+  --
 
    lua_ident : aliased Interfaces.C.char_array (size_t);  -- /usr/include/lua.h:139
    pragma Import (C, lua_ident, "lua_ident");
 
   --** state manipulation
-  -- 
+  --
 
    function lua_newstate (arg1 : lua_Alloc; arg2 : System.Address) return System.Address;  -- /usr/include/lua.h:145
    pragma Import (C, lua_newstate, "lua_newstate");
@@ -239,11 +267,11 @@ package lua_h is
    function lua_atpanic (arg1 : System.Address; arg2 : lua_CFunction) return lua_CFunction;  -- /usr/include/lua.h:149
    pragma Import (C, lua_atpanic, "lua_atpanic");
 
-   function lua_version (arg1 : System.Address) return access lua_Number;  -- /usr/include/lua.h:152
+   function lua_version (arg1 : System.Address) return access constant lua_Number;  -- /usr/include/lua.h:152
    pragma Import (C, lua_version, "lua_version");
 
   --** basic stack manipulation
-  -- 
+  --
 
    function lua_absindex (arg1 : System.Address; arg2 : int) return int;  -- /usr/include/lua.h:158
    pragma Import (C, lua_absindex, "lua_absindex");
@@ -279,7 +307,7 @@ package lua_h is
    pragma Import (C, lua_xmove, "lua_xmove");
 
   --** access functions (stack -> C)
-  -- 
+  --
 
    function lua_isnumber (arg1 : System.Address; arg2 : int) return int;  -- /usr/include/lua.h:173
    pragma Import (C, lua_isnumber, "lua_isnumber");
@@ -320,10 +348,10 @@ package lua_h is
    function lua_tolstring
      (arg1 : System.Address;
       arg2 : int;
-      arg3 : access stddef_h.size_t) return Interfaces.C.Strings.chars_ptr;  -- /usr/include/lua.h:184
+      arg3 : access Interfaces.C.size_t) return Interfaces.C.Strings.chars_ptr;  -- /usr/include/lua.h:184
    pragma Import (C, lua_tolstring, "lua_tolstring");
 
-   function lua_rawlen (arg1 : System.Address; arg2 : int) return stddef_h.size_t;  -- /usr/include/lua.h:185
+   function lua_rawlen (arg1 : System.Address; arg2 : int) return Interfaces.C.size_t;  -- /usr/include/lua.h:185
    pragma Import (C, lua_rawlen, "lua_rawlen");
 
    function lua_tocfunction (arg1 : System.Address; arg2 : int) return lua_CFunction;  -- /usr/include/lua.h:186
@@ -339,7 +367,7 @@ package lua_h is
    pragma Import (C, lua_topointer, "lua_topointer");
 
   --** Comparison and arithmetic functions
-  -- 
+  --
 
    procedure lua_arith (arg1 : System.Address; arg2 : int);  -- /usr/include/lua.h:211
    pragma Import (C, lua_arith, "lua_arith");
@@ -358,7 +386,7 @@ package lua_h is
    pragma Import (C, lua_compare, "lua_compare");
 
   --** push functions (C -> stack)
-  -- 
+  --
 
    procedure lua_pushnil (arg1 : System.Address);  -- /usr/include/lua.h:224
    pragma Import (C, lua_pushnil, "lua_pushnil");
@@ -372,7 +400,7 @@ package lua_h is
    function lua_pushlstring
      (arg1 : System.Address;
       arg2 : Interfaces.C.Strings.chars_ptr;
-      arg3 : stddef_h.size_t) return Interfaces.C.Strings.chars_ptr;  -- /usr/include/lua.h:227
+      arg3 : Interfaces.C.size_t) return Interfaces.C.Strings.chars_ptr;  -- /usr/include/lua.h:227
    pragma Import (C, lua_pushlstring, "lua_pushlstring");
 
    function lua_pushstring (arg1 : System.Address; arg2 : Interfaces.C.Strings.chars_ptr) return Interfaces.C.Strings.chars_ptr;  -- /usr/include/lua.h:228
@@ -404,7 +432,7 @@ package lua_h is
    pragma Import (C, lua_pushthread, "lua_pushthread");
 
   --** get functions (Lua -> stack)
-  -- 
+  --
 
    function lua_getglobal (arg1 : System.Address; arg2 : Interfaces.C.Strings.chars_ptr) return int;  -- /usr/include/lua.h:241
    pragma Import (C, lua_getglobal, "lua_getglobal");
@@ -445,7 +473,7 @@ package lua_h is
       arg3 : int);  -- /usr/include/lua.h:249
    pragma Import (C, lua_createtable, "lua_createtable");
 
-   function lua_newuserdata (arg1 : System.Address; arg2 : stddef_h.size_t) return System.Address;  -- /usr/include/lua.h:250
+   function lua_newuserdata (arg1 : System.Address; arg2 : Interfaces.C.size_t) return System.Address;  -- /usr/include/lua.h:250
    pragma Import (C, lua_newuserdata, "lua_newuserdata");
 
    function lua_getmetatable (arg1 : System.Address; arg2 : int) return int;  -- /usr/include/lua.h:251
@@ -455,7 +483,7 @@ package lua_h is
    pragma Import (C, lua_getuservalue, "lua_getuservalue");
 
   --** set functions (stack -> Lua)
-  -- 
+  --
 
    procedure lua_setglobal (arg1 : System.Address; arg2 : Interfaces.C.Strings.chars_ptr);  -- /usr/include/lua.h:258
    pragma Import (C, lua_setglobal, "lua_setglobal");
@@ -497,7 +525,7 @@ package lua_h is
    pragma Import (C, lua_setuservalue, "lua_setuservalue");
 
   --** 'load' and 'call' functions (load and run Lua code)
-  -- 
+  --
 
    procedure lua_callk
      (arg1 : System.Address;
@@ -532,7 +560,7 @@ package lua_h is
    pragma Import (C, lua_dump, "lua_dump");
 
   --** coroutine functions
-  -- 
+  --
 
    function lua_yieldk
      (arg1 : System.Address;
@@ -554,7 +582,7 @@ package lua_h is
    pragma Import (C, lua_isyieldable, "lua_isyieldable");
 
   --** garbage-collection function and options
-  -- 
+  --
 
    function lua_gc
      (arg1 : System.Address;
@@ -563,7 +591,7 @@ package lua_h is
    pragma Import (C, lua_gc, "lua_gc");
 
   --** miscellaneous functions
-  -- 
+  --
 
    function lua_error (arg1 : System.Address) return int;  -- /usr/include/lua.h:319
    pragma Import (C, lua_error, "lua_error");
@@ -577,7 +605,7 @@ package lua_h is
    procedure lua_len (arg1 : System.Address; arg2 : int);  -- /usr/include/lua.h:324
    pragma Import (C, lua_len, "lua_len");
 
-   function lua_stringtonumber (arg1 : System.Address; arg2 : Interfaces.C.Strings.chars_ptr) return stddef_h.size_t;  -- /usr/include/lua.h:326
+   function lua_stringtonumber (arg1 : System.Address; arg2 : Interfaces.C.Strings.chars_ptr) return Interfaces.C.size_t;  -- /usr/include/lua.h:326
    pragma Import (C, lua_stringtonumber, "lua_stringtonumber");
 
    function lua_getallocf (arg1 : System.Address; arg2 : System.Address) return lua_Alloc;  -- /usr/include/lua.h:328
@@ -592,28 +620,28 @@ package lua_h is
   --** {==============================================================
   --** some useful macros
   --** ===============================================================
-  -- 
+  --
 
-  -- }==============================================================  
+  -- }==============================================================
   --** {==============================================================
   --** compatibility macros for unsigned conversions
   --** ===============================================================
-  -- 
+  --
 
-  -- }==============================================================  
+  -- }==============================================================
   --** {======================================================================
   --** Debug API
   --** =======================================================================
-  -- 
+  --
 
   --** Event codes
-  -- 
+  --
 
   --** Event masks
-  -- 
+  --
 
-  -- activation record  
-  -- Functions to be called by the debugger in specific events  
+  -- activation record
+  -- Functions to be called by the debugger in specific events
    type lua_Hook is access procedure (arg1 : System.Address; arg2 : System.Address);
    pragma Convention (C, lua_Hook);  -- /usr/include/lua.h:421
 
@@ -683,20 +711,20 @@ package lua_h is
    function lua_gethookcount (arg1 : System.Address) return int;  -- /usr/include/lua.h:438
    pragma Import (C, lua_gethookcount, "lua_gethookcount");
 
-  -- (n)  
-  -- (n) 'global', 'local', 'field', 'method'  
-  -- (S) 'Lua', 'C', 'main', 'tail'  
-  -- (S)  
-  -- (l)  
-  -- (S)  
-  -- (S)  
-  -- (u) number of upvalues  
-  -- (u) number of parameters  
-  -- (u)  
-  -- (t)  
-  -- (S)  
-  -- private part  
-  -- active function  
+  -- (n)
+  -- (n) 'global', 'local', 'field', 'method'
+  -- (S) 'Lua', 'C', 'main', 'tail'
+  -- (S)
+  -- (l)
+  -- (S)
+  -- (S)
+  -- (u) number of upvalues
+  -- (u) number of parameters
+  -- (u)
+  -- (t)
+  -- (S)
+  -- private part
+  -- active function
    --  skipped empty struct CallInfo
 
    subtype anon1072_anon1110_array is Interfaces.C.char_array (0 .. 59);
@@ -718,28 +746,7 @@ package lua_h is
    end record;
    pragma Convention (C_Pass_By_Copy, lua_Debug);  -- /usr/include/lua.h:441
 
-  -- }======================================================================  
-  --*****************************************************************************
-  --* Copyright (C) 1994-2015 Lua.org, PUC-Rio.
-  --*
-  --* Permission is hereby granted, free of charge, to any person obtaining
-  --* a copy of this software and associated documentation files (the
-  --* "Software"), to deal in the Software without restriction, including
-  --* without limitation the rights to use, copy, modify, merge, publish,
-  --* distribute, sublicense, and/or sell copies of the Software, and to
-  --* permit persons to whom the Software is furnished to do so, subject to
-  --* the following conditions:
-  --*
-  --* The above copyright notice and this permission notice shall be
-  --* included in all copies or substantial portions of the Software.
-  --*
-  --* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-  --* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-  --* MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-  --* IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
-  --* CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
-  --* TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
-  --* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-  --***************************************************************************** 
+  -- }======================================================================
 
-end lua_h;
+
+end Lua.Internal;

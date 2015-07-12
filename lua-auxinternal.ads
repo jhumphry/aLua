@@ -1,14 +1,42 @@
-pragma Ada_2005;
-pragma Style_Checks (Off);
+-- Lua.Interface
+
+-- Contains the raw interfaces with the Lua auxiliary library written in C
+-- Generated from lauxlib.h and then manually tidied up
+
+-- Copyright (c) 2015, James Humphry
+-- under the same terms as the original source
+
+-- The copyright notice of the original source follows:
+--*****************************************************************************
+--* Copyright (C) 1994-2015 Lua.org, PUC-Rio.
+--*
+--* Permission is hereby granted, free of charge, to any person obtaining
+--* a copy of this software and associated documentation files (the
+--* "Software"), to deal in the Software without restriction, including
+--* without limitation the rights to use, copy, modify, merge, publish,
+--* distribute, sublicense, and/or sell copies of the Software, and to
+--* permit persons to whom the Software is furnished to do so, subject to
+--* the following conditions:
+--*
+--* The above copyright notice and this permission notice shall be
+--* included in all copies or substantial portions of the Software.
+--*
+--* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+--* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+--* MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+--* IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+--* CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+--* TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+--* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+--*****************************************************************************
 
 with Interfaces.C; use Interfaces.C;
 with Interfaces.C.Strings;
-with lua_h;
 with System;
-with stddef_h;
-limited with stdio_h;
 
-package lauxlib_h is
+with Lua.Internal;
+
+private package Lua.AuxInternal is
 
    --  unsupported macro: LUA_ERRFILE (LUA_ERRERR+1)
    --  unsupported macro: LUAL_NUMSIZES (sizeof(lua_Integer)*16 + sizeof(lua_Number))
@@ -59,19 +87,19 @@ package lauxlib_h is
   --** $Id: lauxlib.h,v 1.128 2014/10/29 16:11:17 roberto Exp $
   --** Auxiliary functions for building Lua libraries
   --** See Copyright Notice in lua.h
-  -- 
+  --
 
-  -- extra error code for 'luaL_load'  
+  -- extra error code for 'luaL_load'
    type luaL_Reg is record
       name : Interfaces.C.Strings.chars_ptr;  -- /usr/include/lauxlib.h:24
-      func : lua_h.lua_CFunction;  -- /usr/include/lauxlib.h:25
+      func : Internal.lua_CFunction;  -- /usr/include/lauxlib.h:25
    end record;
    pragma Convention (C_Pass_By_Copy, luaL_Reg);  -- /usr/include/lauxlib.h:23
 
    procedure luaL_checkversion_u
      (arg1 : System.Address;
-      arg2 : lua_h.lua_Number;
-      arg3 : stddef_h.size_t);  -- /usr/include/lauxlib.h:31
+      arg2 : Internal.lua_Number;
+      arg3 : Interfaces.C.size_t);  -- /usr/include/lauxlib.h:31
    pragma Import (C, luaL_checkversion_u, "luaL_checkversion_");
 
    function luaL_getmetafield
@@ -89,7 +117,7 @@ package lauxlib_h is
    function luaL_tolstring
      (arg1 : System.Address;
       arg2 : int;
-      arg3 : access stddef_h.size_t) return Interfaces.C.Strings.chars_ptr;  -- /usr/include/lauxlib.h:37
+      arg3 : access Interfaces.C.size_t) return Interfaces.C.Strings.chars_ptr;  -- /usr/include/lauxlib.h:37
    pragma Import (C, luaL_tolstring, "luaL_tolstring");
 
    function luaL_argerror
@@ -101,32 +129,32 @@ package lauxlib_h is
    function luaL_checklstring
      (arg1 : System.Address;
       arg2 : int;
-      arg3 : access stddef_h.size_t) return Interfaces.C.Strings.chars_ptr;  -- /usr/include/lauxlib.h:39
+      arg3 : access Interfaces.C.size_t) return Interfaces.C.Strings.chars_ptr;  -- /usr/include/lauxlib.h:39
    pragma Import (C, luaL_checklstring, "luaL_checklstring");
 
    function luaL_optlstring
      (arg1 : System.Address;
       arg2 : int;
       arg3 : Interfaces.C.Strings.chars_ptr;
-      arg4 : access stddef_h.size_t) return Interfaces.C.Strings.chars_ptr;  -- /usr/include/lauxlib.h:41
+      arg4 : access Interfaces.C.size_t) return Interfaces.C.Strings.chars_ptr;  -- /usr/include/lauxlib.h:41
    pragma Import (C, luaL_optlstring, "luaL_optlstring");
 
-   function luaL_checknumber (arg1 : System.Address; arg2 : int) return lua_h.lua_Number;  -- /usr/include/lauxlib.h:43
+   function luaL_checknumber (arg1 : System.Address; arg2 : int) return Internal.lua_Number;  -- /usr/include/lauxlib.h:43
    pragma Import (C, luaL_checknumber, "luaL_checknumber");
 
    function luaL_optnumber
      (arg1 : System.Address;
       arg2 : int;
-      arg3 : lua_h.lua_Number) return lua_h.lua_Number;  -- /usr/include/lauxlib.h:44
+      arg3 : Internal.lua_Number) return Internal.lua_Number;  -- /usr/include/lauxlib.h:44
    pragma Import (C, luaL_optnumber, "luaL_optnumber");
 
-   function luaL_checkinteger (arg1 : System.Address; arg2 : int) return lua_h.lua_Integer;  -- /usr/include/lauxlib.h:46
+   function luaL_checkinteger (arg1 : System.Address; arg2 : int) return Internal.lua_Integer;  -- /usr/include/lauxlib.h:46
    pragma Import (C, luaL_checkinteger, "luaL_checkinteger");
 
    function luaL_optinteger
      (arg1 : System.Address;
       arg2 : int;
-      arg3 : lua_h.lua_Integer) return lua_h.lua_Integer;  -- /usr/include/lauxlib.h:47
+      arg3 : Internal.lua_Integer) return Internal.lua_Integer;  -- /usr/include/lauxlib.h:47
    pragma Import (C, luaL_optinteger, "luaL_optinteger");
 
    procedure luaL_checkstack
@@ -185,7 +213,7 @@ package lauxlib_h is
    function luaL_execresult (arg1 : System.Address; arg2 : int) return int;  -- /usr/include/lauxlib.h:66
    pragma Import (C, luaL_execresult, "luaL_execresult");
 
-  -- pre-defined references  
+  -- pre-defined references
    function luaL_ref (arg1 : System.Address; arg2 : int) return int;  -- /usr/include/lauxlib.h:72
    pragma Import (C, luaL_ref, "luaL_ref");
 
@@ -204,7 +232,7 @@ package lauxlib_h is
    function luaL_loadbufferx
      (arg1 : System.Address;
       arg2 : Interfaces.C.Strings.chars_ptr;
-      arg3 : stddef_h.size_t;
+      arg3 : Interfaces.C.size_t;
       arg4 : Interfaces.C.Strings.chars_ptr;
       arg5 : Interfaces.C.Strings.chars_ptr) return int;  -- /usr/include/lauxlib.h:80
    pragma Import (C, luaL_loadbufferx, "luaL_loadbufferx");
@@ -215,7 +243,7 @@ package lauxlib_h is
    function luaL_newstate return System.Address;  -- /usr/include/lauxlib.h:84
    pragma Import (C, luaL_newstate, "luaL_newstate");
 
-   function luaL_len (arg1 : System.Address; arg2 : int) return lua_h.lua_Integer;  -- /usr/include/lauxlib.h:86
+   function luaL_len (arg1 : System.Address; arg2 : int) return Internal.lua_Integer;  -- /usr/include/lauxlib.h:86
    pragma Import (C, luaL_len, "luaL_len");
 
    function luaL_gsub
@@ -247,44 +275,44 @@ package lauxlib_h is
    procedure luaL_requiref
      (arg1 : System.Address;
       arg2 : Interfaces.C.Strings.chars_ptr;
-      arg3 : lua_h.lua_CFunction;
+      arg3 : Internal.lua_CFunction;
       arg4 : int);  -- /usr/include/lauxlib.h:98
    pragma Import (C, luaL_requiref, "luaL_requiref");
 
   --** ===============================================================
   --** some useful macros
   --** ===============================================================
-  -- 
+  --
 
   --** {======================================================
   --** Generic Buffer manipulation
   --** =======================================================
-  -- 
+  --
 
-  -- buffer address  
+  -- buffer address
    subtype anon1660_anon1662_array is Interfaces.C.char_array (0 .. 8191);
    type luaL_Buffer is record
       b : Interfaces.C.Strings.chars_ptr;  -- /usr/include/lauxlib.h:141
-      size : aliased stddef_h.size_t;  -- /usr/include/lauxlib.h:142
-      n : aliased stddef_h.size_t;  -- /usr/include/lauxlib.h:143
+      size : aliased Interfaces.C.size_t;  -- /usr/include/lauxlib.h:142
+      n : aliased Interfaces.C.size_t;  -- /usr/include/lauxlib.h:143
       L : System.Address;  -- /usr/include/lauxlib.h:144
       initb : aliased anon1660_anon1662_array;  -- /usr/include/lauxlib.h:145
    end record;
    pragma Convention (C_Pass_By_Copy, luaL_Buffer);  -- /usr/include/lauxlib.h:140
 
-  -- buffer size  
-  -- number of characters in buffer  
-  -- initial buffer  
+  -- buffer size
+  -- number of characters in buffer
+  -- initial buffer
    procedure luaL_buffinit (arg1 : System.Address; arg2 : access luaL_Buffer);  -- /usr/include/lauxlib.h:155
    pragma Import (C, luaL_buffinit, "luaL_buffinit");
 
-   function luaL_prepbuffsize (arg1 : access luaL_Buffer; arg2 : stddef_h.size_t) return Interfaces.C.Strings.chars_ptr;  -- /usr/include/lauxlib.h:156
+   function luaL_prepbuffsize (arg1 : access luaL_Buffer; arg2 : Interfaces.C.size_t) return Interfaces.C.Strings.chars_ptr;  -- /usr/include/lauxlib.h:156
    pragma Import (C, luaL_prepbuffsize, "luaL_prepbuffsize");
 
    procedure luaL_addlstring
      (arg1 : access luaL_Buffer;
       arg2 : Interfaces.C.Strings.chars_ptr;
-      arg3 : stddef_h.size_t);  -- /usr/include/lauxlib.h:157
+      arg3 : Interfaces.C.size_t);  -- /usr/include/lauxlib.h:157
    pragma Import (C, luaL_addlstring, "luaL_addlstring");
 
    procedure luaL_addstring (arg1 : access luaL_Buffer; arg2 : Interfaces.C.Strings.chars_ptr);  -- /usr/include/lauxlib.h:158
@@ -296,49 +324,51 @@ package lauxlib_h is
    procedure luaL_pushresult (arg1 : access luaL_Buffer);  -- /usr/include/lauxlib.h:160
    pragma Import (C, luaL_pushresult, "luaL_pushresult");
 
-   procedure luaL_pushresultsize (arg1 : access luaL_Buffer; arg2 : stddef_h.size_t);  -- /usr/include/lauxlib.h:161
+   procedure luaL_pushresultsize (arg1 : access luaL_Buffer; arg2 : Interfaces.C.size_t);  -- /usr/include/lauxlib.h:161
    pragma Import (C, luaL_pushresultsize, "luaL_pushresultsize");
 
    function luaL_buffinitsize
      (arg1 : System.Address;
       arg2 : access luaL_Buffer;
-      arg3 : stddef_h.size_t) return Interfaces.C.Strings.chars_ptr;  -- /usr/include/lauxlib.h:162
+      arg3 : Interfaces.C.size_t) return Interfaces.C.Strings.chars_ptr;  -- /usr/include/lauxlib.h:162
    pragma Import (C, luaL_buffinitsize, "luaL_buffinitsize");
 
-  -- }======================================================  
+  -- }======================================================
   --** {======================================================
   --** File handles for IO library
   --** =======================================================
-  -- 
+  --
 
   --** A file handle is a userdata with metatable 'LUA_FILEHANDLE' and
   --** initial structure 'luaL_Stream' (it may contain other fields
   --** after that initial structure).
-  -- 
+  --
 
-  -- stream (NULL for incompletely created streams)  
-   type luaL_Stream is record
-      f : access stdio_h.FILE;  -- /usr/include/lauxlib.h:186
-      closef : lua_h.lua_CFunction;  -- /usr/include/lauxlib.h:187
-   end record;
-   pragma Convention (C_Pass_By_Copy, luaL_Stream);  -- /usr/include/lauxlib.h:185
+  -- stream (NULL for incompletely created streams)
+--     type luaL_Stream is record
+--        f : access stdio_h.FILE;  -- /usr/include/lauxlib.h:186
+--        closef : Internal.lua_CFunction;  -- /usr/include/lauxlib.h:187
+--     end record;
+--     pragma Convention (C_Pass_By_Copy, luaL_Stream);  -- /usr/include/lauxlib.h:185
+-- *** TO FIX ***
 
-  -- to close stream (NULL for closed streams)  
-  -- }======================================================  
-  -- compatibility with old module system  
+
+  -- to close stream (NULL for closed streams)
+  -- }======================================================
+  -- compatibility with old module system
   --** {==================================================================
   --** "Abstraction Layer" for basic report of messages and errors
   --** ===================================================================
-  -- 
+  --
 
-  -- print a string  
-  -- print a newline and flush the output  
-  -- print an error message  
-  -- }==================================================================  
+  -- print a string
+  -- print a newline and flush the output
+  -- print an error message
+  -- }==================================================================
   --** {============================================================
   --** Compatibility with deprecated conversions
   --** =============================================================
-  -- 
+  --
 
-  -- }============================================================  
-end lauxlib_h;
+  -- }============================================================
+end Lua.AuxInternal;
