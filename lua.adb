@@ -60,6 +60,20 @@ package body Lua is
       Internal.lua_arith(L.L, Arith_Op'Pos(op));
    end Arith;
 
+   -------------
+   -- Compare --
+   -------------
+
+
+   function Compare (L : in State;
+                     index1 : in Integer;
+                     index2 : in Integer;
+                     op : in Comparison_Op) return Boolean is
+     (Internal.lua_compare(L.L,
+                           C.int(index1),
+                           C.int(index2),
+                           C.int(Comparison_Op'Pos(op))) = 1);
+
    ---
    --- *** Stack manipulation and information
    ---

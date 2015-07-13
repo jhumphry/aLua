@@ -60,11 +60,15 @@ begin
    Put("Stack size now: "); Put(L.GetTop); New_Line;
    Put_Line("Stack now contains:");
    Print_Stack(L);
+   Put_Line("Is Stack(-2) <= Stack(-1)? " &
+            (if L.Compare(-2, -1, Lua.OPLE) then "Yes" else "No"));
    Put_Line("Duplicating element at index 2. Stack now contains:");
    L.PushValue(2);
    Print_Stack(L);
    Put_Line("Adding top two elements. Stack now contains:");
    L.Arith(Lua.OPADD);
    Print_Stack(L);
+   Put_Line("Is Stack(-2) <= Stack(-1)? " &
+            (if L.Compare(-2, -1, Lua.OPLE) then "Yes" else "No"));
 
 end Simple_Example;

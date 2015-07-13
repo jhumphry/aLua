@@ -36,6 +36,8 @@ package Lua is
    type Arith_Op is (OPADD, OPSUB, OPMUL, OPMOD, OPPOW, OPDIV, OPIDIV, OPBAND,
                      OPBOR, OPBXOR, OPSHL, OPSHR, OPUNM, OPBNOT);
 
+   type Comparison_Op is (OPEQ, OPLT, OPLE);
+
    type Lua_Type is (TNONE, TNIL, TBOOLEAN, TLIGHTUSERDATA, TNUMBER, TSTRING,
                      TTABLE, TFUNCTION, TUSERDATA, TTHREAD, TNUMTAGS);
 
@@ -45,6 +47,10 @@ package Lua is
    procedure Push (L : in out State; n : in Number);
    function ToNumber (L : in State; index : in Integer) return Number;
    procedure Arith (L : in out State; op : in Arith_Op);
+   function Compare (L : in State;
+                     index1 : in Integer;
+                     index2 : in Integer;
+                     op : in Comparison_Op) return Boolean;
 
    -- Stack manipulation and information
    function AbsIndex (L : in State; idx : in Integer) return Integer;
@@ -73,6 +79,8 @@ private
                      OPDIV => 5, OPIDIV => 6, OPBAND => 7, OPBOR => 8,
                      OPBXOR => 9, OPSHL => 10, OPSHR => 11, OPUNM => 12,
                      OPBNOT => 13);
+
+   for Comparison_Op use (OPEQ => 0, OPLT => 1, OPLE => 2);
 
    for Lua_Type use (TNONE => -1, TNIL => 0, TBOOLEAN => 1, TLIGHTUSERDATA => 2,
                      TNUMBER => 3, TSTRING => 4, TTABLE => 5, TFUNCTION => 6,

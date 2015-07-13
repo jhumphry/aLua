@@ -97,9 +97,9 @@ private package Lua.Internal is
 --     LUA_OPUNM : constant := 12;  --  /usr/include/lua.h:208
 --     LUA_OPBNOT : constant := 13;  --  /usr/include/lua.h:209
 
-   LUA_OPEQ : constant := 0;  --  /usr/include/lua.h:213
-   LUA_OPLT : constant := 1;  --  /usr/include/lua.h:214
-   LUA_OPLE : constant := 2;  --  /usr/include/lua.h:215
+--     LUA_OPEQ : constant := 0;  --  /usr/include/lua.h:213
+--     LUA_OPLT : constant := 1;  --  /usr/include/lua.h:214
+--     LUA_OPLE : constant := 2;  --  /usr/include/lua.h:215
    --  arg-macro: procedure lua_call (L, n, r)
    --    lua_callk(L, (n), (r), 0, NULL)
    --  arg-macro: procedure lua_pcall (L, n, r, f)
