@@ -27,12 +27,12 @@ with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Long_Float_Text_IO; use Ada.Long_Float_Text_IO;
 with Ada.Integer_Text_IO; use Ada.Integer_Text_IO;
 
-with Lua;
+with Lua; use Lua;
 
 procedure Simple_Example is
-   L : Lua.State;
+   L : State;
 
-   procedure Print_Stack(L : Lua.State) is
+   procedure Print_Stack(L : State) is
    begin
       Put_Line("Relative index : Absolute index : Type : Contents");
       for I in 1..L.GetTop loop
@@ -50,7 +50,7 @@ begin
    Put(Item => L.Version, Aft => 0, Exp => 0);
    New_Line;
 
-   Put_Line("Lua state status: " & Lua.Thread_Status'Image(L.Status));
+   Put_Line("Lua state status: " & Thread_Status'Image(L.Status));
    New_Line;
 
    Put_Line("Basic stack manipulation.");
@@ -61,23 +61,23 @@ begin
    Put_Line("Stack now contains:");
    Print_Stack(L);
    Put_Line("Is Stack(-2) <= Stack(-1)? " &
-            (if L.Compare(-2, -1, Lua.OPLE) then "Yes" else "No"));
+            (if L.Compare(-2, -1, OPLE) then "Yes" else "No"));
    Put_Line("Duplicating element at index 2. Stack now contains:");
    L.PushValue(2);
    Print_Stack(L);
    Put_Line("Adding top two elements. Stack now contains:");
-   L.Arith(Lua.OPADD);
+   L.Arith(OPADD);
    Print_Stack(L);
    Put_Line("Is Stack(-2) <= Stack(-1)? " &
-            (if L.Compare(-2, -1, Lua.OPLE) then "Yes" else "No"));
+            (if L.Compare(-2, -1, OPLE) then "Yes" else "No"));
    New_Line;
 
    Put_Line("Manually triggering garbage collection...");
-   L.GC(Lua.GCCOLLECT);
+   L.GC(GCCOLLECT);
    New_Line;
 
    Put("Checking type of main thread: ");
-   L.geti(Lua.RegistryIndex, Lua.RIDX_MainThread);
+   L.geti(RegistryIndex, RIDX_MainThread);
    Put(L.TypeName(L.TypeInfo(-1)));
    New_Line;
 
