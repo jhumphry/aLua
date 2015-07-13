@@ -36,6 +36,9 @@ package Lua is
    type Arith_Op is (OPADD, OPSUB, OPMUL, OPMOD, OPPOW, OPDIV, OPIDIV, OPBAND,
                      OPBOR, OPBXOR, OPSHL, OPSHR, OPUNM, OPBNOT);
 
+   type Lua_Type is (TNONE, TNIL, TBOOLEAN, TLIGHTUSERDATA, TNUMBER, TSTRING,
+                     TTABLE, TFUNCTION, TUSERDATA, TTHREAD, TNUMTAGS);
+
    type State is tagged limited private;
    function Version (L : in State) return Long_Float;
    function Status (L : in State) return Thread_Status;
@@ -55,6 +58,10 @@ package Lua is
    procedure Rotate (L : in out State; idx : in Integer; n : in Integer);
    procedure SetTop (L : in out State; index : in Integer);
 
+   -- Type information
+   function TypeInfo (L : in State; index : in Integer) return Lua_Type;
+   function TypeName (L : in State; tp : in Lua_Type) return String;
+
 private
 
    subtype void_ptr is System.Address;
@@ -66,6 +73,10 @@ private
                      OPDIV => 5, OPIDIV => 6, OPBAND => 7, OPBOR => 8,
                      OPBXOR => 9, OPSHL => 10, OPSHR => 11, OPUNM => 12,
                      OPBNOT => 13);
+
+   for Lua_Type use (TNONE => -1, TNIL => 0, TBOOLEAN => 1, TLIGHTUSERDATA => 2,
+                     TNUMBER => 3, TSTRING => 4, TTABLE => 5, TFUNCTION => 6,
+                     TUSERDATA => 7, TTHREAD => 8, TNUMTAGS => 9);
 
    type State is new Ada.Finalization.Limited_Controlled with
       record

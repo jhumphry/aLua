@@ -5,6 +5,7 @@
 with Interfaces; use Interfaces;
 with Interfaces.C;
 use type Interfaces.C.int;
+with Interfaces.C.Strings;
 
 with Lua.Internal, Lua.AuxInternal;
 
@@ -108,6 +109,20 @@ package body Lua is
    begin
       Internal.lua_settop(L.L, C.int(index));
    end SetTop;
+
+   ---
+   --- *** Type information
+   ---
+
+   function TypeInfo (L : in State; index : in Integer) return Lua_Type is
+     (
+      Lua_Type'Val(Internal.lua_type(L.L, C.int(index)))
+     );
+
+   function TypeName (L : in State; tp : in Lua_Type) return String is
+     (
+      C.Strings.Value(Internal.lua_typename(L.L, C.int(Lua_Type'Pos(tp))))
+     );
 
    --
    -- *** Resource Management ***

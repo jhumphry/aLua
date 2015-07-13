@@ -34,9 +34,11 @@ procedure Simple_Example is
 
    procedure Print_Stack(L : Lua.State) is
    begin
-      Put_Line("Relative index : Absolute index : Contents");
+      Put_Line("Relative index : Absolute index : Type : Contents");
       for I in 1..L.GetTop loop
-         Put(-I); Put(" : "); Put(L.AbsIndex(-I)); Put(" : ");
+         Put(-I); Put(" : ");
+         Put(L.AbsIndex(-I)); Put(" : ");
+         Put(L.TypeName(L.TypeInfo(-I))); Put(" : ");
          Put(L.ToNumber(-I), Aft => 0, Exp => 0); New_Line;
       end loop;
    end Print_Stack;

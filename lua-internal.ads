@@ -62,17 +62,17 @@ private package Lua.Internal is
 --     LUA_ERRGCMM : constant := 5;  --  /usr/include/lua.h:52
 --     LUA_ERRERR : constant := 6;  --  /usr/include/lua.h:53
 
-   LUA_TNONE : constant := (-1);  --  /usr/include/lua.h:62
-
-   LUA_TNIL : constant := 0;  --  /usr/include/lua.h:64
-   LUA_TBOOLEAN : constant := 1;  --  /usr/include/lua.h:65
-   LUA_TLIGHTUSERDATA : constant := 2;  --  /usr/include/lua.h:66
-   LUA_TNUMBER : constant := 3;  --  /usr/include/lua.h:67
-   LUA_TSTRING : constant := 4;  --  /usr/include/lua.h:68
-   LUA_TTABLE : constant := 5;  --  /usr/include/lua.h:69
-   LUA_TFUNCTION : constant := 6;  --  /usr/include/lua.h:70
-   LUA_TUSERDATA : constant := 7;  --  /usr/include/lua.h:71
-   LUA_TTHREAD : constant := 8;  --  /usr/include/lua.h:72
+--     LUA_TNONE : constant := (-1);  --  /usr/include/lua.h:62
+--
+--     LUA_TNIL : constant := 0;  --  /usr/include/lua.h:64
+--     LUA_TBOOLEAN : constant := 1;  --  /usr/include/lua.h:65
+--     LUA_TLIGHTUSERDATA : constant := 2;  --  /usr/include/lua.h:66
+--     LUA_TNUMBER : constant := 3;  --  /usr/include/lua.h:67
+--     LUA_TSTRING : constant := 4;  --  /usr/include/lua.h:68
+--     LUA_TTABLE : constant := 5;  --  /usr/include/lua.h:69
+--     LUA_TFUNCTION : constant := 6;  --  /usr/include/lua.h:70
+--     LUA_TUSERDATA : constant := 7;  --  /usr/include/lua.h:71
+--     LUA_TTHREAD : constant := 8;  --  /usr/include/lua.h:72
 
    LUA_NUMTAGS : constant := 9;  --  /usr/include/lua.h:74
 
