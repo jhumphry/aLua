@@ -55,6 +55,7 @@ package Lua is
    -- Stack manipulation and information
    function AbsIndex (L : in State; idx : in Integer) return Integer;
    function CheckStack (L : in State; n : in Integer) return Boolean;
+   procedure Copy (L : in out State; fromidx : in Integer; toidx : in Integer);
    function GetTop (L : in State) return Integer;
    procedure Insert (L : in out State; index : in Integer);
    procedure Pop (L : in out State; n : in Integer);

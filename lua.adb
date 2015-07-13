@@ -84,6 +84,11 @@ package body Lua is
    function CheckStack (L : in State; n : in Integer) return Boolean is
      (Internal.lua_checkstack(L.L, C.int(n)) /= 0);
 
+   procedure Copy (L : in out State; fromidx : in Integer; toidx : in Integer) is
+   begin
+      Internal.lua_copy(L.L, C.int(fromidx), C.int(toidx));
+   end Copy;
+
    function GetTop (L : in State) return Integer is
      (Integer(Internal.lua_gettop(L.L)));
 
