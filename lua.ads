@@ -86,6 +86,24 @@ package Lua is
    function TypeInfo (L : in State; index : in Integer) return Lua_Type;
    function TypeName (L : in State; tp : in Lua_Type) return String;
 
+   -- Table manipulation
+   procedure createtable (L : in out State;
+                          narr : in Integer := 0;
+                          nrec : in Integer := 0);
+   procedure newtable (L : in out State);
+   function getfield (L : in out State; index : in Integer; k : in String)
+                  return Lua_Type;
+   procedure getfield (L : in out State; index : in Integer; k : in String);
+   function geti (L : in out State; index : in Integer; i : in Integer)
+                  return Lua_Type;
+   procedure geti (L : in out State; index : in Integer; i : in Integer);
+   function gettable (L : in out State; index : in Integer) return Lua_Type;
+   procedure gettable (L : in out State; index : in Integer);
+   function next (L : in out State; index : in Integer) return Boolean;
+   procedure setfield (L : in out State; index : in Integer; k : in String);
+   procedure seti (L : in out State; index : in Integer; i : in Integer);
+   procedure settable (L : in State; index : in Integer);
+
 private
 
    subtype void_ptr is System.Address;

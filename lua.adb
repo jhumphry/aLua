@@ -168,6 +168,81 @@ package body Lua is
      );
 
    --
+   -- *** Table Manipulation
+   --
+
+   procedure createtable (L : in out State;
+                          narr : in Integer := 0;
+                          nrec : in Integer := 0) is
+   begin
+      Internal.lua_createtable(L.L, C.int(narr), C.int(nrec));
+   end createtable;
+
+   procedure newtable (L : in out State) is
+   begin
+      Internal.lua_createtable(L.L, 0, 0);
+   end newtable;
+
+   function getfield (L : in out State; index : in Integer; k : in String)
+                      return Lua_Type is
+     (
+      Lua_Type'Val(
+                   Internal.lua_getfield(L.L,
+                                         C.int(index),
+                                         C.Strings.New_String(k & ASCII.Nul))
+                  )
+     );
+
+   procedure getfield (L : in out State; index : in Integer; k : in String) is
+      Discard : C.int;
+   begin
+      Discard := Internal.lua_getfield(L.L,
+                                       C.int(index),
+                                       C.Strings.New_String(k));
+   end getfield;
+
+   function geti (L : in out State; index : in Integer; i : in Integer)
+                  return Lua_Type is
+     (
+      Lua_Type'Val(Internal.lua_geti(L.L, C.int(index), Long_Long_Integer(i)))
+     );
+
+   procedure geti (L : in out State; index : in Integer; i : in Integer) is
+     Discard : C.int;
+   begin
+      Discard := Internal.lua_geti(L.L, C.int(index), Long_Long_Integer(i));
+   end geti;
+
+   function gettable (L : in out State; index : in Integer) return Lua_Type is
+     (
+      Lua_Type'Val(Internal.lua_gettable(L.L, C.int(index)))
+     );
+
+   procedure gettable (L : in out State; index : in Integer) is
+     Discard : C.int;
+   begin
+      Discard := Internal.lua_gettable(L.L, C.int(index));
+   end gettable;
+
+   function next (L : in out State; index : in Integer) return Boolean is
+     (Internal.lua_next(L.L, C.int(index)) /= 0);
+
+   procedure setfield (L : in out State; index : in Integer; k : in String) is
+   begin
+      Internal.lua_setfield(L.L, C.int(index), C.Strings.New_String(k));
+   end setfield;
+
+   procedure seti (L : in out State; index : in Integer; i : in Integer) is
+   begin
+      Internal.lua_seti(L.L, C.int(index), Long_Long_Integer(i));
+   end seti;
+
+   procedure settable (L : in State; index : in Integer) is
+   begin
+      Internal.lua_settable(L.L, C.int(index));
+   end settable;
+
+   --
    -- *** Resource Management ***
    --
 

@@ -74,5 +74,11 @@ begin
 
    Put_Line("Manually triggering garbage collection...");
    L.GC(Lua.GCCOLLECT);
+   New_Line;
+
+   Put("Checking type of main thread: ");
+   L.geti(Lua.RegistryIndex, Lua.RIDX_MainThread);
+   Put(L.TypeName(L.TypeInfo(-1)));
+   New_Line;
 
 end Simple_Example;
