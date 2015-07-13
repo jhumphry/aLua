@@ -33,11 +33,15 @@ package Lua is
 
    type Thread_Status is (OK, YIELD, ERRRUN, ERRSYNTAX, ERRMEM, ERRGCMM, ERRERR);
 
+   type Arith_Op is (OPADD, OPSUB, OPMUL, OPMOD, OPPOW, OPDIV, OPIDIV, OPBAND,
+                     OPBOR, OPBXOR, OPSHL, OPSHR, OPUNM, OPBNOT);
+
    type State is tagged limited private;
    function Version (L : in State) return Long_Float;
    function Status (L : in State) return Thread_Status;
    procedure Push (L : in out State; n : in Number);
    function ToNumber (L : in State; index : in Integer) return Number;
+   procedure Arith (L : in out State; op : in Arith_Op);
 
    -- Stack manipulation and information
    function AbsIndex (L : in State; idx : in Integer) return Integer;
@@ -57,6 +61,11 @@ private
 
    for Thread_Status use (OK => 0, YIELD => 1, ERRRUN => 2, ERRSYNTAX => 3,
                           ERRMEM => 4, ERRGCMM => 5, ERRERR => 6);
+
+   for Arith_Op use (OPADD => 0, OPSUB => 1, OPMUL => 2, OPMOD => 3, OPPOW => 4,
+                     OPDIV => 5, OPIDIV => 6, OPBAND => 7, OPBOR => 8,
+                     OPBXOR => 9, OPSHL => 10, OPSHR => 11, OPUNM => 12,
+                     OPBNOT => 13);
 
    type State is new Ada.Finalization.Limited_Controlled with
       record

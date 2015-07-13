@@ -58,9 +58,11 @@ begin
    Put("Stack size now: "); Put(L.GetTop); New_Line;
    Put_Line("Stack now contains:");
    Print_Stack(L);
-   Put_Line("Duplicating element at index 2");
+   Put_Line("Duplicating element at index 2. Stack now contains:");
    L.PushValue(2);
-   Put_Line("Stack now contains:");
+   Print_Stack(L);
+   Put_Line("Adding top two elements. Stack now contains:");
+   L.Arith(Lua.OPADD);
    Print_Stack(L);
 
 end Simple_Example;

@@ -82,20 +82,20 @@ private package Lua.Internal is
    LUA_RIDX_GLOBALS : constant := 2;  --  /usr/include/lua.h:84
    --  unsupported macro: LUA_RIDX_LAST LUA_RIDX_GLOBALS
 
-   LUA_OPADD : constant := 0;  --  /usr/include/lua.h:196
-   LUA_OPSUB : constant := 1;  --  /usr/include/lua.h:197
-   LUA_OPMUL : constant := 2;  --  /usr/include/lua.h:198
-   LUA_OPMOD : constant := 3;  --  /usr/include/lua.h:199
-   LUA_OPPOW : constant := 4;  --  /usr/include/lua.h:200
-   LUA_OPDIV : constant := 5;  --  /usr/include/lua.h:201
-   LUA_OPIDIV : constant := 6;  --  /usr/include/lua.h:202
-   LUA_OPBAND : constant := 7;  --  /usr/include/lua.h:203
-   LUA_OPBOR : constant := 8;  --  /usr/include/lua.h:204
-   LUA_OPBXOR : constant := 9;  --  /usr/include/lua.h:205
-   LUA_OPSHL : constant := 10;  --  /usr/include/lua.h:206
-   LUA_OPSHR : constant := 11;  --  /usr/include/lua.h:207
-   LUA_OPUNM : constant := 12;  --  /usr/include/lua.h:208
-   LUA_OPBNOT : constant := 13;  --  /usr/include/lua.h:209
+--     LUA_OPADD : constant := 0;  --  /usr/include/lua.h:196
+--     LUA_OPSUB : constant := 1;  --  /usr/include/lua.h:197
+--     LUA_OPMUL : constant := 2;  --  /usr/include/lua.h:198
+--     LUA_OPMOD : constant := 3;  --  /usr/include/lua.h:199
+--     LUA_OPPOW : constant := 4;  --  /usr/include/lua.h:200
+--     LUA_OPDIV : constant := 5;  --  /usr/include/lua.h:201
+--     LUA_OPIDIV : constant := 6;  --  /usr/include/lua.h:202
+--     LUA_OPBAND : constant := 7;  --  /usr/include/lua.h:203
+--     LUA_OPBOR : constant := 8;  --  /usr/include/lua.h:204
+--     LUA_OPBXOR : constant := 9;  --  /usr/include/lua.h:205
+--     LUA_OPSHL : constant := 10;  --  /usr/include/lua.h:206
+--     LUA_OPSHR : constant := 11;  --  /usr/include/lua.h:207
+--     LUA_OPUNM : constant := 12;  --  /usr/include/lua.h:208
+--     LUA_OPBNOT : constant := 13;  --  /usr/include/lua.h:209
 
    LUA_OPEQ : constant := 0;  --  /usr/include/lua.h:213
    LUA_OPLT : constant := 1;  --  /usr/include/lua.h:214

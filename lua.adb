@@ -50,6 +50,15 @@ package body Lua is
       return Number(result);
    end ToNumber;
 
+   -----------
+   -- Arith --
+   -----------
+
+   procedure Arith (L : in out State; op : in Arith_Op) is
+   begin
+      Internal.lua_arith(L.L, Arith_Op'Pos(op));
+   end Arith;
+
    ---
    --- *** Stack manipulation and information
    ---
