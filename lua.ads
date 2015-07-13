@@ -39,6 +39,18 @@ package Lua is
    procedure Push (L : in out State; n : in Number);
    function ToNumber (L : in State; index : in Integer) return Number;
 
+   -- Stack manipulation and information
+   function AbsIndex (L : in State; idx : in Integer) return Integer;
+   function CheckStack (L : in State; n : in Integer) return Boolean;
+   function GetTop (L : in State) return Integer;
+   procedure Insert (L : in out State; index : in Integer);
+   procedure Pop (L : in out State; n : in Integer);
+   procedure PushValue (L : in out State; index : in Integer);
+   procedure Remove (L : in out State; index : in Integer);
+   procedure Replace (L : in out State; index : in Integer);
+   procedure Rotate (L : in out State; idx : in Integer; n : in Integer);
+   procedure SetTop (L : in out State; index : in Integer);
+
 private
 
    subtype void_ptr is System.Address;

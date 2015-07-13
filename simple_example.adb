@@ -31,6 +31,16 @@ with Lua;
 
 procedure Simple_Example is
    L : Lua.State;
+
+   procedure Print_Stack(L : Lua.State) is
+   begin
+      Put_Line("Relative index : Absolute index : Contents");
+      for I in 1..L.GetTop loop
+         Put(-I); Put(" : "); Put(L.AbsIndex(-I)); Put(" : ");
+         Put(L.ToNumber(-I), Aft => 0, Exp => 0); New_Line;
+      end loop;
+   end Print_Stack;
+
 begin
    Put_Line("A simple example of using Lua from within Ada");
 
@@ -42,12 +52,15 @@ begin
    New_Line;
 
    Put_Line("Basic stack manipulation.");
+   Put("Initial stack size: "); Put(L.GetTop); New_Line;
    Put_Line("Pushing 3.0, 7.5, 2.3");
    L.Push(3.0); L.Push(7.5); L.Push(2.3);
+   Put("Stack size now: "); Put(L.GetTop); New_Line;
    Put_Line("Stack now contains:");
-   for I in 1..3 loop
-      Put(-I); Put(":");
-      Put(L.ToNumber(-I), Aft => 0, Exp => 0); New_Line;
-   end loop;
+   Print_Stack(L);
+   Put_Line("Duplicating element at index 2");
+   L.PushValue(2);
+   Put_Line("Stack now contains:");
+   Print_Stack(L);
 
 end Simple_Example;

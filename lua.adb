@@ -50,7 +50,59 @@ package body Lua is
       return Number(result);
    end ToNumber;
 
+   ---
+   --- *** Stack manipulation and information
+   ---
 
+   function AbsIndex (L : in State; idx : in Integer) return Integer is
+     (Integer(Internal.lua_absindex(L.L, C.int(idx))));
+
+   function CheckStack (L : in State; n : in Integer) return Boolean is
+     (Internal.lua_checkstack(L.L, C.int(n)) /= 0);
+
+   function GetTop (L : in State) return Integer is
+     (Integer(Internal.lua_gettop(L.L)));
+
+   procedure Insert (L : in out State; index : in Integer) is
+   begin
+      Internal.lua_rotate(L.L, C.int(index), 1);
+   end Insert;
+
+   procedure Pop (L : in out State; n : in Integer) is
+   begin
+      Internal.lua_settop(L.L, -C.int(n)-1);
+   end Pop;
+
+   procedure PushValue (L : in out State; index : in Integer) is
+   begin
+      Internal.lua_pushvalue(L.L, C.int(index));
+   end PushValue;
+
+   procedure Remove (L : in out State; index : in Integer) is
+   begin
+      Internal.lua_rotate(L.L, C.int(index), -1);
+      Internal.lua_settop(L.L, -2);
+   end Remove;
+
+   procedure Replace (L : in out State; index : in Integer) is
+   begin
+      Internal.lua_copy(L.L, -1, C.int(index));
+      Internal.lua_settop(L.L, -2);
+   end Replace;
+
+   procedure Rotate (L : in out State; idx : in Integer; n : in Integer) is
+   begin
+      Internal.lua_rotate(L.L, C.int(idx), C.int(n));
+   end Rotate;
+
+   procedure SetTop (L : in out State; index : in Integer) is
+   begin
+      Internal.lua_settop(L.L, C.int(index));
+   end SetTop;
+
+   --
+   -- *** Resource Management ***
+   --
 
    ----------------
    -- Initialize --
