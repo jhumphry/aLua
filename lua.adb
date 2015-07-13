@@ -74,6 +74,23 @@ package body Lua is
                            C.int(index2),
                            C.int(Comparison_Op'Pos(op))) = 1);
 
+   --------
+   -- GC --
+   --------
+
+   procedure GC (L : in State; what : in GC_Op) is
+      Discard : C.int;
+   begin
+      Discard := Internal.lua_gc(L.L, C.int(GC_Op'Pos(what)), 0);
+   end GC;
+
+   function GC (L : in State; what : in GC_Param; data : in Integer)
+                return Integer is
+      (Integer(Internal.lua_gc(L.L, C.int(GC_Param'Pos(what)), C.int(data))));
+
+   function GC (L : in State) return Boolean is
+       (Internal.lua_gc(L.L, GCISRUNNING, 0) /= 0);
+
    ---
    --- *** Stack manipulation and information
    ---

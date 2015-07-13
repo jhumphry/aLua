@@ -107,15 +107,15 @@ private package Lua.Internal is
    --  arg-macro: procedure lua_yield (L, n)
    --    lua_yieldk(L, (n), 0, NULL)
 
-   LUA_GCSTOP : constant := 0;  --  /usr/include/lua.h:302
-   LUA_GCRESTART : constant := 1;  --  /usr/include/lua.h:303
-   LUA_GCCOLLECT : constant := 2;  --  /usr/include/lua.h:304
-   LUA_GCCOUNT : constant := 3;  --  /usr/include/lua.h:305
-   LUA_GCCOUNTB : constant := 4;  --  /usr/include/lua.h:306
-   LUA_GCSTEP : constant := 5;  --  /usr/include/lua.h:307
-   LUA_GCSETPAUSE : constant := 6;  --  /usr/include/lua.h:308
-   LUA_GCSETSTEPMUL : constant := 7;  --  /usr/include/lua.h:309
-   LUA_GCISRUNNING : constant := 9;  --  /usr/include/lua.h:310
+--     LUA_GCSTOP : constant := 0;  --  /usr/include/lua.h:302
+--     LUA_GCRESTART : constant := 1;  --  /usr/include/lua.h:303
+--     LUA_GCCOLLECT : constant := 2;  --  /usr/include/lua.h:304
+--     LUA_GCCOUNT : constant := 3;  --  /usr/include/lua.h:305
+--     LUA_GCCOUNTB : constant := 4;  --  /usr/include/lua.h:306
+--     LUA_GCSTEP : constant := 5;  --  /usr/include/lua.h:307
+--     LUA_GCSETPAUSE : constant := 6;  --  /usr/include/lua.h:308
+--     LUA_GCSETSTEPMUL : constant := 7;  --  /usr/include/lua.h:309
+--     LUA_GCISRUNNING : constant := 9;  --  /usr/include/lua.h:310
    --  arg-macro: function lua_getextraspace (L)
    --    return (void *)((char *)(L) - LUA_EXTRASPACE);
    --  arg-macro: procedure lua_tonumber (L, i)

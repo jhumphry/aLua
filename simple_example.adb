@@ -70,5 +70,9 @@ begin
    Print_Stack(L);
    Put_Line("Is Stack(-2) <= Stack(-1)? " &
             (if L.Compare(-2, -1, Lua.OPLE) then "Yes" else "No"));
+   New_Line;
+
+   Put_Line("Manually triggering garbage collection...");
+   L.GC(Lua.GCCOLLECT);
 
 end Simple_Example;

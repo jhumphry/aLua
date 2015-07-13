@@ -38,6 +38,10 @@ package Lua is
 
    type Comparison_Op is (OPEQ, OPLT, OPLE);
 
+   type GC_Op is (GCSTOP, GCRESTART, GCCOLLECT, GCCOUNT, GCCOUNTB, GCSTEP);
+
+   type GC_Param is (GCSETPAUSE, GCSETSTEPMUL);
+
    type Lua_Type is (TNONE, TNIL, TBOOLEAN, TLIGHTUSERDATA, TNUMBER, TSTRING,
                      TTABLE, TFUNCTION, TUSERDATA, TTHREAD, TNUMTAGS);
 
@@ -51,6 +55,10 @@ package Lua is
                      index1 : in Integer;
                      index2 : in Integer;
                      op : in Comparison_Op) return Boolean;
+   procedure GC (L : in State; what : in GC_Op);
+   function GC (L : in State; what : in GC_Param; data : in Integer)
+                return Integer;
+   function GC (L : in State) return Boolean;
 
    -- Stack manipulation and information
    function AbsIndex (L : in State; idx : in Integer) return Integer;
@@ -82,6 +90,13 @@ private
                      OPBNOT => 13);
 
    for Comparison_Op use (OPEQ => 0, OPLT => 1, OPLE => 2);
+
+   for GC_Op use (GCSTOP => 0, GCRESTART => 1, GCCOLLECT => 2, GCCOUNT => 3,
+                  GCCOUNTB => 4, GCSTEP => 5);
+
+   for GC_Param use (GCSETPAUSE => 6, GCSETSTEPMUL => 7);
+
+   GCISRUNNING : constant := 9;
 
    for Lua_Type use (TNONE => -1, TNIL => 0, TBOOLEAN => 1, TLIGHTUSERDATA => 2,
                      TNUMBER => 3, TSTRING => 4, TTABLE => 5, TFUNCTION => 6,
