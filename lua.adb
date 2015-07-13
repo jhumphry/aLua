@@ -11,6 +11,13 @@ with Lua.Internal, Lua.AuxInternal;
 
 package body Lua is
 
+   ------------------
+   -- UpvalueIndex --
+   ------------------
+
+   function UpvalueIndex (i : in Integer) return Integer is
+      (RegistryIndex - i);
+
    -------------
    -- Version --
    -------------

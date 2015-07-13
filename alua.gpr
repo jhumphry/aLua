@@ -1,8 +1,7 @@
+project ALua is
 
-project aLua is
-
-   for Languages use ("Ada");
-   for Source_Dirs use ("./", "tests");
+   for Languages use ("Ada", "C");
+   for Source_Dirs use (".", "tests");
    for Object_Dir use "build/";
    for Exec_Dir use "exec/";
    for Main use ("simple_example.adb");
@@ -24,8 +23,7 @@ project aLua is
    end Compiler;
 
    package Linker is
-        for Default_Switches ("ada") use ("-g", "-llua", "-lm");
+      for Default_Switches ("ada") use ("-g", "-llua", "-lm");
    end Linker;
 
-end aLua;
-
+end ALua;

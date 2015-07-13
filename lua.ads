@@ -45,6 +45,15 @@ package Lua is
    type Lua_Type is (TNONE, TNIL, TBOOLEAN, TLIGHTUSERDATA, TNUMBER, TSTRING,
                      TTABLE, TFUNCTION, TUSERDATA, TTHREAD, TNUMTAGS);
 
+   -- Imports to do with special stack positions
+   MaxStack : constant Integer
+     with Import, Convention => C, Link_Name => "lua_conf_luai_maxstack";
+   RegistryIndex : constant Integer:= -MaxStack - 1000;
+   RIDX_MainThread : constant Integer;
+   RIDX_Globals : constant Integer;
+   RIDX_Last : constant Integer;
+   function UpvalueIndex (i : in Integer) return Integer;
+
    type State is tagged limited private;
    function Version (L : in State) return Long_Float;
    function Status (L : in State) return Thread_Status;
@@ -101,6 +110,10 @@ private
    for Lua_Type use (TNONE => -1, TNIL => 0, TBOOLEAN => 1, TLIGHTUSERDATA => 2,
                      TNUMBER => 3, TSTRING => 4, TTABLE => 5, TFUNCTION => 6,
                      TUSERDATA => 7, TTHREAD => 8, TNUMTAGS => 9);
+
+   RIDX_MainThread : constant Integer := 1;
+   RIDX_Globals : constant Integer := 2;
+   RIDX_Last : constant Integer := RIDX_Globals;
 
    type State is new Ada.Finalization.Limited_Controlled with
       record
