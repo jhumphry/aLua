@@ -45,9 +45,9 @@ package Lua is
    type Lua_Type is (TNONE, TNIL, TBOOLEAN, TLIGHTUSERDATA, TNUMBER, TSTRING,
                      TTABLE, TFUNCTION, TUSERDATA, TTHREAD, TNUMTAGS);
 
-   -- Imports to do with special stack positions and the registry
    Lua_Error : exception;
 
+   -- Special stack positions and the registry
    MaxStack : constant Integer
      with Import, Convention => C, Link_Name => "lua_conf_luai_maxstack";
    RegistryIndex : constant Integer
@@ -57,9 +57,12 @@ package Lua is
    RIDX_Last : constant Integer;
    function UpvalueIndex (i : in Integer) return Integer;
 
+   -- Basic state control
    type State is tagged limited private;
    function Version (L : in State) return Long_Float;
    function Status (L : in State) return Thread_Status;
+
+   -- Operations on values
    procedure Push (L : in out State; n : in Number);
    function ToNumber (L : in State; index : in Integer) return Number;
    procedure Arith (L : in out State; op : in Arith_Op);
@@ -67,6 +70,8 @@ package Lua is
                      index1 : in Integer;
                      index2 : in Integer;
                      op : in Comparison_Op) return Boolean;
+
+   -- Garbage Collector control
    procedure GC (L : in State; what : in GC_Op);
    function GC (L : in State; what : in GC_Param; data : in Integer)
                 return Integer;
@@ -114,6 +119,7 @@ package Lua is
    procedure getmetatable (L : in out State; index : in Integer);
    procedure setglobal (L : in out State; name : in String);
    procedure setmetatable (L : in out State; index : in Integer);
+
 private
 
    subtype void_ptr is System.Address;

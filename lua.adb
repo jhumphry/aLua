@@ -11,39 +11,31 @@ with Lua.Internal, Lua.AuxInternal;
 
 package body Lua is
 
-   ------------------
-   -- UpvalueIndex --
-   ------------------
+   --
+   -- *** Special stack positions and the registry
+   --
 
    function UpvalueIndex (i : in Integer) return Integer is
       (RegistryIndex - i);
 
-   -------------
-   -- Version --
-   -------------
+   --
+   -- *** Basic state control
+   --
 
    function Version (L : State) return Long_Float is
       (Long_Float(Internal.lua_version(L.L).all));
 
-   ------------
-   -- Status --
-   ------------
-
    function Status (L : State) return Thread_Status is
       (Thread_Status'Val(Internal.lua_status(L.L)));
 
-   ----------
-   -- Push --
-   ----------
+   --
+   -- *** Operations on values
+   --
 
    procedure Push (L : in out State; n : in Number) is
    begin
       Internal.lua_pushnumber(L.L, Internal.lua_Number(n));
    end Push;
-
-   ---------------
-   -- ToNumber --
-   ---------------
 
    function ToNumber (L : in State; index : in Integer) return Number is
       isnum : aliased C.int := 0;
@@ -58,19 +50,10 @@ package body Lua is
       return Number(result);
    end ToNumber;
 
-   -----------
-   -- Arith --
-   -----------
-
    procedure Arith (L : in out State; op : in Arith_Op) is
    begin
       Internal.lua_arith(L.L, Arith_Op'Pos(op));
    end Arith;
-
-   -------------
-   -- Compare --
-   -------------
-
 
    function Compare (L : in State;
                      index1 : in Integer;
@@ -81,9 +64,9 @@ package body Lua is
                            C.int(index2),
                            C.int(Comparison_Op'Pos(op))) = 1);
 
-   --------
-   -- GC --
-   --------
+   --
+   -- *** Garbage Collector control
+   ---
 
    procedure GC (L : in State; what : in GC_Op) is
       Discard : C.int;
@@ -98,9 +81,9 @@ package body Lua is
    function GC (L : in State) return Boolean is
        (Internal.lua_gc(L.L, GCISRUNNING, 0) /= 0);
 
-   ---
-   --- *** Stack manipulation and information
-   ---
+   --
+   -- *** Stack manipulation and information
+   --
 
    function AbsIndex (L : in State; idx : in Integer) return Integer is
      (Integer(Internal.lua_absindex(L.L, C.int(idx))));
@@ -153,9 +136,9 @@ package body Lua is
       Internal.lua_settop(L.L, C.int(index));
    end SetTop;
 
-   ---
-   --- *** Type information
-   ---
+   --
+   -- *** Type information
+   --
 
    function TypeInfo (L : in State; index : in Integer) return Lua_Type is
      (
@@ -243,13 +226,9 @@ package body Lua is
    end settable;
 
    --
-   -- *** Resource Management ***
    -- *** Globals and Metatables
    --
 
-   ----------------
-   -- Initialize --
-   ----------------
    function getglobal (L : in out State; name : in String) return Lua_Type is
      (Lua_Type'Val(Internal.lua_getglobal(L.L, C.Strings.New_String(name))));
 
@@ -291,10 +270,6 @@ package body Lua is
    begin
       Object.L := AuxInternal.luaL_newstate;
    end Initialize;
-
-   --------------
-   -- Finalize --
-   --------------
 
    procedure Finalize (Object : in out State) is
    begin
