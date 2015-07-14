@@ -72,6 +72,13 @@ begin
             (if L.Compare(-2, -1, OPLE) then "Yes" else "No"));
    New_Line;
 
+   Put_Line("Setting global foobar to 5");
+   L.Push(5.0);
+   L.Setglobal("foobar");
+   L.GetGlobal("foobar");
+   Put_Line("Global foobar = " & Number'Image(L.ToNumber(-1)));
+   New_Line;
+
    Put_Line("Manually triggering garbage collection...");
    L.GC(GCCOLLECT);
    New_Line;

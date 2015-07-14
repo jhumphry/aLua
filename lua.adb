@@ -244,11 +244,48 @@ package body Lua is
 
    --
    -- *** Resource Management ***
+   -- *** Globals and Metatables
    --
 
    ----------------
    -- Initialize --
    ----------------
+   function getglobal (L : in out State; name : in String) return Lua_Type is
+     (Lua_Type'Val(Internal.lua_getglobal(L.L, C.Strings.New_String(name))));
+
+   procedure getglobal (L : in out State; name : in String) is
+      Discard : C.int;
+   begin
+      Discard := Internal.lua_getglobal(L.L, C.Strings.New_String(name));
+   end getglobal;
+
+   function getmetatable (L : in out State; index : in Integer) return Boolean is
+     (Internal.lua_getmetatable(L.L, C.int(index)) /= 0);
+
+   procedure getmetatable (L : in out State; index : in Integer) is
+   begin
+      if Internal.lua_getmetatable(L.L, C.int(index)) = 0 then
+         raise Lua_Error with "No metatable exists for stack index: " &
+           Integer'Image(index);
+      end if;
+   end getmetatable;
+
+   procedure setglobal (L : in out State; name : in String) is
+   begin
+      Internal.lua_setglobal(L.L, C.Strings.New_String(name));
+   end setglobal;
+
+   procedure setmetatable (L : in out State; index : in Integer) is
+      Discard : C.int;
+   begin
+      -- According to the Lua documentation, lua_setmetatable does not have a
+      -- return value, but according to lua.h it does...
+      Discard := Internal.lua_setmetatable(L.L, C.int(index));
+   end setmetatable;
+
+   --
+   -- *** Resource Management ***
+   --
 
    procedure Initialize (Object : in out State) is
    begin

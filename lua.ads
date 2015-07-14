@@ -46,6 +46,8 @@ package Lua is
                      TTABLE, TFUNCTION, TUSERDATA, TTHREAD, TNUMTAGS);
 
    -- Imports to do with special stack positions and the registry
+   Lua_Error : exception;
+
    MaxStack : constant Integer
      with Import, Convention => C, Link_Name => "lua_conf_luai_maxstack";
    RegistryIndex : constant Integer
@@ -105,6 +107,13 @@ package Lua is
    procedure seti (L : in out State; index : in Integer; i : in Integer);
    procedure settable (L : in State; index : in Integer);
 
+   -- Globals and metatables
+   function getglobal (L : in out State; name : in String) return Lua_Type;
+   procedure getglobal (L : in out State; name : in String);
+   function getmetatable (L : in out State; index : in Integer) return Boolean;
+   procedure getmetatable (L : in out State; index : in Integer);
+   procedure setglobal (L : in out State; name : in String);
+   procedure setmetatable (L : in out State; index : in Integer);
 private
 
    subtype void_ptr is System.Address;
