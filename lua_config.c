@@ -10,6 +10,8 @@ Copyright (c) 2015, James Humphry
 #include <lua.h>
 #include <luaconf.h>
 
+long lua_conf_multret = LUA_MULTRET;
+
 long lua_conf_luai_maxstack = LUAI_MAXSTACK;
 long lua_conf_registry_index = LUA_REGISTRYINDEX;
 

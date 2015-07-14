@@ -31,6 +31,7 @@ with Lua; use Lua;
 
 procedure Simple_Example is
    L : State;
+   Success : Thread_Status;
 
    procedure Print_Stack(L : State) is
    begin
@@ -56,7 +57,7 @@ begin
    Put_Line("Basic stack manipulation.");
    Put("Initial stack size: "); Put(L.GetTop); New_Line;
    Put_Line("Pushing 3.0, 7.5, 2.3");
-   L.Push(3.0); L.Push(7.5); L.Push(2.3);
+   L.PushNumber(3.0); L.PushNumber(7.5); L.PushNumber(2.3);
    Put("Stack size now: "); Put(L.GetTop); New_Line;
    Put_Line("Stack now contains:");
    Print_Stack(L);
@@ -73,10 +74,21 @@ begin
    New_Line;
 
    Put_Line("Setting global foobar to 5");
-   L.Push(5.0);
+   L.PushNumber(5.0);
    L.Setglobal("foobar");
    L.GetGlobal("foobar");
    Put_Line("Global foobar = " & Lua_Number'Image(L.ToNumber(-1)));
+   New_Line;
+
+   Put_Line("Loading chunk: function f (x) return 2*x end");
+   Success := L.LoadString("function f (x) return 2*x end");
+   Put_Line("Load" & (if Success /= OK then " not" else "") & " successful.");
+   L.Call(0, 0);
+   Put_Line("Compiled chunk.");
+   Put("Result of calling f (3): ");
+   L.GetGlobal("f"); L.PushNumber(3.0); L.Call(1, 1);
+   Put(Lua_Number'Image(L.ToNumber(-1))); New_Line;
+   L.Pop(1);
    New_Line;
 
    Put_Line("Manually triggering garbage collection...");

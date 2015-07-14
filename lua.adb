@@ -28,14 +28,46 @@ package body Lua is
    function Status (L : State) return Thread_Status is
       (Thread_Status'Val(Internal.lua_status(L.L)));
 
+   function LoadString (L : in out State;
+                        S : in String)
+                        return Thread_Status is
+      CS : C.Strings.chars_ptr;
+      Result : C.int;
+   begin
+      CS := C.Strings.New_String(S);
+      Result := AuxInternal.luaL_loadstring(L.L, C.Strings.New_String(S));
+      C.Strings.Free(CS);
+      return Thread_Status'Val(Result);
+   end LoadString;
+
+   procedure Call (L : in out State;
+                   nargs : in Integer;
+                   nresults : in Integer) is
+   begin
+      Internal.lua_callk(L.L,
+                         C.int(nargs),
+                         C.int(nresults),
+                         0,
+                         null);
+   end Call;
+
    --
    -- *** Operations on values
    --
 
-   procedure Push (L : in out State; n : in Lua_Number) is
+   procedure PushNumber (L : in out State; n : in Lua_Number) is
    begin
       Internal.lua_pushnumber(L.L, Internal.lua_Number(n));
-   end Push;
+   end PushNumber;
+
+   procedure PushString (L : in out State; s : in String) is
+      CS : C.Strings.chars_ptr;
+      Discard : C.Strings.chars_ptr;
+   begin
+      CS := C.Strings.New_String(S);
+      Discard := Internal.lua_pushstring(L.L, C.Strings.New_String(s));
+      C.Strings.Free(CS);
+   end PushString;
 
    function ToNumber (L : in State; index : in Integer) return Lua_Number is
       isnum : aliased C.int := 0;

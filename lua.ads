@@ -61,9 +61,13 @@ package Lua is
    type State is tagged limited private;
    function Version (L : in State) return Long_Float;
    function Status (L : in State) return Thread_Status;
+   function LoadString (L : in out State;
+                        S : in String) return Thread_Status;
+   procedure Call (L : in out State; nargs : in Integer; nresults : in Integer);
 
    -- Operations on values
-   procedure Push (L : in out State; n : in Lua_Number);
+   procedure PushNumber (L : in out State; n : in Lua_Number);
+   procedure PushString (L : in out State; s : in String);
    function ToNumber (L : in State; index : in Integer) return Lua_Number;
    procedure Arith (L : in out State; op : in Arith_Op);
    function Compare (L : in State;
