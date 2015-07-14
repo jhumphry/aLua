@@ -45,10 +45,11 @@ package Lua is
    type Lua_Type is (TNONE, TNIL, TBOOLEAN, TLIGHTUSERDATA, TNUMBER, TSTRING,
                      TTABLE, TFUNCTION, TUSERDATA, TTHREAD, TNUMTAGS);
 
-   -- Imports to do with special stack positions
+   -- Imports to do with special stack positions and the registry
    MaxStack : constant Integer
      with Import, Convention => C, Link_Name => "lua_conf_luai_maxstack";
-   RegistryIndex : constant Integer:= -MaxStack - 1000;
+   RegistryIndex : constant Integer
+     with Import, Convention => C, Link_Name => "lua_conf_registry_index";
    RIDX_MainThread : constant Integer;
    RIDX_Globals : constant Integer;
    RIDX_Last : constant Integer;
