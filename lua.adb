@@ -263,6 +263,18 @@ package body Lua is
    function next (L : in out State; index : in Integer) return Boolean is
      (Internal.lua_next(L.L, C.int(index)) /= 0);
 
+   function rawgeti (L : in out State; index : in Integer; i : in Integer)
+                  return Lua_Type is
+     (
+      Lua_Type'Val(Internal.lua_rawgeti(L.L, C.int(index), Long_Long_Integer(i)))
+     );
+
+   procedure rawgeti (L : in out State; index : in Integer; i : in Integer) is
+     Discard : C.int;
+   begin
+      Discard := Internal.lua_rawgeti(L.L, C.int(index), Long_Long_Integer(i));
+   end rawgeti;
+
    procedure setfield (L : in out State; index : in Integer; k : in String) is
    begin
       Internal.lua_setfield(L.L, C.int(index), C.Strings.New_String(k));
@@ -301,6 +313,14 @@ package body Lua is
            Integer'Image(index);
       end if;
    end getmetatable;
+
+   procedure pushglobaltable (L : in out State) is
+      Discard : C.int;
+   begin
+      Discard := Internal.lua_rawgeti(L.L,
+                                      C.int(RegistryIndex),
+                                      Long_Long_Integer(RIDX_Globals));
+   end pushglobaltable;
 
    procedure setglobal (L : in out State; name : in String) is
    begin

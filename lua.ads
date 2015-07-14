@@ -117,6 +117,9 @@ package Lua is
    function gettable (L : in out State; index : in Integer) return Lua_Type;
    procedure gettable (L : in out State; index : in Integer);
    function next (L : in out State; index : in Integer) return Boolean;
+   function rawgeti (L : in out State; index : in Integer; i : in Integer)
+                  return Lua_Type;
+   procedure rawgeti (L : in out State; index : in Integer; i : in Integer);
    procedure setfield (L : in out State; index : in Integer; k : in String);
    procedure seti (L : in out State; index : in Integer; i : in Integer);
    procedure settable (L : in State; index : in Integer);
@@ -126,6 +129,7 @@ package Lua is
    procedure getglobal (L : in out State; name : in String);
    function getmetatable (L : in out State; index : in Integer) return Boolean;
    procedure getmetatable (L : in out State; index : in Integer);
+   procedure pushglobaltable (L : in out State);
    procedure setglobal (L : in out State; name : in String);
    procedure setmetatable (L : in out State; index : in Integer);
 
