@@ -51,6 +51,27 @@ package body Lua is
                          null);
    end Call;
 
+   function PCall (L : in out State;
+                   nargs : in Integer;
+                   nresults : in Integer;
+                   msgh : in Integer := 0)
+                   return Thread_Status is
+     (
+      Thread_Status'Val(
+                        Internal.lua_pcallk(L.L,
+                                            C.int(nargs),
+                                            C.int(nresults),
+                                            C.int(msgh),
+                                            0,
+                                            null
+                                           )
+
+                       )
+     );
+
+
+
+
    --
    -- *** Operations on values
    --

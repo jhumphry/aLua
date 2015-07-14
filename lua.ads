@@ -64,6 +64,11 @@ package Lua is
    function LoadString (L : in out State;
                         S : in String) return Thread_Status;
    procedure Call (L : in out State; nargs : in Integer; nresults : in Integer);
+   function PCall (L : in out State;
+                   nargs : in Integer;
+                   nresults : in Integer;
+                   msgh : in Integer := 0)
+     return Thread_Status;
 
    -- Operations on values
    procedure PushNumber (L : in out State; n : in Lua_Number);
