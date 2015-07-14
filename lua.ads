@@ -29,7 +29,7 @@ private with System;
 
 package Lua is
 
-   subtype Number is Long_Float;
+   subtype Lua_Number is Long_Float;
 
    type Thread_Status is (OK, YIELD, ERRRUN, ERRSYNTAX, ERRMEM, ERRGCMM, ERRERR);
 
@@ -63,8 +63,8 @@ package Lua is
    function Status (L : in State) return Thread_Status;
 
    -- Operations on values
-   procedure Push (L : in out State; n : in Number);
-   function ToNumber (L : in State; index : in Integer) return Number;
+   procedure Push (L : in out State; n : in Lua_Number);
+   function ToNumber (L : in State; index : in Integer) return Lua_Number;
    procedure Arith (L : in out State; op : in Arith_Op);
    function Compare (L : in State;
                      index1 : in Integer;

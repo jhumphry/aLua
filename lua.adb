@@ -32,12 +32,12 @@ package body Lua is
    -- *** Operations on values
    --
 
-   procedure Push (L : in out State; n : in Number) is
+   procedure Push (L : in out State; n : in Lua_Number) is
    begin
       Internal.lua_pushnumber(L.L, Internal.lua_Number(n));
    end Push;
 
-   function ToNumber (L : in State; index : in Integer) return Number is
+   function ToNumber (L : in State; index : in Integer) return Lua_Number is
       isnum : aliased C.int := 0;
       result : Internal.lua_Number;
    begin
@@ -47,7 +47,7 @@ package body Lua is
            & Integer'Image(index)
            & " not a number.";
       end if;
-      return Number(result);
+      return Lua_Number(result);
    end ToNumber;
 
    procedure Arith (L : in out State; op : in Arith_Op) is

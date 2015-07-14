@@ -76,7 +76,7 @@ begin
    L.Push(5.0);
    L.Setglobal("foobar");
    L.GetGlobal("foobar");
-   Put_Line("Global foobar = " & Number'Image(L.ToNumber(-1)));
+   Put_Line("Global foobar = " & Lua_Number'Image(L.ToNumber(-1)));
    New_Line;
 
    Put_Line("Manually triggering garbage collection...");
