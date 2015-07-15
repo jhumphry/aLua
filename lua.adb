@@ -438,6 +438,15 @@ package body Lua is
    end setmetatable;
 
    --
+   -- *** Threads
+   --
+
+   procedure xmove (from, to : in out Thread; n : in Integer) is
+   begin
+      Internal.lua_xmove(from.L, to.L, C.int(n));
+   end xmove;
+
+   --
    -- *** Resource Management ***
    --
 

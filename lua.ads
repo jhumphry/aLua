@@ -158,7 +158,9 @@ package Lua is
    procedure setglobal (L : in out State; name : in String);
    procedure setmetatable (L : in out State; index : in Integer);
 
+   -- Threads
    type Thread is new State with private;
+   procedure xmove (from, to : in out Thread; n : in Integer);
 
 private
 
