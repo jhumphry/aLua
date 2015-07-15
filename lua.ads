@@ -88,6 +88,10 @@ package Lua is
    procedure PushThread (L : in out State);
 
    -- Pulling values from the stack
+   -- Currently these can modify the state because they can convert the value
+   -- on the stack to the requested type. They should be split into 'hard'-typed
+   -- variants that take a parameter of mode 'in' and 'soft'-typed variants that
+   -- take an 'in out' parameter
    function ToBoolean (L : in State; index : in Integer) return Boolean;
    function ToInteger (L : in State; index : in Integer) return Lua_Integer;
    function ToNumber (L : in State; index : in Integer) return Lua_Number;

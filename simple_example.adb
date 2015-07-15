@@ -66,17 +66,21 @@ begin
 
    Put_Line("Basic stack manipulation.");
    Put("Initial stack size: "); Put(L.GetTop); New_Line;
-   Put_Line("Pushing 3, 7.5, 2.3, 'Hello, World!', True");
-   L.PushInteger(3);
+   Put_Line("Pushing 3.0, 7.5, 2.3, 'Hello, World!', True, 5");
+   L.PushNumber(3.0);
    L.PushNumber(7.5);
    L.PushNumber(2.3);
    L.PushString("Hello, World!");
    L.PushBoolean(True);
+   L.PushInteger(5);
    Put("Stack size now: "); Put(L.GetTop); New_Line;
    Put_Line("Stack now contains:");
    Print_Stack(L);
-   Put_Line("Pop top two elements...");
-   L.Pop(2);
+   Put("Get top element as string: "); Put(L.ToString(-1)); New_Line;
+   Put_Line("Stack now contains:");
+   Print_Stack(L);
+   Put_Line("Pop top three elements");
+   L.Pop(3);
    Put_Line("Stack now contains:");
    Print_Stack(L);
    Put_Line("Is Stack(-2) <= Stack(-1)? " &
