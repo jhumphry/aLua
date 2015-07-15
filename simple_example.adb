@@ -36,11 +36,21 @@ procedure Simple_Example is
    procedure Print_Stack(L : State) is
    begin
       Put_Line("Relative index : Absolute index : Type : Contents");
-      for I in 1..L.GetTop loop
-         Put(-I); Put(" : ");
-         Put(L.AbsIndex(-I)); Put(" : ");
-         Put(L.TypeName(L.TypeInfo(-I))); Put(" : ");
-         Put(L.ToNumber(-I), Aft => 0, Exp => 0); New_Line;
+      for I in reverse 1..L.GetTop loop
+         Put(I - L.GetTop - 1); Put(" : ");
+         Put(L.AbsIndex(I)); Put(" : ");
+         Put(L.TypeName(L.TypeInfo(I))); Put(" : ");
+         case Lua_Type'Pos(L.TypeInfo(I)) is
+            when 1 =>
+               Put((if L.ToBoolean(I) then "true" else "false"));
+            when 3 =>
+               Put(L.ToNumber(I), Aft => 0, Exp => 0);
+            when 4 =>
+               Put("'" & L.ToString(I) & "'");
+            when others =>
+               Put("-");
+         end case;
+         New_Line;
       end loop;
    end Print_Stack;
 
@@ -56,9 +66,17 @@ begin
 
    Put_Line("Basic stack manipulation.");
    Put("Initial stack size: "); Put(L.GetTop); New_Line;
-   Put_Line("Pushing 3.0, 7.5, 2.3");
-   L.PushNumber(3.0); L.PushNumber(7.5); L.PushNumber(2.3);
+   Put_Line("Pushing 3, 7.5, 2.3, 'Hello, World!', True");
+   L.PushInteger(3);
+   L.PushNumber(7.5);
+   L.PushNumber(2.3);
+   L.PushString("Hello, World!");
+   L.PushBoolean(True);
    Put("Stack size now: "); Put(L.GetTop); New_Line;
+   Put_Line("Stack now contains:");
+   Print_Stack(L);
+   Put_Line("Pop top two elements...");
+   L.Pop(2);
    Put_Line("Stack now contains:");
    Print_Stack(L);
    Put_Line("Is Stack(-2) <= Stack(-1)? " &

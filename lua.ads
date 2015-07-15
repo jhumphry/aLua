@@ -30,6 +30,7 @@ private with System;
 package Lua is
 
    subtype Lua_Number is Long_Float;
+   subtype Lua_Integer is Long_Long_Integer;
 
    type Thread_Status is (OK, YIELD, ERRRUN, ERRSYNTAX, ERRMEM, ERRGCMM, ERRERR);
 
@@ -59,6 +60,7 @@ package Lua is
 
    -- Basic state control
    type State is tagged limited private;
+   type Thread;
    function Version (L : in State) return Long_Float;
    function Status (L : in State) return Thread_Status;
    function LoadString (L : in out State;
@@ -70,10 +72,23 @@ package Lua is
                    msgh : in Integer := 0)
      return Thread_Status;
 
-   -- Operations on values
+   -- Pushing values to the stack
+   procedure PushBoolean (L : in out State; b : in Boolean);
+   procedure PushInteger (L : in out State; n : in Lua_Integer);
+   procedure PushNil (L : in out State);
    procedure PushNumber (L : in out State; n : in Lua_Number);
    procedure PushString (L : in out State; s : in String);
+   function PushThread (L : in out State) return Boolean;
+   procedure PushThread (L : in out State);
+
+   -- Pulling values from the stack
+   function ToBoolean (L : in State; index : in Integer) return Boolean;
+   function ToInteger (L : in State; index : in Integer) return Lua_Integer;
    function ToNumber (L : in State; index : in Integer) return Lua_Number;
+   function ToString (L : in State; index : in Integer) return String;
+   function ToThread (L : in State; index : in Integer) return Thread;
+
+   -- Operations on values
    procedure Arith (L : in out State; op : in Arith_Op);
    function Compare (L : in State;
                      index1 : in Integer;
@@ -133,6 +148,8 @@ package Lua is
    procedure setglobal (L : in out State; name : in String);
    procedure setmetatable (L : in out State; index : in Integer);
 
+   type Thread is new State with private;
+
 private
 
    subtype void_ptr is System.Address;
@@ -169,5 +186,9 @@ private
 
    overriding procedure Initialize (Object : in out State);
    overriding procedure Finalize   (Object : in out State);
+
+   type Thread is new State with null record;
+   overriding procedure Initialize (Object : in out Thread) is null;
+   overriding procedure Finalize   (Object : in out Thread) is null;
 
 end Lua;

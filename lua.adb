@@ -4,10 +4,11 @@
 
 with Interfaces; use Interfaces;
 with Interfaces.C;
-use type Interfaces.C.int;
+use type Interfaces.C.int, Interfaces.C.size_t;
 with Interfaces.C.Strings;
 
 with Lua.Internal, Lua.AuxInternal;
+with Ada.Finalization;
 
 package body Lua is
 
@@ -73,8 +74,23 @@ package body Lua is
 
 
    --
-   -- *** Operations on values
+   -- *** Pushing values to the stack
    --
+
+   procedure PushBoolean (L : in out State; b : in Boolean) is
+   begin
+      Internal.lua_pushboolean(L.L, C.int( (if b then 1 else 0) ) );
+   end PushBoolean;
+
+   procedure PushInteger (L : in out State; n : in Lua_Integer) is
+   begin
+      Internal.lua_pushinteger(L.L, Internal.lua_Integer(n));
+   end PushInteger;
+
+   procedure PushNil (L : in out State) is
+   begin
+      Internal.lua_pushnil(L.L);
+   end PushNil;
 
    procedure PushNumber (L : in out State; n : in Lua_Number) is
    begin
@@ -90,6 +106,34 @@ package body Lua is
       C.Strings.Free(CS);
    end PushString;
 
+   function PushThread (L : in out State) return Boolean is
+     (Internal.lua_pushthread(L.L) = 1);
+
+   procedure PushThread (L : in out State) is
+      Discard : C.int;
+   begin
+      Discard := Internal.lua_pushthread(L.L);
+   end PushThread;
+
+   --
+   -- *** Pulling values from the stack
+   --
+   function ToBoolean (L : in State; index : in Integer) return Boolean is
+      (Internal.lua_toboolean(L.L, C.int(Index)) /= 0);
+
+   function ToInteger (L : in State; index : in Integer) return Lua_Integer is
+      isnum : aliased C.int := 0;
+      result : Internal.lua_Integer;
+   begin
+      result := Internal.lua_tointegerx(L.L , C.int(index), isnum'Access);
+      if isnum = 0 then
+         raise Constraint_Error with "Value at Lua stack index "
+           & Integer'Image(index)
+           & " is not convertible to an integer.";
+      end if;
+      return Lua_Integer(result);
+   end ToInteger;
+
    function ToNumber (L : in State; index : in Integer) return Lua_Number is
       isnum : aliased C.int := 0;
       result : Internal.lua_Number;
@@ -98,10 +142,41 @@ package body Lua is
       if isnum = 0 then
          raise Constraint_Error with "Value at Lua stack index "
            & Integer'Image(index)
-           & " not a number.";
+           & " is not convertible to a number.";
       end if;
       return Lua_Number(result);
    end ToNumber;
+
+   function ToString (L : in State; index : in Integer) return String is
+      result : C.Strings.chars_ptr;
+      len : aliased C.size_t := 0;
+   begin
+      result := Internal.lua_tolstring(L.L, C.int(index), len'Access);
+      if len = 0 then
+         return "";
+      else
+         declare
+            converted_result : String(1..Integer(len+1));
+         begin
+            C.To_Ada(Item => C.Strings.Value(result),
+                     Target => converted_result,
+                     Count => Natural(len),
+                     Trim_Nul => False);
+            return converted_result;
+         end;
+      end if;
+   end ToString;
+
+   function ToThread (L : in State; index : in Integer) return Thread is
+   begin
+      return R : Thread do
+         R.L := Internal.lua_tothread(L.L, C.int(index));
+      end return;
+   end ToThread;
+
+   --
+   -- *** Operations on values
+   --
 
    procedure Arith (L : in out State; op : in Arith_Op) is
    begin
