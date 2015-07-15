@@ -39,9 +39,15 @@ package Lua is
 
    type Comparison_Op is (OPEQ, OPLT, OPLE);
 
-   type GC_Op is (GCSTOP, GCRESTART, GCCOLLECT, GCCOUNT, GCCOUNTB, GCSTEP);
+   type GC_Inputs is (GCSTOP, GCRESTART, GCCOLLECT, GCCOUNT,
+                      GCCOUNTB, GCSTEP, GCSETPAUSE, GCSETSTEPMUL, GCISRUNNING);
+   for GC_Inputs use (GCSTOP => 0, GCRESTART => 1, GCCOLLECT => 2,
+                      GCCOUNT => 3, GCCOUNTB => 4, GCSTEP => 5,
+                      GCSETPAUSE => 6, GCSETSTEPMUL => 7, GCISRUNNING => 9);
 
-   type GC_Param is (GCSETPAUSE, GCSETSTEPMUL);
+   subtype GC_Op is GC_Inputs range GCSTOP..GCSTEP;
+   subtype GC_Param is GC_Inputs range GCSETPAUSE..GCSETSTEPMUL;
+   subtype GC_Queries is GC_Inputs range GCISRUNNING..GCISRUNNING;
 
    type Lua_Type is (TNONE, TNIL, TBOOLEAN, TLIGHTUSERDATA, TNUMBER, TSTRING,
                      TTABLE, TFUNCTION, TUSERDATA, TTHREAD, TNUMTAGS);
@@ -163,13 +169,6 @@ private
                      OPBNOT => 13);
 
    for Comparison_Op use (OPEQ => 0, OPLT => 1, OPLE => 2);
-
-   for GC_Op use (GCSTOP => 0, GCRESTART => 1, GCCOLLECT => 2, GCCOUNT => 3,
-                  GCCOUNTB => 4, GCSTEP => 5);
-
-   for GC_Param use (GCSETPAUSE => 6, GCSETSTEPMUL => 7);
-
-   GCISRUNNING : constant := 9;
 
    for Lua_Type use (TNONE => -1, TNIL => 0, TBOOLEAN => 1, TLIGHTUSERDATA => 2,
                      TNUMBER => 3, TSTRING => 4, TTABLE => 5, TFUNCTION => 6,

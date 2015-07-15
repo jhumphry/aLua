@@ -19,7 +19,7 @@ project ALua is
    end Builder;
 
    package Compiler is
-      for Default_Switches ("ada") use ("-gnat12", "-gnato", "-g", "-fstack-check", "-gnatE", "-gnatf");
+      for Default_Switches ("ada") use ("-gnat12", "-gnato", "-g", "-fstack-check", "-gnatE", "-gnatf", "-gnatwZ");
    end Compiler;
 
    package Linker is

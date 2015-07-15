@@ -40,12 +40,12 @@ procedure Simple_Example is
          Put(I - L.GetTop - 1); Put(" : ");
          Put(L.AbsIndex(I)); Put(" : ");
          Put(L.TypeName(L.TypeInfo(I))); Put(" : ");
-         case Lua_Type'Pos(L.TypeInfo(I)) is
-            when 1 =>
+         case L.TypeInfo(I) is
+            when TBOOLEAN =>
                Put((if L.ToBoolean(I) then "true" else "false"));
-            when 3 =>
+            when TNUMBER =>
                Put(L.ToNumber(I), Aft => 0, Exp => 0);
-            when 4 =>
+            when TSTRING =>
                Put("'" & L.ToString(I) & "'");
             when others =>
                Put("-");

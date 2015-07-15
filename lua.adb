@@ -2,6 +2,8 @@
 
 -- An Ada 2012 interface to the Lua language
 
+with Ada.Unchecked_Conversion;
+
 with Interfaces; use Interfaces;
 with Interfaces.C;
 use type Interfaces.C.int, Interfaces.C.size_t;
@@ -11,6 +13,31 @@ with Lua.Internal, Lua.AuxInternal;
 with Ada.Finalization;
 
 package body Lua is
+
+   --
+   -- *** Conversions between Ada enumerations and C integer constants
+   --
+
+   function Int_To_Thread_Status is new
+     Ada.Unchecked_Conversion(Source => C.int,
+                              Target => Thread_Status);
+
+   function Arith_Op_To_Int is new Ada.Unchecked_Conversion(Source => Arith_Op,
+                                                            Target => C.int);
+
+   function Comparison_Op_To_Int is new
+     Ada.Unchecked_Conversion(Source => Comparison_Op,
+                              Target => C.int);
+
+   function GC_Inputs_To_Int is new
+     Ada.Unchecked_Conversion(Source => GC_Inputs,
+                              Target => C.int);
+
+   function Lua_Type_To_Int is new Ada.Unchecked_Conversion(Source => Lua_Type,
+                                                            Target => C.Int);
+
+   function Int_To_Lua_Type is new Ada.Unchecked_Conversion(Source => C.Int,
+                                                            Target => Lua_Type);
 
    --
    -- *** Special stack positions and the registry
@@ -27,7 +54,7 @@ package body Lua is
       (Long_Float(Internal.lua_version(L.L).all));
 
    function Status (L : State) return Thread_Status is
-      (Thread_Status'Val(Internal.lua_status(L.L)));
+      (Int_To_Thread_Status(Internal.lua_status(L.L)));
 
    function LoadString (L : in out State;
                         S : in String)
@@ -180,7 +207,7 @@ package body Lua is
 
    procedure Arith (L : in out State; op : in Arith_Op) is
    begin
-      Internal.lua_arith(L.L, Arith_Op'Pos(op));
+      Internal.lua_arith(L.L, Arith_Op_To_Int(op));
    end Arith;
 
    function Compare (L : in State;
@@ -190,7 +217,7 @@ package body Lua is
      (Internal.lua_compare(L.L,
                            C.int(index1),
                            C.int(index2),
-                           C.int(Comparison_Op'Pos(op))) = 1);
+                           Comparison_Op_To_Int(op)) = 1);
 
    --
    -- *** Garbage Collector control
@@ -199,15 +226,15 @@ package body Lua is
    procedure GC (L : in State; what : in GC_Op) is
       Discard : C.int;
    begin
-      Discard := Internal.lua_gc(L.L, C.int(GC_Op'Pos(what)), 0);
+      Discard := Internal.lua_gc(L.L, GC_Inputs_To_Int(what), 0);
    end GC;
 
    function GC (L : in State; what : in GC_Param; data : in Integer)
                 return Integer is
-      (Integer(Internal.lua_gc(L.L, C.int(GC_Param'Pos(what)), C.int(data))));
+      (Integer(Internal.lua_gc(L.L, GC_Inputs_To_Int(what), C.int(data))));
 
    function GC (L : in State) return Boolean is
-       (Internal.lua_gc(L.L, GCISRUNNING, 0) /= 0);
+       (Internal.lua_gc(L.L, GC_Inputs_To_Int(GCISRUNNING), 0) /= 0);
 
    --
    -- *** Stack manipulation and information
@@ -270,12 +297,12 @@ package body Lua is
 
    function TypeInfo (L : in State; index : in Integer) return Lua_Type is
      (
-      Lua_Type'Val(Internal.lua_type(L.L, C.int(index)))
+      Int_To_Lua_Type(Internal.lua_type(L.L, C.int(index)))
      );
 
    function TypeName (L : in State; tp : in Lua_Type) return String is
      (
-      C.Strings.Value(Internal.lua_typename(L.L, C.int(Lua_Type'Pos(tp))))
+      C.Strings.Value(Internal.lua_typename(L.L, C.int(Lua_Type_To_Int(tp))))
      );
 
    --
