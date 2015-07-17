@@ -29,6 +29,8 @@ with Ada.Integer_Text_IO; use Ada.Integer_Text_IO;
 
 with Lua; use Lua;
 
+with Simple_Example_Foobar;
+
 procedure Simple_Example is
    L : State;
    Success : Thread_Status;
@@ -99,7 +101,7 @@ begin
    L.PushNumber(5.0);
    L.Setglobal("foobar");
    L.GetGlobal("foobar");
-   Put_Line("Global foobar = " & Lua_Number'Image(L.ToNumber(-1)));
+   Put("Global foobar = "); Put(L.ToNumber(-1), Aft => 0, Exp => 0); New_Line;
    New_Line;
 
    Put_Line("Loading chunk: function f (x) return 2*x end");
@@ -109,8 +111,21 @@ begin
    Put_Line("Compiled chunk.");
    Put("Result of calling f (3): ");
    L.GetGlobal("f"); L.PushNumber(3.0); L.Call(1, 1);
-   Put(Lua_Number'Image(L.ToNumber(-1))); New_Line;
+   Put(L.ToNumber(-1), Aft => 0, Exp => 0); New_Line;
    L.Pop(1);
+   New_Line;
+
+   L.Pop(L.GetTop);
+   Put_Line("Registering an AdaFunction foobar in Lua");
+   L.Register("foobar", AdaFunction'(Simple_Example_Foobar'Access));
+   Success := L.LoadString("baz = foobar(5.0)");
+   Put_Line("Loading code snippet 'baz = foobar(5.0)'" &
+            (if Success /= OK then " not" else "") & " successful.");
+   Put_Line("Calling 'baz = foobar(5.0)' from Lua");
+   L.Call(0, 0);
+   Put("baz = ");
+   L.GetGlobal("baz");
+   Put(L.ToNumber(-1), Aft => 0, Exp => 0); New_Line;
    New_Line;
 
    Put_Line("Manually triggering garbage collection...");

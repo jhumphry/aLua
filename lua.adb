@@ -40,11 +40,26 @@ package body Lua is
                                                             Target => Lua_Type);
 
    --
+   -- *** Conversions between C pointers and Ada types
+   --
+
+   function AdaFunction_To_Address is new
+     Ada.Unchecked_Conversion(Source => AdaFunction,
+                              Target => System.Address);
+
+
+   function Address_To_AdaFunction is new
+     Ada.Unchecked_Conversion(Source => System.Address,
+                              Target => AdaFunction);
+   --
    -- *** Special stack positions and the registry
    --
 
    function UpvalueIndex (i : in Integer) return Integer is
-      (RegistryIndex - i);
+     (RegistryIndex - i - 1);
+   -- Lua cannot call Ada functions directly, so a trampoline is used.
+   -- The first UpvalueIndex is reserved for the address of the Ada function
+   -- to be called by CFunction_Trampoline
 
    --
    -- *** Basic state control
@@ -101,12 +116,24 @@ package body Lua is
                        )
      );
 
-
-
+   procedure Register(L : in State; name : in String; f : in AdaFunction) is
+      C_name : C.Strings.chars_ptr := C.Strings.New_String(name);
+   begin
+      Internal.lua_pushlightuserdata(L.L, AdaFunction_To_Address(f));
+      Internal.lua_pushcclosure(L.L, CFunction_Trampoline'Access, 1);
+      Internal.lua_setglobal(L.L, C_name);
+      C.Strings.Free(C_name);
+   end Register;
 
    --
    -- *** Pushing values to the stack
    --
+
+   procedure PushAdaFunction (L : in State; f : in AdaFunction) is
+   begin
+      Internal.lua_pushlightuserdata(L.L, AdaFunction_To_Address(f));
+      Internal.lua_pushcclosure(L.L, CFunction_Trampoline'Access, 1);
+   end PushAdaFunction;
 
    procedure PushBoolean (L : in  State; b : in Boolean) is
    begin
@@ -496,5 +523,15 @@ package body Lua is
    begin
       Internal.lua_close(Object.L);
    end Finalize;
+
+   function CFunction_Trampoline (L : System.Address) return C.int is
+      S : Existing_State;
+      f_index : C.int := C.Int(RegistryIndex-1);
+      f_address : System.Address := Internal.lua_touserdata(L, f_index);
+      f : AdaFunction := Address_To_AdaFunction(f_address);
+   begin
+      S.L := L;
+      return C.int(f(S));
+   end CFunction_Trampoline;
 
 end Lua;

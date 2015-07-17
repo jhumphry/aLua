@@ -26,6 +26,7 @@
 with Ada.Finalization;
 
 private with System;
+private with Interfaces.C;
 
 package Lua is
 
@@ -79,8 +80,11 @@ package Lua is
                    nresults : in Integer;
                    msgh : in Integer := 0)
                    return Thread_Status;
+   type AdaFunction is access function (L : State'Class) return Natural;
+   procedure Register(L : in State; name : in String; f : in AdaFunction);
 
    -- Pushing values to the stack
+   procedure PushAdaFunction (L : in State; f : in AdaFunction);
    procedure PushBoolean (L : in  State; b : in Boolean);
    procedure PushInteger (L : in State; n : in Lua_Integer);
    procedure PushNil (L : in State);
@@ -197,8 +201,17 @@ private
    overriding procedure Initialize (Object : in out State);
    overriding procedure Finalize   (Object : in out State);
 
-   type Thread is new State with null record;
-   overriding procedure Initialize (Object : in out Thread) is null;
-   overriding procedure Finalize   (Object : in out Thread) is null;
+   -- Existing_State is a clone of State but without automatic initialization
+   -- It is used internally when lua_State* are returned from the Lua library
+   -- and we don't want to re-initialize them when turning them into the
+   -- State record type.
+   type Existing_State is new State with null record;
+   overriding procedure Initialize (Object : in out Existing_State) is null;
+   overriding procedure Finalize   (Object : in out Existing_State) is null;
+
+   type Thread is new Existing_State with null record;
+
+   function CFunction_Trampoline (L : System.Address) return Interfaces.C.int
+     with Convention => C;
 
 end Lua;
