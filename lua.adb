@@ -56,7 +56,7 @@ package body Lua is
    function Status (L : State) return Thread_Status is
       (Int_To_Thread_Status(Internal.lua_status(L.L)));
 
-   function LoadString (L : in out State;
+   function LoadString (L : in State;
                         S : in String)
                         return Thread_Status is
       CS : C.Strings.chars_ptr;
@@ -68,7 +68,11 @@ package body Lua is
       return Thread_Status'Val(Result);
    end LoadString;
 
-   procedure Call (L : in out State;
+   --
+   -- *** Calling, yielding and functions
+   --
+
+   procedure Call (L : in State;
                    nargs : in Integer;
                    nresults : in Integer) is
    begin
@@ -79,7 +83,7 @@ package body Lua is
                          null);
    end Call;
 
-   function PCall (L : in out State;
+   function PCall (L : in State;
                    nargs : in Integer;
                    nresults : in Integer;
                    msgh : in Integer := 0)
@@ -104,27 +108,27 @@ package body Lua is
    -- *** Pushing values to the stack
    --
 
-   procedure PushBoolean (L : in out State; b : in Boolean) is
+   procedure PushBoolean (L : in  State; b : in Boolean) is
    begin
       Internal.lua_pushboolean(L.L, C.int( (if b then 1 else 0) ) );
    end PushBoolean;
 
-   procedure PushInteger (L : in out State; n : in Lua_Integer) is
+   procedure PushInteger (L : in State; n : in Lua_Integer) is
    begin
       Internal.lua_pushinteger(L.L, Internal.lua_Integer(n));
    end PushInteger;
 
-   procedure PushNil (L : in out State) is
+   procedure PushNil (L : in State) is
    begin
       Internal.lua_pushnil(L.L);
    end PushNil;
 
-   procedure PushNumber (L : in out State; n : in Lua_Number) is
+   procedure PushNumber (L : in  State; n : in Lua_Number) is
    begin
       Internal.lua_pushnumber(L.L, Internal.lua_Number(n));
    end PushNumber;
 
-   procedure PushString (L : in out State; s : in String) is
+   procedure PushString (L : in State; s : in String) is
       CS : C.Strings.chars_ptr;
       Discard : C.Strings.chars_ptr;
    begin
@@ -133,10 +137,10 @@ package body Lua is
       C.Strings.Free(CS);
    end PushString;
 
-   function PushThread (L : in out State) return Boolean is
+   function PushThread (L : in State) return Boolean is
      (Internal.lua_pushthread(L.L) = 1);
 
-   procedure PushThread (L : in out State) is
+   procedure PushThread (L : in State) is
       Discard : C.int;
    begin
       Discard := Internal.lua_pushthread(L.L);
@@ -205,7 +209,7 @@ package body Lua is
    -- *** Operations on values
    --
 
-   procedure Arith (L : in out State; op : in Arith_Op) is
+   procedure Arith (L : in State; op : in Arith_Op) is
    begin
       Internal.lua_arith(L.L, Arith_Op_To_Int(op));
    end Arith;
@@ -219,7 +223,7 @@ package body Lua is
                            C.int(index2),
                            Comparison_Op_To_Int(op)) = 1);
 
-   procedure Len (L : in out State; index : Integer) is
+   procedure Len (L : in  State; index : Integer) is
    begin
       Internal.lua_len(L.L, C.int(index));
    end Len;
@@ -228,7 +232,7 @@ package body Lua is
                      return Boolean is
       (Internal.lua_rawequal(L.L, C.int(index1), C.int(index2)) /= 0);
 
-   function RawLen (L : in out State; index : Integer) return Integer is
+   function RawLen (L : in State; index : Integer) return Integer is
       (Integer(Internal.lua_rawlen(L.L, C.int(index))));
 
    --
@@ -258,7 +262,7 @@ package body Lua is
    function CheckStack (L : in State; n : in Integer) return Boolean is
      (Internal.lua_checkstack(L.L, C.int(n)) /= 0);
 
-   procedure Copy (L : in out State; fromidx : in Integer; toidx : in Integer) is
+   procedure Copy (L : in State; fromidx : in Integer; toidx : in Integer) is
    begin
       Internal.lua_copy(L.L, C.int(fromidx), C.int(toidx));
    end Copy;
@@ -266,39 +270,39 @@ package body Lua is
    function GetTop (L : in State) return Integer is
      (Integer(Internal.lua_gettop(L.L)));
 
-   procedure Insert (L : in out State; index : in Integer) is
+   procedure Insert (L : in State; index : in Integer) is
    begin
       Internal.lua_rotate(L.L, C.int(index), 1);
    end Insert;
 
-   procedure Pop (L : in out State; n : in Integer) is
+   procedure Pop (L : in State; n : in Integer) is
    begin
       Internal.lua_settop(L.L, -C.int(n)-1);
    end Pop;
 
-   procedure PushValue (L : in out State; index : in Integer) is
+   procedure PushValue (L : in State; index : in Integer) is
    begin
       Internal.lua_pushvalue(L.L, C.int(index));
    end PushValue;
 
-   procedure Remove (L : in out State; index : in Integer) is
+   procedure Remove (L : in State; index : in Integer) is
    begin
       Internal.lua_rotate(L.L, C.int(index), -1);
       Internal.lua_settop(L.L, -2);
    end Remove;
 
-   procedure Replace (L : in out State; index : in Integer) is
+   procedure Replace (L : in State; index : in Integer) is
    begin
       Internal.lua_copy(L.L, -1, C.int(index));
       Internal.lua_settop(L.L, -2);
    end Replace;
 
-   procedure Rotate (L : in out State; idx : in Integer; n : in Integer) is
+   procedure Rotate (L : in State; idx : in Integer; n : in Integer) is
    begin
       Internal.lua_rotate(L.L, C.int(idx), C.int(n));
    end Rotate;
 
-   procedure SetTop (L : in out State; index : in Integer) is
+   procedure SetTop (L : in State; index : in Integer) is
    begin
       Internal.lua_settop(L.L, C.int(index));
    end SetTop;
@@ -321,19 +325,19 @@ package body Lua is
    -- *** Table Manipulation
    --
 
-   procedure createtable (L : in out State;
+   procedure createtable (L : in State;
                           narr : in Integer := 0;
                           nrec : in Integer := 0) is
    begin
       Internal.lua_createtable(L.L, C.int(narr), C.int(nrec));
    end createtable;
 
-   procedure newtable (L : in out State) is
+   procedure newtable (L : in State) is
    begin
       Internal.lua_createtable(L.L, 0, 0);
    end newtable;
 
-   function getfield (L : in out State; index : in Integer; k : in String)
+   function getfield (L : in State; index : in Integer; k : in String)
                       return Lua_Type is
      (
       Lua_Type'Val(
@@ -343,7 +347,7 @@ package body Lua is
                   )
      );
 
-   procedure getfield (L : in out State; index : in Integer; k : in String) is
+   procedure getfield (L : in State; index : in Integer; k : in String) is
       Discard : C.int;
    begin
       Discard := Internal.lua_getfield(L.L,
@@ -351,50 +355,50 @@ package body Lua is
                                        C.Strings.New_String(k));
    end getfield;
 
-   function geti (L : in out State; index : in Integer; i : in Integer)
+   function geti (L : in State; index : in Integer; i : in Integer)
                   return Lua_Type is
      (
       Lua_Type'Val(Internal.lua_geti(L.L, C.int(index), Long_Long_Integer(i)))
      );
 
-   procedure geti (L : in out State; index : in Integer; i : in Integer) is
+   procedure geti (L : in State; index : in Integer; i : in Integer) is
      Discard : C.int;
    begin
       Discard := Internal.lua_geti(L.L, C.int(index), Long_Long_Integer(i));
    end geti;
 
-   function gettable (L : in out State; index : in Integer) return Lua_Type is
+   function gettable (L : in State; index : in Integer) return Lua_Type is
      (
       Lua_Type'Val(Internal.lua_gettable(L.L, C.int(index)))
      );
 
-   procedure gettable (L : in out State; index : in Integer) is
+   procedure gettable (L : in State; index : in Integer) is
      Discard : C.int;
    begin
       Discard := Internal.lua_gettable(L.L, C.int(index));
    end gettable;
 
-   function next (L : in out State; index : in Integer) return Boolean is
+   function next (L : in State; index : in Integer) return Boolean is
      (Internal.lua_next(L.L, C.int(index)) /= 0);
 
-   function rawget (L : in out State; index : in Integer) return Lua_Type is
+   function rawget (L : in State; index : in Integer) return Lua_Type is
      (
       Lua_Type'Val(Internal.lua_rawget(L.L, C.int(index)))
      );
 
-   procedure rawget (L : in out State; index : in Integer) is
+   procedure rawget (L : in State; index : in Integer) is
      Discard : C.int;
    begin
       Discard := Internal.lua_rawget(L.L, C.int(index));
    end rawget;
 
-   function rawgeti (L : in out State; index : in Integer; i : in Integer)
+   function rawgeti (L : in State; index : in Integer; i : in Integer)
                   return Lua_Type is
      (
       Lua_Type'Val(Internal.lua_rawgeti(L.L, C.int(index), Long_Long_Integer(i)))
      );
 
-   procedure rawgeti (L : in out State; index : in Integer; i : in Integer) is
+   procedure rawgeti (L : in State; index : in Integer; i : in Integer) is
      Discard : C.int;
    begin
       Discard := Internal.lua_rawgeti(L.L, C.int(index), Long_Long_Integer(i));
@@ -405,17 +409,17 @@ package body Lua is
       Internal.lua_rawset(L.L, C.int(index));
    end rawset;
 
-   procedure rawseti (L : in out State; index : in Integer; i : in Integer) is
+   procedure rawseti (L : in State; index : in Integer; i : in Integer) is
    begin
       Internal.lua_rawseti(L.L, C.int(index), Long_Long_Integer(i));
    end rawseti;
 
-   procedure setfield (L : in out State; index : in Integer; k : in String) is
+   procedure setfield (L : in State; index : in Integer; k : in String) is
    begin
       Internal.lua_setfield(L.L, C.int(index), C.Strings.New_String(k));
    end setfield;
 
-   procedure seti (L : in out State; index : in Integer; i : in Integer) is
+   procedure seti (L : in State; index : in Integer; i : in Integer) is
    begin
       Internal.lua_seti(L.L, C.int(index), Long_Long_Integer(i));
    end seti;
@@ -429,19 +433,19 @@ package body Lua is
    -- *** Globals and Metatables
    --
 
-   function getglobal (L : in out State; name : in String) return Lua_Type is
+   function getglobal (L : in State; name : in String) return Lua_Type is
      (Lua_Type'Val(Internal.lua_getglobal(L.L, C.Strings.New_String(name))));
 
-   procedure getglobal (L : in out State; name : in String) is
+   procedure getglobal (L : in State; name : in String) is
       Discard : C.int;
    begin
       Discard := Internal.lua_getglobal(L.L, C.Strings.New_String(name));
    end getglobal;
 
-   function getmetatable (L : in out State; index : in Integer) return Boolean is
+   function getmetatable (L : in State; index : in Integer) return Boolean is
      (Internal.lua_getmetatable(L.L, C.int(index)) /= 0);
 
-   procedure getmetatable (L : in out State; index : in Integer) is
+   procedure getmetatable (L : in State; index : in Integer) is
    begin
       if Internal.lua_getmetatable(L.L, C.int(index)) = 0 then
          raise Lua_Error with "No metatable exists for stack index: " &
@@ -449,7 +453,7 @@ package body Lua is
       end if;
    end getmetatable;
 
-   procedure pushglobaltable (L : in out State) is
+   procedure pushglobaltable (L : in State) is
       Discard : C.int;
    begin
       Discard := Internal.lua_rawgeti(L.L,
@@ -457,12 +461,12 @@ package body Lua is
                                       Long_Long_Integer(RIDX_Globals));
    end pushglobaltable;
 
-   procedure setglobal (L : in out State; name : in String) is
+   procedure setglobal (L : in State; name : in String) is
    begin
       Internal.lua_setglobal(L.L, C.Strings.New_String(name));
    end setglobal;
 
-   procedure setmetatable (L : in out State; index : in Integer) is
+   procedure setmetatable (L : in State; index : in Integer) is
       Discard : C.int;
    begin
       -- According to the Lua documentation, lua_setmetatable does not have a
@@ -474,7 +478,7 @@ package body Lua is
    -- *** Threads
    --
 
-   procedure xmove (from, to : in out Thread; n : in Integer) is
+   procedure xmove (from, to : in Thread; n : in Integer) is
    begin
       Internal.lua_xmove(from.L, to.L, C.int(n));
    end xmove;

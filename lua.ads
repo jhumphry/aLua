@@ -69,29 +69,27 @@ package Lua is
    type Thread;
    function Version (L : in State) return Long_Float;
    function Status (L : in State) return Thread_Status;
-   function LoadString (L : in out State;
+   function LoadString (L : in State;
                         S : in String) return Thread_Status;
-   procedure Call (L : in out State; nargs : in Integer; nresults : in Integer);
-   function PCall (L : in out State;
+
+   -- Calling, yielding and functions
+   procedure Call (L : in State; nargs : in Integer; nresults : in Integer);
+   function PCall (L : in State;
                    nargs : in Integer;
                    nresults : in Integer;
                    msgh : in Integer := 0)
-     return Thread_Status;
+                   return Thread_Status;
 
    -- Pushing values to the stack
-   procedure PushBoolean (L : in out State; b : in Boolean);
-   procedure PushInteger (L : in out State; n : in Lua_Integer);
-   procedure PushNil (L : in out State);
-   procedure PushNumber (L : in out State; n : in Lua_Number);
-   procedure PushString (L : in out State; s : in String);
-   function PushThread (L : in out State) return Boolean;
-   procedure PushThread (L : in out State);
+   procedure PushBoolean (L : in  State; b : in Boolean);
+   procedure PushInteger (L : in State; n : in Lua_Integer);
+   procedure PushNil (L : in State);
+   procedure PushNumber (L : in State; n : in Lua_Number);
+   procedure PushString (L : in State; s : in String);
+   function PushThread (L : in State) return Boolean;
+   procedure PushThread (L : in State);
 
    -- Pulling values from the stack
-   -- Currently these can modify the state because they can convert the value
-   -- on the stack to the requested type. They should be split into 'hard'-typed
-   -- variants that take a parameter of mode 'in' and 'soft'-typed variants that
-   -- take an 'in out' parameter
    function ToBoolean (L : in State; index : in Integer) return Boolean;
    function ToInteger (L : in State; index : in Integer) return Lua_Integer;
    function ToNumber (L : in State; index : in Integer) return Lua_Number;
@@ -99,14 +97,14 @@ package Lua is
    function ToThread (L : in State; index : in Integer) return Thread;
 
    -- Operations on values
-   procedure Arith (L : in out State; op : in Arith_Op);
+   procedure Arith (L : in State; op : in Arith_Op);
    function Compare (L : in State;
                      index1 : in Integer;
                      index2 : in Integer;
                      op : in Comparison_Op) return Boolean;
-   procedure Len (L : in out State; index : Integer);
+   procedure Len (L : in  State; index : Integer);
    function RawEqual (L : in State; index1, index2 : in Integer) return Boolean;
-   function RawLen (L : in out State; index : Integer) return Integer;
+   function RawLen (L : in State; index : Integer) return Integer;
 
    -- Garbage Collector control
    procedure GC (L : in State; what : in GC_Op);
@@ -117,57 +115,57 @@ package Lua is
    -- Stack manipulation and information
    function AbsIndex (L : in State; idx : in Integer) return Integer;
    function CheckStack (L : in State; n : in Integer) return Boolean;
-   procedure Copy (L : in out State; fromidx : in Integer; toidx : in Integer);
+   procedure Copy (L : in State; fromidx : in Integer; toidx : in Integer);
    function GetTop (L : in State) return Integer;
-   procedure Insert (L : in out State; index : in Integer);
-   procedure Pop (L : in out State; n : in Integer);
-   procedure PushValue (L : in out State; index : in Integer);
-   procedure Remove (L : in out State; index : in Integer);
-   procedure Replace (L : in out State; index : in Integer);
-   procedure Rotate (L : in out State; idx : in Integer; n : in Integer);
-   procedure SetTop (L : in out State; index : in Integer);
+   procedure Insert (L : in State; index : in Integer);
+   procedure Pop (L : in State; n : in Integer);
+   procedure PushValue (L : in State; index : in Integer);
+   procedure Remove (L : in State; index : in Integer);
+   procedure Replace (L : in State; index : in Integer);
+   procedure Rotate (L : in State; idx : in Integer; n : in Integer);
+   procedure SetTop (L : in State; index : in Integer);
 
    -- Type information
    function TypeInfo (L : in State; index : in Integer) return Lua_Type;
    function TypeName (L : in State; tp : in Lua_Type) return String;
 
    -- Table manipulation
-   procedure createtable (L : in out State;
+   procedure createtable (L : in State;
                           narr : in Integer := 0;
                           nrec : in Integer := 0);
-   procedure newtable (L : in out State);
-   function getfield (L : in out State; index : in Integer; k : in String)
+   procedure newtable (L : in State);
+   function getfield (L : in State; index : in Integer; k : in String)
                   return Lua_Type;
-   procedure getfield (L : in out State; index : in Integer; k : in String);
-   function geti (L : in out State; index : in Integer; i : in Integer)
+   procedure getfield (L : in State; index : in Integer; k : in String);
+   function geti (L : in State; index : in Integer; i : in Integer)
                   return Lua_Type;
-   procedure geti (L : in out State; index : in Integer; i : in Integer);
-   function gettable (L : in out State; index : in Integer) return Lua_Type;
-   procedure gettable (L : in out State; index : in Integer);
-   function next (L : in out State; index : in Integer) return Boolean;
-   function rawget (L : in out State; index : in Integer) return Lua_Type;
-   procedure rawget (L : in out State; index : in Integer);
-   function rawgeti (L : in out State; index : in Integer; i : in Integer)
+   procedure geti (L : in State; index : in Integer; i : in Integer);
+   function gettable (L : in State; index : in Integer) return Lua_Type;
+   procedure gettable (L : in State; index : in Integer);
+   function next (L : in State; index : in Integer) return Boolean;
+   function rawget (L : in State; index : in Integer) return Lua_Type;
+   procedure rawget (L : in State; index : in Integer);
+   function rawgeti (L : in State; index : in Integer; i : in Integer)
                   return Lua_Type;
-   procedure rawgeti (L : in out State; index : in Integer; i : in Integer);
+   procedure rawgeti (L : in State; index : in Integer; i : in Integer);
    procedure rawset (L : in State; index : in Integer);
-   procedure rawseti (L : in out State; index : in Integer; i : in Integer);
-   procedure setfield (L : in out State; index : in Integer; k : in String);
-   procedure seti (L : in out State; index : in Integer; i : in Integer);
+   procedure rawseti (L : in State; index : in Integer; i : in Integer);
+   procedure setfield (L : in State; index : in Integer; k : in String);
+   procedure seti (L : in State; index : in Integer; i : in Integer);
    procedure settable (L : in State; index : in Integer);
 
    -- Globals and metatables
-   function getglobal (L : in out State; name : in String) return Lua_Type;
-   procedure getglobal (L : in out State; name : in String);
-   function getmetatable (L : in out State; index : in Integer) return Boolean;
-   procedure getmetatable (L : in out State; index : in Integer);
-   procedure pushglobaltable (L : in out State);
-   procedure setglobal (L : in out State; name : in String);
-   procedure setmetatable (L : in out State; index : in Integer);
+   function getglobal (L : in State; name : in String) return Lua_Type;
+   procedure getglobal (L : in State; name : in String);
+   function getmetatable (L : in State; index : in Integer) return Boolean;
+   procedure getmetatable (L : in State; index : in Integer);
+   procedure pushglobaltable (L : in State);
+   procedure setglobal (L : in State; name : in String);
+   procedure setmetatable (L : in State; index : in Integer);
 
    -- Threads
    type Thread is new State with private;
-   procedure xmove (from, to : in out Thread; n : in Integer);
+   procedure xmove (from, to : in Thread; n : in Integer);
 
 private
 
