@@ -34,72 +34,21 @@ with Interfaces.C; use Interfaces.C;
 with Interfaces.C.Extensions;
 with System;
 with Interfaces.C.Strings;
+with Ada.Characters.Latin_1;
 
 private package Lua.Internal is
 
+   -- mark for precompiled code ('<esc>Lua')
+   LUA_SIGNATURE : constant String := Ada.Characters.Latin_1.ESC & "Lua";
+   -- is this null terminated?
 
-   LUA_VERSION_MAJOR : aliased constant String := "5" & ASCII.NUL;  --  /usr/include/lua.h:19
-   LUA_VERSION_MINOR : aliased constant String := "3" & ASCII.NUL;  --  /usr/include/lua.h:20
-   LUA_VERSION_NUM : constant := 503;  --  /usr/include/lua.h:21
-   LUA_VERSION_RELEASE : aliased constant String := "1" & ASCII.NUL;  --  /usr/include/lua.h:22
-   --  unsupported macro: LUA_VERSION "Lua " LUA_VERSION_MAJOR "." LUA_VERSION_MINOR
-   --  unsupported macro: LUA_RELEASE LUA_VERSION "." LUA_VERSION_RELEASE
-   --  unsupported macro: LUA_COPYRIGHT LUA_RELEASE "  Copyright (C) 1994-2015 Lua.org, PUC-Rio"
-
-   LUA_AUTHORS : aliased constant String := "R. Ierusalimschy, L. H. de Figueiredo, W. Celes" & ASCII.NUL;  --  /usr/include/lua.h:27
-   --  unsupported macro: LUA_SIGNATURE "\x1bLua"
-
+   -- option for multiple returns in 'lua_pcall' and 'lua_call'
    LUA_MULTRET : constant := (-1);  --  /usr/include/lua.h:34
-   --  unsupported macro: LUA_REGISTRYINDEX (-LUAI_MAXSTACK - 1000)
-   --  arg-macro: function lua_upvalueindex (i)
-   --    return LUA_REGISTRYINDEX - (i);
 
---     LUA_OK : constant := 0;  --  /usr/include/lua.h:47
---     LUA_YIELD : constant := 1;  --  /usr/include/lua.h:48
---     LUA_ERRRUN : constant := 2;  --  /usr/include/lua.h:49
---     LUA_ERRSYNTAX : constant := 3;  --  /usr/include/lua.h:50
---     LUA_ERRMEM : constant := 4;  --  /usr/include/lua.h:51
---     LUA_ERRGCMM : constant := 5;  --  /usr/include/lua.h:52
---     LUA_ERRERR : constant := 6;  --  /usr/include/lua.h:53
-
---     LUA_TNONE : constant := (-1);  --  /usr/include/lua.h:62
---
---     LUA_TNIL : constant := 0;  --  /usr/include/lua.h:64
---     LUA_TBOOLEAN : constant := 1;  --  /usr/include/lua.h:65
---     LUA_TLIGHTUSERDATA : constant := 2;  --  /usr/include/lua.h:66
---     LUA_TNUMBER : constant := 3;  --  /usr/include/lua.h:67
---     LUA_TSTRING : constant := 4;  --  /usr/include/lua.h:68
---     LUA_TTABLE : constant := 5;  --  /usr/include/lua.h:69
---     LUA_TFUNCTION : constant := 6;  --  /usr/include/lua.h:70
---     LUA_TUSERDATA : constant := 7;  --  /usr/include/lua.h:71
---     LUA_TTHREAD : constant := 8;  --  /usr/include/lua.h:72
-
-   LUA_NUMTAGS : constant := 9;  --  /usr/include/lua.h:74
-
+  -- minimum Lua stack available to a C function
    LUA_MINSTACK : constant := 20;  --  /usr/include/lua.h:79
 
-   LUA_RIDX_MAINTHREAD : constant := 1;  --  /usr/include/lua.h:83
-   LUA_RIDX_GLOBALS : constant := 2;  --  /usr/include/lua.h:84
-   --  unsupported macro: LUA_RIDX_LAST LUA_RIDX_GLOBALS
 
---     LUA_OPADD : constant := 0;  --  /usr/include/lua.h:196
---     LUA_OPSUB : constant := 1;  --  /usr/include/lua.h:197
---     LUA_OPMUL : constant := 2;  --  /usr/include/lua.h:198
---     LUA_OPMOD : constant := 3;  --  /usr/include/lua.h:199
---     LUA_OPPOW : constant := 4;  --  /usr/include/lua.h:200
---     LUA_OPDIV : constant := 5;  --  /usr/include/lua.h:201
---     LUA_OPIDIV : constant := 6;  --  /usr/include/lua.h:202
---     LUA_OPBAND : constant := 7;  --  /usr/include/lua.h:203
---     LUA_OPBOR : constant := 8;  --  /usr/include/lua.h:204
---     LUA_OPBXOR : constant := 9;  --  /usr/include/lua.h:205
---     LUA_OPSHL : constant := 10;  --  /usr/include/lua.h:206
---     LUA_OPSHR : constant := 11;  --  /usr/include/lua.h:207
---     LUA_OPUNM : constant := 12;  --  /usr/include/lua.h:208
---     LUA_OPBNOT : constant := 13;  --  /usr/include/lua.h:209
-
---     LUA_OPEQ : constant := 0;  --  /usr/include/lua.h:213
---     LUA_OPLT : constant := 1;  --  /usr/include/lua.h:214
---     LUA_OPLE : constant := 2;  --  /usr/include/lua.h:215
    --  arg-macro: procedure lua_call (L, n, r)
    --    lua_callk(L, (n), (r), 0, NULL)
    --  arg-macro: procedure lua_pcall (L, n, r, f)
@@ -107,25 +56,12 @@ private package Lua.Internal is
    --  arg-macro: procedure lua_yield (L, n)
    --    lua_yieldk(L, (n), 0, NULL)
 
---     LUA_GCSTOP : constant := 0;  --  /usr/include/lua.h:302
---     LUA_GCRESTART : constant := 1;  --  /usr/include/lua.h:303
---     LUA_GCCOLLECT : constant := 2;  --  /usr/include/lua.h:304
---     LUA_GCCOUNT : constant := 3;  --  /usr/include/lua.h:305
---     LUA_GCCOUNTB : constant := 4;  --  /usr/include/lua.h:306
---     LUA_GCSTEP : constant := 5;  --  /usr/include/lua.h:307
---     LUA_GCSETPAUSE : constant := 6;  --  /usr/include/lua.h:308
---     LUA_GCSETSTEPMUL : constant := 7;  --  /usr/include/lua.h:309
---     LUA_GCISRUNNING : constant := 9;  --  /usr/include/lua.h:310
    --  arg-macro: function lua_getextraspace (L)
    --    return (void *)((char *)(L) - LUA_EXTRASPACE);
    --  arg-macro: procedure lua_tonumber (L, i)
    --    lua_tonumberx(L,(i),NULL)
    --  arg-macro: procedure lua_tointeger (L, i)
    --    lua_tointegerx(L,(i),NULL)
-   --  arg-macro: procedure lua_pop (L, n)
-   --    lua_settop(L, -(n)-1)
-   --  arg-macro: procedure lua_newtable (L)
-   --    lua_createtable(L, 0, 0)
    --  arg-macro: function lua_register (L, n, f)
    --    return lua_pushcfunction(L, (f)), lua_setglobal(L, (n));
    --  arg-macro: procedure lua_pushcfunction (L, f)
@@ -146,18 +82,9 @@ private package Lua.Internal is
    --    return lua_type(L, (n)) = LUA_TNONE;
    --  arg-macro: function lua_isnoneornil (L, n)
    --    return lua_type(L, (n)) <= 0;
-   --  arg-macro: procedure lua_pushliteral (L, s)
-   --    lua_pushstring(L, "" s)
-   --  arg-macro: procedure lua_pushglobaltable (L)
-   --    lua_rawgeti(L, LUA_REGISTRYINDEX, LUA_RIDX_GLOBALS)
+
    --  arg-macro: procedure lua_tostring (L, i)
    --    lua_tolstring(L, (i), NULL)
-   --  arg-macro: procedure lua_insert (L, idx)
-   --    lua_rotate(L, (idx), 1)
-   --  arg-macro: function lua_remove (L, idx)
-   --    return lua_rotate(L, (idx), -1), lua_pop(L, 1);
-   --  arg-macro: function lua_replace (L, idx)
-   --    return lua_copy(L, -1, (idx)), lua_pop(L, 1);
 
    LUA_HOOKCALL : constant := 0;  --  /usr/include/lua.h:402
    LUA_HOOKRET : constant := 1;  --  /usr/include/lua.h:403
@@ -169,27 +96,6 @@ private package Lua.Internal is
    --  unsupported macro: LUA_MASKLINE (1 << LUA_HOOKLINE)
    --  unsupported macro: LUA_MASKCOUNT (1 << LUA_HOOKCOUNT)
 
-  --** $Id: lua.h,v 1.328 2015/06/03 13:03:38 roberto Exp $
-  --** Lua - A Scripting Language
-  --** Lua.org, PUC-Rio, Brazil (http://www.lua.org)
-  --** See Copyright Notice at the end of this file
-  --
-
-  -- mark for precompiled code ('<esc>Lua')
-  -- option for multiple returns in 'lua_pcall' and 'lua_call'
-  --** Pseudo-indices
-  --** (-LUAI_MAXSTACK is the minimum valid index; we keep some free empty
-  --** space after that to help overflow detection)
-  --
-
-  -- thread status
-   --  skipped empty struct lua_State
-
-  --** basic types
-  --
-
-  -- minimum Lua stack available to a C function
-  -- predefined values in the registry
   -- type of numbers in Lua
    subtype lua_Number is double;  -- /usr/include/lua.h:89
 
