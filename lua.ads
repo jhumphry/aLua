@@ -104,6 +104,9 @@ package Lua is
                      index1 : in Integer;
                      index2 : in Integer;
                      op : in Comparison_Op) return Boolean;
+   procedure Len (L : in out State; index : Integer);
+   function RawEqual (L : in State; index1, index2 : in Integer) return Boolean;
+   function RawLen (L : in out State; index : Integer) return Integer;
 
    -- Garbage Collector control
    procedure GC (L : in State; what : in GC_Op);

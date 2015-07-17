@@ -219,6 +219,18 @@ package body Lua is
                            C.int(index2),
                            Comparison_Op_To_Int(op)) = 1);
 
+   procedure Len (L : in out State; index : Integer) is
+   begin
+      Internal.lua_len(L.L, C.int(index));
+   end Len;
+
+   function RawEqual(L : in State; index1, index2 : in Integer)
+                     return Boolean is
+      (Internal.lua_rawequal(L.L, C.int(index1), C.int(index2)) /= 0);
+
+   function RawLen (L : in out State; index : Integer) return Integer is
+      (Integer(Internal.lua_rawlen(L.L, C.int(index))));
+
    --
    -- *** Garbage Collector control
    ---
