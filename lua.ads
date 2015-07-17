@@ -145,9 +145,13 @@ package Lua is
    function gettable (L : in out State; index : in Integer) return Lua_Type;
    procedure gettable (L : in out State; index : in Integer);
    function next (L : in out State; index : in Integer) return Boolean;
+   function rawget (L : in out State; index : in Integer) return Lua_Type;
+   procedure rawget (L : in out State; index : in Integer);
    function rawgeti (L : in out State; index : in Integer; i : in Integer)
                   return Lua_Type;
    procedure rawgeti (L : in out State; index : in Integer; i : in Integer);
+   procedure rawset (L : in State; index : in Integer);
+   procedure rawseti (L : in out State; index : in Integer; i : in Integer);
    procedure setfield (L : in out State; index : in Integer; k : in String);
    procedure seti (L : in out State; index : in Integer; i : in Integer);
    procedure settable (L : in State; index : in Integer);

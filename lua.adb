@@ -377,6 +377,17 @@ package body Lua is
    function next (L : in out State; index : in Integer) return Boolean is
      (Internal.lua_next(L.L, C.int(index)) /= 0);
 
+   function rawget (L : in out State; index : in Integer) return Lua_Type is
+     (
+      Lua_Type'Val(Internal.lua_rawget(L.L, C.int(index)))
+     );
+
+   procedure rawget (L : in out State; index : in Integer) is
+     Discard : C.int;
+   begin
+      Discard := Internal.lua_rawget(L.L, C.int(index));
+   end rawget;
+
    function rawgeti (L : in out State; index : in Integer; i : in Integer)
                   return Lua_Type is
      (
@@ -388,6 +399,16 @@ package body Lua is
    begin
       Discard := Internal.lua_rawgeti(L.L, C.int(index), Long_Long_Integer(i));
    end rawgeti;
+
+   procedure rawset (L : in State; index : in Integer) is
+   begin
+      Internal.lua_rawset(L.L, C.int(index));
+   end rawset;
+
+   procedure rawseti (L : in out State; index : in Integer; i : in Integer) is
+   begin
+      Internal.lua_rawseti(L.L, C.int(index), Long_Long_Integer(i));
+   end rawseti;
 
    procedure setfield (L : in out State; index : in Integer; k : in String) is
    begin
