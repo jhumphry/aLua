@@ -119,8 +119,7 @@ package body Lua is
    procedure Register(L : in State; name : in String; f : in AdaFunction) is
       C_name : C.Strings.chars_ptr := C.Strings.New_String(name);
    begin
-      Internal.lua_pushlightuserdata(L.L, AdaFunction_To_Address(f));
-      Internal.lua_pushcclosure(L.L, CFunction_Trampoline'Access, 1);
+      PushAdaClosure(L, f, 0);
       Internal.lua_setglobal(L.L, C_name);
       C.Strings.Free(C_name);
    end Register;
@@ -129,10 +128,18 @@ package body Lua is
    -- *** Pushing values to the stack
    --
 
-   procedure PushAdaFunction (L : in State; f : in AdaFunction) is
+   procedure PushAdaClosure (L : in State;
+                             f : in AdaFunction;
+                             n : in Natural) is
    begin
       Internal.lua_pushlightuserdata(L.L, AdaFunction_To_Address(f));
-      Internal.lua_pushcclosure(L.L, CFunction_Trampoline'Access, 1);
+      L.Rotate(L.GetTop - n, 1);
+      Internal.lua_pushcclosure(L.L, CFunction_Trampoline'Access, C.int(1 + n));
+   end PushAdaClosure;
+
+   procedure PushAdaFunction (L : in State; f : in AdaFunction) is
+   begin
+      PushAdaClosure(L, f, 0);
    end PushAdaFunction;
 
    procedure PushBoolean (L : in  State; b : in Boolean) is

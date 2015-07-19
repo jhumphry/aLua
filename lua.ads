@@ -86,6 +86,7 @@ package Lua is
      with Import, Convention => C, Link_Name => "lua_conf_multret";
 
    -- Pushing values to the stack
+   procedure PushAdaClosure (L : in State; f : in AdaFunction; n : in Natural);
    procedure PushAdaFunction (L : in State; f : in AdaFunction);
    procedure PushBoolean (L : in  State; b : in Boolean);
    procedure PushInteger (L : in State; n : in Lua_Integer);

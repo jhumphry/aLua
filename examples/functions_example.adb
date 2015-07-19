@@ -32,6 +32,7 @@ with Lua.Util; use Lua.Util;
 
 with Func_Foobar;
 with Func_Multret;
+with Func_Closure;
 
 procedure Functions_Example is
    L : State;
@@ -75,6 +76,19 @@ begin
    Put_Line("Calling 'multret(5)' from Lua");
    L.GetGlobal("multret");
    L.PushInteger(5);
+   L.Call(1, MultRet_Sentinel);
+   Put_Line("Stack now contains:");
+   Print_Stack(L);
+   New_Line;
+
+   L.Pop(L.GetTop);
+   Put_Line("Registering an AdaFunction closure (with upvalue 2.0) in Lua");
+   L.PushNumber(2.0);
+   L.PushAdaClosure(AdaFunction'(Func_Closure'Access), 1);
+   L.SetGlobal("closure");
+   Put_Line("Calling 'closure(3.5)' from Lua");
+   L.GetGlobal("closure");
+   L.PushNumber(3.5);
    L.Call(1, MultRet_Sentinel);
    Put_Line("Stack now contains:");
    Print_Stack(L);
