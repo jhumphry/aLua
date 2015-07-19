@@ -1,4 +1,4 @@
--- Simple_Example_Foobar
+-- Func_Foobar
 
 -- A simple example of using the Ada 2012 interface to Lua
 
@@ -29,11 +29,11 @@ use Lua;
 with Ada.Text_IO;
 use Ada.Text_IO;
 
-function Simple_Example_FooBar (L : State'Class) return Natural is
+function Func_FooBar (L : State'Class) return Natural is
    x : Long_Float := L.ToNumber(-1);
 begin
-   Put_Line("In Ada function foobar(" & Long_Float'Image(x) & ")");
+   Put_Line("* In Ada function foobar(" & Long_Float'Image(x) & ")");
    L.pop(1);
    L.PushNumber(x*x);
    return 1;
-end Simple_Example_FooBar;
+end Func_FooBar;
