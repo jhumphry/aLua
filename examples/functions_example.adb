@@ -28,14 +28,17 @@ with Ada.Long_Float_Text_IO; use Ada.Long_Float_Text_IO;
 with Ada.Integer_Text_IO; use Ada.Integer_Text_IO;
 
 with Lua; use Lua;
+with Lua.Util; use Lua.Util;
 
 with Func_Foobar;
+with Func_Multret;
 
 procedure Functions_Example is
    L : State;
    Success : Thread_Status;
 
 begin
+
    Put_Line("A simple example of using Lua and Ada functions together");
 
    Put("Lua version: ");
@@ -64,6 +67,17 @@ begin
    Put("baz = ");
    L.GetGlobal("baz");
    Put(L.ToNumber(-1), Aft => 0, Exp => 0); New_Line;
+   New_Line;
+
+   L.Pop(L.GetTop);
+   Put_Line("Registering an AdaFunction multret in Lua");
+   L.Register("multret", AdaFunction'(Func_Multret'Access));
+   Put_Line("Calling 'multret(5)' from Lua");
+   L.GetGlobal("multret");
+   L.PushInteger(5);
+   L.Call(1, MultRet_Sentinel);
+   Put_Line("Stack now contains:");
+   Print_Stack(L);
    New_Line;
 
 end Functions_Example;

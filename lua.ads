@@ -82,6 +82,8 @@ package Lua is
                    return Thread_Status;
    type AdaFunction is access function (L : State'Class) return Natural;
    procedure Register(L : in State; name : in String; f : in AdaFunction);
+   MultRet_Sentinel : constant Integer
+     with Import, Convention => C, Link_Name => "lua_conf_multret";
 
    -- Pushing values to the stack
    procedure PushAdaFunction (L : in State; f : in AdaFunction);
