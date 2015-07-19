@@ -80,7 +80,7 @@ package body Lua is
       CS := C.Strings.New_String(S);
       Result := AuxInternal.luaL_loadstring(L.L, C.Strings.New_String(S));
       C.Strings.Free(CS);
-      return Thread_Status'Val(Result);
+      return Int_To_Thread_Status(Result);
    end LoadString;
 
    --
@@ -104,16 +104,16 @@ package body Lua is
                    msgh : in Integer := 0)
                    return Thread_Status is
      (
-      Thread_Status'Val(
-                        Internal.lua_pcallk(L.L,
-                                            C.int(nargs),
-                                            C.int(nresults),
-                                            C.int(msgh),
-                                            0,
-                                            null
-                                           )
+      Int_To_Thread_Status(
+                           Internal.lua_pcallk(L.L,
+                                               C.int(nargs),
+                                               C.int(nresults),
+                                               C.int(msgh),
+                                               0,
+                                               null
+                                              )
 
-                       )
+                          )
      );
 
    procedure Register(L : in State; name : in String; f : in AdaFunction) is
@@ -156,12 +156,12 @@ package body Lua is
    end PushNumber;
 
    procedure PushString (L : in State; s : in String) is
-      CS : C.Strings.chars_ptr;
+      C_s : C.Strings.chars_ptr;
       Discard : C.Strings.chars_ptr;
    begin
-      CS := C.Strings.New_String(S);
-      Discard := Internal.lua_pushstring(L.L, C.Strings.New_String(s));
-      C.Strings.Free(CS);
+      C_s := C.Strings.New_String(s);
+      Discard := Internal.lua_pushstring(L.L, C_s);
+      C.Strings.Free(C_s);
    end PushString;
 
    function PushThread (L : in State) return Boolean is
@@ -366,26 +366,32 @@ package body Lua is
 
    function getfield (L : in State; index : in Integer; k : in String)
                       return Lua_Type is
-     (
-      Lua_Type'Val(
-                   Internal.lua_getfield(L.L,
-                                         C.int(index),
-                                         C.Strings.New_String(k & ASCII.Nul))
-                  )
-     );
+      Result : C.int;
+      C_k : C.Strings.chars_ptr := C.Strings.New_String(k);
+   begin
+      Result := Internal.lua_getfield(L.L,
+                                       C.int(index),
+                                       C_k);
+      C.Strings.Free(C_k);
+      return Int_To_Lua_Type(Result);
+   end getfield;
 
    procedure getfield (L : in State; index : in Integer; k : in String) is
       Discard : C.int;
+      C_k : C.Strings.chars_ptr := C.Strings.New_String(k);
    begin
       Discard := Internal.lua_getfield(L.L,
                                        C.int(index),
-                                       C.Strings.New_String(k));
+                                       C_k);
+      C.Strings.Free(C_k);
    end getfield;
 
    function geti (L : in State; index : in Integer; i : in Integer)
                   return Lua_Type is
      (
-      Lua_Type'Val(Internal.lua_geti(L.L, C.int(index), Long_Long_Integer(i)))
+      Int_To_Lua_Type(Internal.lua_geti(L.L,
+                                        C.int(index),
+                                        Long_Long_Integer(i)))
      );
 
    procedure geti (L : in State; index : in Integer; i : in Integer) is
@@ -396,7 +402,7 @@ package body Lua is
 
    function gettable (L : in State; index : in Integer) return Lua_Type is
      (
-      Lua_Type'Val(Internal.lua_gettable(L.L, C.int(index)))
+      Int_To_Lua_Type(Internal.lua_gettable(L.L, C.int(index)))
      );
 
    procedure gettable (L : in State; index : in Integer) is
@@ -410,7 +416,7 @@ package body Lua is
 
    function rawget (L : in State; index : in Integer) return Lua_Type is
      (
-      Lua_Type'Val(Internal.lua_rawget(L.L, C.int(index)))
+      Int_To_Lua_Type(Internal.lua_rawget(L.L, C.int(index)))
      );
 
    procedure rawget (L : in State; index : in Integer) is
@@ -422,7 +428,10 @@ package body Lua is
    function rawgeti (L : in State; index : in Integer; i : in Integer)
                   return Lua_Type is
      (
-      Lua_Type'Val(Internal.lua_rawgeti(L.L, C.int(index), Long_Long_Integer(i)))
+      Int_To_Lua_Type(Internal.lua_rawgeti(L.L,
+                                           C.int(index),
+                                           Long_Long_Integer(i))
+                     )
      );
 
    procedure rawgeti (L : in State; index : in Integer; i : in Integer) is
@@ -442,8 +451,10 @@ package body Lua is
    end rawseti;
 
    procedure setfield (L : in State; index : in Integer; k : in String) is
+      C_k : C.Strings.chars_ptr := C.Strings.New_String(k);
    begin
-      Internal.lua_setfield(L.L, C.int(index), C.Strings.New_String(k));
+      Internal.lua_setfield(L.L, C.int(index), C_k);
+      C.Strings.Free(C_k);
    end setfield;
 
    procedure seti (L : in State; index : in Integer; i : in Integer) is
@@ -461,12 +472,20 @@ package body Lua is
    --
 
    function getglobal (L : in State; name : in String) return Lua_Type is
-     (Lua_Type'Val(Internal.lua_getglobal(L.L, C.Strings.New_String(name))));
+      C_name : C.Strings.chars_ptr := C.Strings.New_String(name);
+      Result : C.int;
+   begin
+      Result := Internal.lua_getglobal(L.L, C_name);
+      C.Strings.Free(C_Name);
+      return Int_To_Lua_Type(Result);
+   end getglobal;
 
    procedure getglobal (L : in State; name : in String) is
-      Discard : C.int;
+      C_name : C.Strings.chars_ptr := C.Strings.New_String(name);
+      Result : C.int;
    begin
-      Discard := Internal.lua_getglobal(L.L, C.Strings.New_String(name));
+      Result := Internal.lua_getglobal(L.L, C_name);
+      C.Strings.Free(C_Name);
    end getglobal;
 
    function getmetatable (L : in State; index : in Integer) return Boolean is
@@ -489,8 +508,10 @@ package body Lua is
    end pushglobaltable;
 
    procedure setglobal (L : in State; name : in String) is
+      C_name : C.Strings.chars_ptr := C.Strings.New_String(name);
    begin
-      Internal.lua_setglobal(L.L, C.Strings.New_String(name));
+      Internal.lua_setglobal(L.L, C_name);
+      C.Strings.Free(C_name);
    end setglobal;
 
    procedure setmetatable (L : in State; index : in Integer) is
