@@ -28,31 +28,10 @@ with Ada.Long_Float_Text_IO; use Ada.Long_Float_Text_IO;
 with Ada.Integer_Text_IO; use Ada.Integer_Text_IO;
 
 with Lua; use Lua;
-
+with Lua.Util; use Lua.Util;
 
 procedure Simple_Example is
    L : State;
-
-   procedure Print_Stack(L : State) is
-   begin
-      Put_Line("Relative index : Absolute index : Type : Contents");
-      for I in reverse 1..L.GetTop loop
-         Put(I - L.GetTop - 1); Put(" : ");
-         Put(L.AbsIndex(I)); Put(" : ");
-         Put(L.TypeName(L.TypeInfo(I))); Put(" : ");
-         case L.TypeInfo(I) is
-            when TBOOLEAN =>
-               Put((if L.ToBoolean(I) then "true" else "false"));
-            when TNUMBER =>
-               Put(L.ToNumber(I), Aft => 0, Exp => 0);
-            when TSTRING =>
-               Put("'" & L.ToString(I) & "'");
-            when others =>
-               Put("-");
-         end case;
-         New_Line;
-      end loop;
-   end Print_Stack;
 
 begin
    Put_Line("A simple example of using Lua from within Ada");
