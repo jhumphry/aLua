@@ -9,7 +9,7 @@ with Interfaces.C;
 use type Interfaces.C.int, Interfaces.C.size_t;
 with Interfaces.C.Strings;
 
-with Lua.Internal, Lua.AuxInternal;
+with Lua.Internal, Lua.AuxInternal, Lua.LibInternal;
 with Ada.Finalization;
 
 package body Lua is
@@ -82,6 +82,11 @@ package body Lua is
       C.Strings.Free(CS);
       return Int_To_Thread_Status(Result);
    end LoadString;
+
+   procedure OpenLibs (L : in State) is
+   begin
+      LibInternal.luaL_openlibs(L.L);
+   end OpenLibs;
 
    --
    -- *** Calling, yielding and functions
