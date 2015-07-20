@@ -39,13 +39,13 @@ procedure Functions_Example is
 
    LF : Character renames Ada.Characters.Latin_1.LF;
    Coroutine_Source : String := "" &
-     "co = coroutine.create( function  (x) " & LF &
+     "function co (x) " & LF &
      " for i = 1, x do " & LF &
      "  coroutine.yield(i) " & LF &
      " end " & LF &
      " return -1 " & LF &
      " end " & LF &
-     ")";
+     "";
 
 begin
 
@@ -104,27 +104,30 @@ begin
    New_Line;
 
    L.Pop(L.GetTop);
+   Put_Line("Now to look at using coroutines");
    Put_Line("Adding standard libraries...");
    L.OpenLibs;
-   Put_Line("Loading coroutine: " & Coroutine_Source); New_Line;
+   Put_Line("Loading coroutine source: ");
+   Put_Line(Coroutine_Source);
    Success := L.LoadString(Coroutine_Source);
    Put_Line("Load" & (if Success /= OK then " not" else "") & " successful.");
    L.Call(0, 0);
-   L.GetGlobal("co");
-   pragma Assert (L.TypeInfo(-1) = TTHREAD);
-   Put_Line("Compiled chunk. Resuming coroutine with parameter 3");
+   Put_Line("Compiled coroutine code.");
    declare
-      Coroutine : Thread := L.ToThread(-1);
+      Coroutine : Thread := L.NewThread;
       Coroutine_Status : Thread_Status;
    begin
+      Put_Line("New thread created");
+      Put_Line("Resuming coroutine with parameter 3 in this thread:");
+      Coroutine.GetGlobal("co");
       Coroutine.PushInteger(3);
       Coroutine_Status := Coroutine.resume(L, 1);
-      Put_Line("Coroutine status : " & Thread_Status'Image(Coroutine_Status));
-      Print_Stack(Coroutine);
+      Put("Coroutine status : " & Thread_Status'Image(Coroutine_Status));
+      Put(" Result: "); Put(Coroutine.ToNumber(-1)); New_Line;
       while Coroutine_Status = YIELD loop
          Coroutine_Status := Coroutine.resume(L, 1);
-         Put_Line("Coroutine status : " & Thread_Status'Image(Coroutine_Status));
-         Print_Stack(Coroutine);
+         Put("Coroutine status : " & Thread_Status'Image(Coroutine_Status));
+         Put(" Result: "); Put(Coroutine.ToNumber(-1)); New_Line;
       end loop;
    end;
    New_Line;
