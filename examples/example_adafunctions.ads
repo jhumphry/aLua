@@ -1,6 +1,6 @@
--- Func_Closure
+-- Example_Adafunctions
 
--- A simple example of creating an Ada closure accessible from Lua
+-- A example of using the Ada 2012 interface to Lua for functions / closures etc
 
 -- Copyright (c) 2015, James Humphry
 
@@ -23,20 +23,14 @@
 -- TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 -- SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-with Lua;
-use Lua;
+with Lua; use Lua;
 
-with Ada.Text_IO;
-use Ada.Text_IO;
+package Example_AdaFunctions is
 
-function Func_Closure (L : State'Class) return Natural is
-   p : Long_Float := L.ToNumber(UpvalueIndex(1));
-   x : Long_Float := L.ToNumber(-1);
-begin
-   Put_Line("* In Ada closure foobar" &
-              "<" & Long_Float'Image(p) & ">" &
-              "(" & Long_Float'Image(x) & ")");
-   L.pop(1);
-   L.PushNumber(x*p);
-   return 1;
-end Func_Closure;
+   function FooBar (L : State'Class) return Natural;
+
+   function Multret (L : State'Class) return Natural;
+
+   function Closure (L : State'Class) return Natural;
+
+end Example_AdaFunctions;

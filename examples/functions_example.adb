@@ -30,9 +30,7 @@ with Ada.Integer_Text_IO; use Ada.Integer_Text_IO;
 with Lua; use Lua;
 with Lua.Util; use Lua.Util;
 
-with Func_Foobar;
-with Func_Multret;
-with Func_Closure;
+with Example_AdaFunctions;
 
 procedure Functions_Example is
    L : State;
@@ -59,7 +57,7 @@ begin
 
    L.Pop(L.GetTop);
    Put_Line("Registering an AdaFunction foobar in Lua");
-   L.Register("foobar", AdaFunction'(Func_Foobar'Access));
+   L.Register("foobar", AdaFunction'(Example_AdaFunctions.Foobar'Access));
    Success := L.LoadString("baz = foobar(5.0)");
    Put_Line("Loading code snippet 'baz = foobar(5.0)'" &
             (if Success /= OK then " not" else "") & " successful.");
@@ -72,7 +70,7 @@ begin
 
    L.Pop(L.GetTop);
    Put_Line("Registering an AdaFunction multret in Lua");
-   L.Register("multret", AdaFunction'(Func_Multret'Access));
+   L.Register("multret", AdaFunction'(Example_AdaFunctions.Multret'Access));
    Put_Line("Calling 'multret(5)' from Lua");
    L.GetGlobal("multret");
    L.PushInteger(5);
@@ -84,7 +82,7 @@ begin
    L.Pop(L.GetTop);
    Put_Line("Registering an AdaFunction closure (with upvalue 2.0) in Lua");
    L.PushNumber(2.0);
-   L.PushAdaClosure(AdaFunction'(Func_Closure'Access), 1);
+   L.PushAdaClosure(AdaFunction'(Example_AdaFunctions.Closure'Access), 1);
    L.SetGlobal("closure");
    Put_Line("Calling 'closure(3.5)' from Lua");
    L.GetGlobal("closure");
