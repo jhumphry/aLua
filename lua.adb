@@ -538,6 +538,17 @@ package body Lua is
    -- *** Threads
    --
 
+   function newthread (L : in State'Class) return Thread is
+   begin
+      return T : Thread do
+         T.L := Internal.lua_newthread(L.L);
+      end return;
+   end newthread;
+
+   function resume(L : in State'Class; from : in State'Class; nargs : Integer)
+                   return Thread_Status is
+      (Int_To_Thread_Status(Internal.lua_resume(L.L, from.l, C.int(nargs))));
+
    procedure xmove (from, to : in Thread; n : in Integer) is
    begin
       Internal.lua_xmove(from.L, to.L, C.int(n));

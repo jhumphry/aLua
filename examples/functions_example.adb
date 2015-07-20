@@ -26,6 +26,7 @@
 with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Long_Float_Text_IO; use Ada.Long_Float_Text_IO;
 with Ada.Integer_Text_IO; use Ada.Integer_Text_IO;
+with Ada.Characters.Latin_1;
 
 with Lua; use Lua;
 with Lua.Util; use Lua.Util;
@@ -35,6 +36,16 @@ with Example_AdaFunctions;
 procedure Functions_Example is
    L : State;
    Success : Thread_Status;
+
+   LF : Character renames Ada.Characters.Latin_1.LF;
+   Coroutine_Source : String := "" &
+     "co = coroutine.create( function  (x) " & LF &
+     " for i = 1, x do " & LF &
+     "  coroutine.yield(i) " & LF &
+     " end " & LF &
+     " return -1 " & LF &
+     " end " & LF &
+     ")";
 
 begin
 
@@ -90,6 +101,32 @@ begin
    L.Call(1, MultRet_Sentinel);
    Put_Line("Stack now contains:");
    Print_Stack(L);
+   New_Line;
+
+   L.Pop(L.GetTop);
+   Put_Line("Adding standard libraries...");
+   L.OpenLibs;
+   Put_Line("Loading coroutine: " & Coroutine_Source); New_Line;
+   Success := L.LoadString(Coroutine_Source);
+   Put_Line("Load" & (if Success /= OK then " not" else "") & " successful.");
+   L.Call(0, 0);
+   L.GetGlobal("co");
+   pragma Assert (L.TypeInfo(-1) = TTHREAD);
+   Put_Line("Compiled chunk. Resuming coroutine with parameter 3");
+   declare
+      Coroutine : Thread := L.ToThread(-1);
+      Coroutine_Status : Thread_Status;
+   begin
+      Coroutine.PushInteger(3);
+      Coroutine_Status := Coroutine.resume(L, 1);
+      Put_Line("Coroutine status : " & Thread_Status'Image(Coroutine_Status));
+      Print_Stack(Coroutine);
+      while Coroutine_Status = YIELD loop
+         Coroutine_Status := Coroutine.resume(L, 1);
+         Put_Line("Coroutine status : " & Thread_Status'Image(Coroutine_Status));
+         Print_Stack(Coroutine);
+      end loop;
+   end;
    New_Line;
 
 end Functions_Example;

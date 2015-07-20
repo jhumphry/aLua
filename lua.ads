@@ -173,6 +173,9 @@ package Lua is
 
    -- Threads
    type Thread is new State with private;
+   function newthread (L : in State'Class) return Thread;
+   function resume(L : in State'Class; from : in State'Class; nargs : Integer)
+     return Thread_Status;
    procedure xmove (from, to : in Thread; n : in Integer);
 
 private
