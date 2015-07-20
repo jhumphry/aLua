@@ -26,6 +26,6 @@
 package Lua.Util is
 
    -- Print the stack out to the console
-   procedure Print_Stack(L : in State);
+   procedure Print_Stack(L : in State'Class);
 
 end Lua.Util;
