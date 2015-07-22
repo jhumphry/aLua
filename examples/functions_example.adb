@@ -72,7 +72,7 @@ begin
    L.Pop(L.GetTop);
    Print_Stack(L);
    Put_Line("Retrieving reference...");
-   R.Get;
+   L.Get(R);
    Print_Stack(L);
    New_Line;
 
@@ -145,11 +145,11 @@ begin
       S : Lua_Reference := R;
    begin
       Put_Line("Retrieving a copy of reference saved earlier...");
-      S.Get;
+      L.Get(S);
       Print_Stack(L);
    end;
    Put_Line("Retrieving reference saved earlier...");
-   R.Get;
+   L.Get(R);
    Print_Stack(L);
    New_Line;
 

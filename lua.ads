@@ -181,8 +181,8 @@ package Lua is
    type Lua_Reference is tagged private;
    function Ref (L : in State'Class; t : in Integer := RegistryIndex)
                  return Lua_Reference;
-   function Get (R : Lua_Reference) return Lua_Type;
-   procedure Get (R : Lua_Reference);
+   function Get (L : in State; R : Lua_Reference'Class) return Lua_Type;
+   procedure Get (L : in State; R : Lua_Reference'Class);
 
 private
 
