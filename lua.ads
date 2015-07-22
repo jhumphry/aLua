@@ -72,7 +72,6 @@ package Lua is
    function Status (L : in State) return Thread_Status;
    function LoadString (L : in State;
                         S : in String) return Thread_Status;
-   procedure OpenLibs (L : in State);
 
    -- Calling, yielding and functions
    procedure Call (L : in State; nargs : in Integer; nresults : in Integer);

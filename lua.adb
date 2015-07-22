@@ -83,11 +83,6 @@ package body Lua is
       return Int_To_Thread_Status(Result);
    end LoadString;
 
-   procedure OpenLibs (L : in State) is
-   begin
-      LibInternal.luaL_openlibs(L.L);
-   end OpenLibs;
-
    --
    -- *** Calling, yielding and functions
    --

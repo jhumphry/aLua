@@ -29,6 +29,7 @@ with Ada.Integer_Text_IO; use Ada.Integer_Text_IO;
 with Ada.Characters.Latin_1;
 
 with Lua; use Lua;
+with Lua.Libs;
 with Lua.Util; use Lua.Util;
 
 with Example_AdaFunctions;
@@ -105,8 +106,8 @@ begin
 
    L.Pop(L.GetTop);
    Put_Line("Now to look at using coroutines");
-   Put_Line("Adding standard libraries...");
-   L.OpenLibs;
+   Put_Line("Adding coroutine libraries...");
+   Libs.Require_Standard_Library(L, Libs.Coroutine_Lib);
    Put_Line("Loading coroutine source: ");
    Put_Line(Coroutine_Source);
    Success := L.LoadString(Coroutine_Source);

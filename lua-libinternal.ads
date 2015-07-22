@@ -36,34 +36,6 @@ with System;
 
 private package Lua.LibInternal is
 
-
-   LUA_COLIBNAME : aliased constant String := "coroutine" & ASCII.NUL;  --  /usr/include/lualib.h:17
-
-   LUA_TABLIBNAME : aliased constant String := "table" & ASCII.NUL;  --  /usr/include/lualib.h:20
-
-   LUA_IOLIBNAME : aliased constant String := "io" & ASCII.NUL;  --  /usr/include/lualib.h:23
-
-   LUA_OSLIBNAME : aliased constant String := "os" & ASCII.NUL;  --  /usr/include/lualib.h:26
-
-   LUA_STRLIBNAME : aliased constant String := "string" & ASCII.NUL;  --  /usr/include/lualib.h:29
-
-   LUA_UTF8LIBNAME : aliased constant String := "utf8" & ASCII.NUL;  --  /usr/include/lualib.h:32
-
-   LUA_BITLIBNAME : aliased constant String := "bit32" & ASCII.NUL;  --  /usr/include/lualib.h:35
-
-   LUA_MATHLIBNAME : aliased constant String := "math" & ASCII.NUL;  --  /usr/include/lualib.h:38
-
-   LUA_DBLIBNAME : aliased constant String := "debug" & ASCII.NUL;  --  /usr/include/lualib.h:41
-
-   LUA_LOADLIBNAME : aliased constant String := "package" & ASCII.NUL;  --  /usr/include/lualib.h:44
-   --  arg-macro: function lua_assert ((void)0
-   --    return (void)0;
-
-  --** $Id: lualib.h,v 1.44 2014/02/06 17:32:33 roberto Exp $
-  --** Lua standard libraries
-  --** See Copyright Notice in lua.h
-  --
-
    function luaopen_base (arg1 : System.Address) return int;  -- /usr/include/lualib.h:15
    pragma Import (C, luaopen_base, "luaopen_base");
 
