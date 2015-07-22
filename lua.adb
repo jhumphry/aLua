@@ -2,7 +2,7 @@
 
 -- An Ada 2012 interface to the Lua language
 
-with Ada.Unchecked_Conversion;
+with Ada.Unchecked_Conversion, Ada.Unchecked_Deallocation;
 
 with Interfaces; use Interfaces;
 with Interfaces.C;
@@ -572,5 +572,70 @@ package body Lua is
       S.L := L;
       return C.int(f(S));
    end CFunction_Trampoline;
+
+   --
+   -- *** References
+   --
+
+   procedure Free is
+     new Ada.Unchecked_Deallocation ( Object => Lua_Reference_Value,
+                                      Name => Lua_Reference_Value_Access);
+
+   function Ref (L : in State'Class; t : in Integer := RegistryIndex)
+                 return Lua_Reference is
+   begin
+      return R : Lua_Reference do
+         R.E := new Lua_Reference_Value;
+         R.E.State := L.L;
+         R.E.Table := C.int(t);
+         R.E.Ref := AuxInternal.lual_ref(L.L, C.int(t));
+         R.E.Count := 1;
+      end return;
+   end Ref;
+
+   function Get (R : Lua_Reference) return Lua_Type is
+   begin
+      if R.E = null then
+         raise Program_Error with "Empty Lua reference used";
+      end if;
+      return Int_To_Lua_Type(Internal.lua_rawgeti(R.E.all.State,
+                             R.E.all.Table,
+                             Long_Long_Integer(R.E.all.Ref)));
+   end Get;
+
+
+   procedure Get (R : Lua_Reference) is
+      Discard : C.int;
+   begin
+      if R.E = null then
+         raise Program_Error with "Empty Lua reference used";
+      end if;
+      Discard := Internal.lua_rawgeti(R.E.all.State,
+                                      R.E.all.Table,
+                                      Long_Long_Integer(R.E.all.Ref));
+   end Get;
+
+   overriding procedure Adjust (Object : in out Lua_Reference) is
+   begin
+      if Object.E /= null then
+         Object.E.Count := Object.E.Count + 1;
+      end if;
+   end Adjust;
+
+   overriding procedure Finalize (Object : in out Lua_Reference) is
+   begin
+      if Object.E /= null then
+         Object.E.Count := Object.E.Count - 1;
+         if Object.E.Count = 0 then
+            -- Note this relies on the Lua state not having been destroyed
+            -- before the references stop being used.
+            AuxInternal.lual_unref(Object.E.State,
+                                   Object.E.Table,
+                                   Object.E.Ref);
+            Free(Object.E);
+         end if;
+      end if;
+   end Finalize;
+
 
 end Lua;

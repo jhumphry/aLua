@@ -177,6 +177,13 @@ package Lua is
      return Thread_Status;
    procedure xmove (from, to : in Thread; n : in Integer);
 
+   -- References
+   type Lua_Reference is tagged private;
+   function Ref (L : in State'Class; t : in Integer := RegistryIndex)
+                 return Lua_Reference;
+   function Get (R : Lua_Reference) return Lua_Type;
+   procedure Get (R : Lua_Reference);
+
 private
 
    subtype void_ptr is System.Address;
@@ -219,5 +226,25 @@ private
 
    function CFunction_Trampoline (L : System.Address) return Interfaces.C.int
      with Convention => C;
+
+   type Lua_Reference_Value is
+      record
+         State : void_Ptr;
+         Table : Interfaces.C.Int;
+         Ref : Interfaces.C.Int;
+         Count : Natural := 0;
+      end record;
+
+   type Lua_Reference_Value_Access is access Lua_Reference_Value;
+
+   type Lua_Reference is
+     new Ada.Finalization.Controlled with
+      record
+         E : Lua_Reference_Value_Access := null;
+      end record;
+
+   overriding procedure Initialize (Object : in out Lua_Reference) is null;
+   overriding procedure Adjust (Object : in out Lua_Reference);
+   overriding procedure Finalize (Object : in out Lua_Reference);
 
 end Lua;

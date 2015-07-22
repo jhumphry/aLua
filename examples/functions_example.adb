@@ -37,6 +37,7 @@ with Example_AdaFunctions;
 procedure Functions_Example is
    L : State;
    Success : Thread_Status;
+   R : Lua_Reference;
 
    LF : Character renames Ada.Characters.Latin_1.LF;
    Coroutine_Source : String := "" &
@@ -64,7 +65,15 @@ begin
    Put("Result of calling f (3): ");
    L.GetGlobal("f"); L.PushNumber(3.0); L.Call(1, 1);
    Put(L.ToNumber(-1), Aft => 0, Exp => 0); New_Line;
-   L.Pop(1);
+   New_Line;
+
+   Put_Line("Saving a reference to the top of the stack and clearing it.");
+   R := Ref(L);
+   L.Pop(L.GetTop);
+   Print_Stack(L);
+   Put_Line("Retrieving reference...");
+   R.Get;
+   Print_Stack(L);
    New_Line;
 
    L.Pop(L.GetTop);
@@ -129,6 +138,19 @@ begin
          Put(" Result: "); Put(Coroutine.ToNumber(-1)); New_Line;
       end loop;
    end;
+   New_Line;
+
+   L.Pop(L.GetTop);
+   declare
+      S : Lua_Reference := R;
+   begin
+      Put_Line("Retrieving a copy of reference saved earlier...");
+      S.Get;
+      Print_Stack(L);
+   end;
+   Put_Line("Retrieving reference saved earlier...");
+   R.Get;
+   Print_Stack(L);
    New_Line;
 
 end Functions_Example;
