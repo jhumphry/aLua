@@ -53,21 +53,18 @@ begin
    L.PushBoolean(True);
    L.PushInteger(5);
    Put("Stack size now: "); Put(L.GetTop); New_Line;
-   Put_Line("Stack now contains:");
    Print_Stack(L);
    Put("Get top element as string: "); Put(L.ToString(-1)); New_Line;
-   Put_Line("Stack now contains:");
    Print_Stack(L);
    Put_Line("Pop top three elements");
    L.Pop(3);
-   Put_Line("Stack now contains:");
    Print_Stack(L);
    Put_Line("Is Stack(-2) <= Stack(-1)? " &
             (if L.Compare(-2, -1, OPLE) then "Yes" else "No"));
-   Put_Line("Duplicating element at index 2. Stack now contains:");
+   Put_Line("Duplicating element at index 2. ");
    L.PushValue(2);
    Print_Stack(L);
-   Put_Line("Adding top two elements. Stack now contains:");
+   Put_Line("Adding top two elements.");
    L.Arith(OPADD);
    Print_Stack(L);
    Put_Line("Is Stack(-2) <= Stack(-1)? " &

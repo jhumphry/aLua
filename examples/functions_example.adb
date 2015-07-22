@@ -87,7 +87,6 @@ begin
    L.GetGlobal("multret");
    L.PushInteger(5);
    L.Call(1, MultRet_Sentinel);
-   Put_Line("Stack now contains:");
    Print_Stack(L);
    New_Line;
 
@@ -100,7 +99,6 @@ begin
    L.GetGlobal("closure");
    L.PushNumber(3.5);
    L.Call(1, MultRet_Sentinel);
-   Put_Line("Stack now contains:");
    Print_Stack(L);
    New_Line;
 

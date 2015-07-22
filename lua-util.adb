@@ -11,10 +11,11 @@ package body Lua.Util is
    procedure Print_Stack(L : State'Class) is
    begin
       if L.GetTop = 0 then
-         Put_Line("-Stack is empty-");
+         Put_Line("Stack now contains: -*- Stack is empty -*-");
          goto Exit_Point;
       end if;
 
+      Put_Line("Stack now contains:");
       Put_Line("Rel index   : Abs index   : Type    : Contents");
       for I in reverse 1..L.GetTop loop
          Put(I - L.GetTop - 1); Set_Col(13); Put(": ");
