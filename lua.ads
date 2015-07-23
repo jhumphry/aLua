@@ -98,6 +98,7 @@ package Lua is
    function StringToNumber (L : in State; s : in String) return Boolean;
 
    -- Pulling values from the stack
+   function ToAdaFunction (L : in State; index : in Integer) return AdaFunction;
    function ToBoolean (L : in State; index : in Integer) return Boolean;
    function ToInteger (L : in State; index : in Integer) return Lua_Integer;
    function ToNumber (L : in State; index : in Integer) return Lua_Number;

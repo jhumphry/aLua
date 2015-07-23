@@ -90,6 +90,16 @@ begin
    New_Line;
 
    L.Pop(L.GetTop);
+   Put_Line("Checking foobar can be retrieved");
+   L.GetGlobal("foobar");
+   if L.ToAdaFunction(-1) = AdaFunction'(Example_AdaFunctions.Foobar'Access) then
+      Put_Line("AdaFunction foobar retrieved successfully from Lua");
+   else
+      Put_Line("AdaFunction foobar was NOT retrieved from Lua");
+   end if;
+   New_Line;
+
+   L.Pop(L.GetTop);
    Put_Line("Registering an AdaFunction multret in Lua");
    L.Register("multret", AdaFunction'(Example_AdaFunctions.Multret'Access));
    Put_Line("Calling 'multret(5)' from Lua");

@@ -8,6 +8,7 @@ with Interfaces; use Interfaces;
 with Interfaces.C;
 use type Interfaces.C.int, Interfaces.C.size_t;
 with Interfaces.C.Strings;
+use type Interfaces.C.Strings.chars_ptr;
 
 with System;
 use type System.Address;
@@ -195,6 +196,22 @@ package body Lua is
    --
    -- *** Pulling values from the stack
    --
+
+   function ToAdaFunction (L : in State; index : in Integer)
+                           return AdaFunction is
+      Upvalue : System.Address;
+      Discard : C.Strings.chars_ptr;
+   begin
+      Discard := Internal.lua_getupvalue(L.L, C.int(index), 1);
+      if Discard = C.Strings.Null_Ptr then
+         raise Constraint_Error
+           with "Function referenced is not an AdaFunction";
+      end if;
+      Upvalue := Internal.lua_touserdata(L.L, -1);
+      Internal.lua_settop(L.L, -2);
+      return Address_To_AdaFunction(Upvalue);
+   end ToAdaFunction;
+
    function ToBoolean (L : in State; index : in Integer) return Boolean is
       (Internal.lua_toboolean(L.L, C.int(Index)) /= 0);
 
