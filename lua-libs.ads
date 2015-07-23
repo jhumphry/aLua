@@ -47,4 +47,13 @@ package Lua.Libs is
                                        Library : in Lua_Standard_Library;
                                        Set_Global : in Boolean := True);
 
+   -- This will add a Yield function to a Lua state for occasions where you
+   -- do not wish to add the whole Coroutine library
+   procedure Add_Yield_Function (L : in State);
+
+private
+
+   function Yield_CFunction (L : System.Address) return Interfaces.C.int
+     with Convention => C;
+
 end Lua.Libs;

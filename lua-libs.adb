@@ -60,4 +60,17 @@ package body Lua.Libs is
                                 glb);
    end Require_Standard_Library;
 
+   procedure Add_Yield_Function (L : in State) is
+      Func_Name : C.Strings.chars_ptr := C.Strings.New_String("yield");
+   begin
+      Internal.lua_pushcclosure(L.L, Yield_CFunction'Access, 0);
+      Internal.lua_setglobal(L.L, Func_Name);
+      C.Strings.Free(Func_Name);
+   end Add_Yield_Function;
+
+   function Yield_CFunction (L : System.Address) return Interfaces.C.int is
+   begin
+      return Internal.lua_yieldk(L, Internal.lua_gettop(L), 0, null);
+   end Yield_CFunction;
+
 end Lua.Libs;

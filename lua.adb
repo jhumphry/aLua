@@ -552,6 +552,12 @@ package body Lua is
       Internal.lua_xmove(from.L, to.L, C.int(n));
    end xmove;
 
+   procedure yield (L : in State; nresults : Integer) is
+      Discard : C.int;
+   begin
+      Discard := Internal.lua_yieldk(L.L, C.int(nresults), 0, null);
+   end yield;
+
    --
    -- *** Resource Management ***
    --

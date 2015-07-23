@@ -176,6 +176,7 @@ package Lua is
    function resume(L : in State'Class; from : in State'Class; nargs : Integer)
      return Thread_Status;
    procedure xmove (from, to : in Thread; n : in Integer);
+   procedure yield (L : in State; nresults : Integer);
 
    -- References
    type Lua_Reference is tagged private;

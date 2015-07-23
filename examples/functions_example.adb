@@ -43,7 +43,7 @@ procedure Functions_Example is
    Coroutine_Source : String := "" &
      "function co (x) " & LF &
      " for i = 1, x do " & LF &
-     "  coroutine.yield(i) " & LF &
+     "  yield(i) " & LF &
      " end " & LF &
      " return -1 " & LF &
      " end " & LF &
@@ -113,8 +113,7 @@ begin
 
    L.Pop(L.GetTop);
    Put_Line("Now to look at using coroutines");
-   Put_Line("Adding coroutine libraries...");
-   Libs.Require_Standard_Library(L, Libs.Coroutine_Lib);
+   Libs.Add_Yield_Function(L);
    Put_Line("Loading coroutine source: ");
    Put_Line(Coroutine_Source);
    Success := L.LoadString(Coroutine_Source);
