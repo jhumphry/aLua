@@ -183,6 +183,15 @@ package body Lua is
       Discard := Internal.lua_pushthread(L.L);
    end PushThread;
 
+   function StringToNumber (L : in State; s : in String) return Boolean is
+      C_String : C.Strings.chars_ptr := C.Strings.New_String(s);
+      Result : C.size_t;
+   begin
+      Result := Internal.lua_stringtonumber(L.L, C_String);
+      C.Strings.Free(C_String);
+      return Result /= 0;
+   end StringToNumber;
+
    --
    -- *** Pulling values from the stack
    --

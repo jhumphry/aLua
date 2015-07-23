@@ -95,6 +95,7 @@ package Lua is
    procedure PushString (L : in State; s : in String);
    function PushThread (L : in State) return Boolean;
    procedure PushThread (L : in State);
+   function StringToNumber (L : in State; s : in String) return Boolean;
 
    -- Pulling values from the stack
    function ToBoolean (L : in State; index : in Integer) return Boolean;
@@ -135,6 +136,9 @@ package Lua is
    -- Type information
    function TypeInfo (L : in State; index : in Integer) return Lua_Type;
    function TypeName (L : in State; tp : in Lua_Type) return String;
+   function TypeName (L : in State; index : in Integer) return String is
+     (TypeName(L, Typeinfo(L, index)));
+
 
    -- Table manipulation
    procedure createtable (L : in State;
