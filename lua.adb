@@ -389,17 +389,41 @@ package body Lua is
       end if;
    end IsAdaFunction;
 
+   function IsBoolean (L : in State; index : in Integer) return Boolean is
+     (Typeinfo(L, index) = TBOOLEAN);
+
    function IsCFunction (L : in State; index : in Integer) return Boolean is
      (Internal.lua_iscfunction(L.L, C.int(index)) /= 0);
 
+   function IsFunction (L : in State; index : in Integer) return Boolean is
+     (Typeinfo(L, index) = TFUNCTION);
+
    function IsInteger (L : in State; index : in Integer) return Boolean is
      (Internal.lua_isinteger(L.L, C.int(index)) /= 0);
+
+   function IsLightuserdata (L : in State; index : in Integer) return Boolean is
+     (Typeinfo(L, index) = TLIGHTUSERDATA);
+
+   function IsNil (L : in State; index : in Integer) return Boolean is
+     (Typeinfo(L, index) = TNIL);
+
+   function IsNone (L : in State; index : in Integer) return Boolean is
+     (Typeinfo(L, index) = TNONE);
+
+   function IsNoneOrNil (L : in State; index : in Integer) return Boolean is
+     (Typeinfo(L, index) = TNONE or Typeinfo(L, index) = TNIL);
 
    function IsNumber (L : in State; index : in Integer) return Boolean is
      (Internal.lua_isnumber(L.L, C.int(index)) /= 0);
 
    function IsString (L : in State; index : in Integer) return Boolean is
      (Internal.lua_isstring(L.L, C.int(index)) /= 0);
+
+   function IsTable (L : in State; index : in Integer) return Boolean is
+     (Typeinfo(L, index) = TTABLE);
+
+   function IsThread (L : in State; index : in Integer) return Boolean is
+     (Typeinfo(L, index) = TTHREAD);
 
    function IsUserdata (L : in State; index : in Integer) return Boolean is
      (Internal.lua_isuserdata(L.L, C.int(index)) /= 0);

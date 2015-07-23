@@ -136,10 +136,18 @@ package Lua is
 
    -- Type information
    function IsAdaFunction (L : in State; index : in Integer) return Boolean;
+   function IsBoolean (L : in State; index : in Integer) return Boolean;
    function IsCFunction (L : in State; index : in Integer) return Boolean;
+   function IsFunction (L : in State; index : in Integer) return Boolean;
    function IsInteger (L : in State; index : in Integer) return Boolean;
+   function IsLightuserdata (L : in State; index : in Integer) return Boolean;
+   function IsNil (L : in State; index : in Integer) return Boolean;
+   function IsNone (L : in State; index : in Integer) return Boolean;
+   function IsNoneOrNil (L : in State; index : in Integer) return Boolean;
    function IsNumber (L : in State; index : in Integer) return Boolean;
    function IsString (L : in State; index : in Integer) return Boolean;
+   function IsTable (L : in State; index : in Integer) return Boolean;
+   function IsThread (L : in State; index : in Integer) return Boolean;
    function IsUserdata (L : in State; index : in Integer) return Boolean;
    function TypeInfo (L : in State; index : in Integer) return Lua_Type;
    function TypeName (L : in State; tp : in Lua_Type) return String;
