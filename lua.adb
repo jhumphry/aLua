@@ -374,6 +374,36 @@ package body Lua is
    -- *** Type information
    --
 
+   function IsAdaFunction (L : in State; index : in Integer) return Boolean is
+   begin
+      if IsCFunction(L, index) then
+         if Internal.lua_getupvalue(L.L, C.int(index),1) /= C.Strings.Null_Ptr then
+            Internal.lua_settop(L.L, -2);
+            return true;
+         else
+            Internal.lua_settop(L.L, -2);
+            return false;
+         end if;
+      else
+         return false;
+      end if;
+   end IsAdaFunction;
+
+   function IsCFunction (L : in State; index : in Integer) return Boolean is
+     (Internal.lua_iscfunction(L.L, C.int(index)) /= 0);
+
+   function IsInteger (L : in State; index : in Integer) return Boolean is
+     (Internal.lua_isinteger(L.L, C.int(index)) /= 0);
+
+   function IsNumber (L : in State; index : in Integer) return Boolean is
+     (Internal.lua_isnumber(L.L, C.int(index)) /= 0);
+
+   function IsString (L : in State; index : in Integer) return Boolean is
+     (Internal.lua_isstring(L.L, C.int(index)) /= 0);
+
+   function IsUserdata (L : in State; index : in Integer) return Boolean is
+     (Internal.lua_isuserdata(L.L, C.int(index)) /= 0);
+
    function TypeInfo (L : in State; index : in Integer) return Lua_Type is
      (
       Int_To_Lua_Type(Internal.lua_type(L.L, C.int(index)))
@@ -561,6 +591,11 @@ package body Lua is
    --
    -- *** Threads
    --
+
+   function isyieldable (L : in State'Class) return Boolean is
+   begin
+      return Internal.lua_isyieldable(L.L) /= 0;
+   end isyieldable;
 
    function newthread (L : in State'Class) return Thread is
    begin

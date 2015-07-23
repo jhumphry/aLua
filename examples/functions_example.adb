@@ -92,6 +92,9 @@ begin
    L.Pop(L.GetTop);
    Put_Line("Checking foobar can be retrieved");
    L.GetGlobal("foobar");
+   if not L.IsAdaFunction(-1) then
+      Put_Line("Error - foobar does not contain an AdaFunction?");
+   end if;
    if L.ToAdaFunction(-1) = AdaFunction'(Example_AdaFunctions.Foobar'Access) then
       Put_Line("AdaFunction foobar retrieved successfully from Lua");
    else

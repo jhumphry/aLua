@@ -135,6 +135,12 @@ package Lua is
    procedure SetTop (L : in State; index : in Integer);
 
    -- Type information
+   function IsAdaFunction (L : in State; index : in Integer) return Boolean;
+   function IsCFunction (L : in State; index : in Integer) return Boolean;
+   function IsInteger (L : in State; index : in Integer) return Boolean;
+   function IsNumber (L : in State; index : in Integer) return Boolean;
+   function IsString (L : in State; index : in Integer) return Boolean;
+   function IsUserdata (L : in State; index : in Integer) return Boolean;
    function TypeInfo (L : in State; index : in Integer) return Lua_Type;
    function TypeName (L : in State; tp : in Lua_Type) return String;
    function TypeName (L : in State; index : in Integer) return String is
@@ -177,6 +183,7 @@ package Lua is
 
    -- Threads
    type Thread is new State with private;
+   function isyieldable (L : in State'Class) return Boolean;
    function newthread (L : in State'Class) return Thread;
    function resume(L : in State'Class; from : in State'Class; nargs : Integer)
      return Thread_Status;
