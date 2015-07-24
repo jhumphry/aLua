@@ -245,8 +245,12 @@ private
 
    type Thread is new Existing_State with null record;
 
+   -- Trampolines
+
    function CFunction_Trampoline (L : System.Address) return Interfaces.C.int
      with Convention => C;
+
+   -- References
 
    type Lua_Reference_Value is
       record

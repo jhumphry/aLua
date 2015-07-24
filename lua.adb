@@ -19,6 +19,11 @@ with Ada.Finalization;
 package body Lua is
 
    --
+   -- *** Types only used internally
+   --
+
+
+   --
    -- *** Conversions between Ada enumerations and C integer constants
    --
 
@@ -51,10 +56,10 @@ package body Lua is
      Ada.Unchecked_Conversion(Source => AdaFunction,
                               Target => System.Address);
 
-
    function Address_To_AdaFunction is new
      Ada.Unchecked_Conversion(Source => System.Address,
                               Target => AdaFunction);
+
    --
    -- *** Special stack positions and the registry
    --
@@ -656,6 +661,10 @@ package body Lua is
    begin
       Internal.lua_close(Object.L);
    end Finalize;
+
+   --
+   -- *** Trampolines
+   --
 
    function CFunction_Trampoline (L : System.Address) return C.int is
       S : Existing_State;
