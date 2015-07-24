@@ -76,6 +76,17 @@ begin
    Print_Stack(L);
    New_Line;
 
+   Put_Line("Loading IO library and running example Lua file");
+   Libs.Require_Standard_Library(L, LIbs.IO_Lib);
+   Success := L.LoadFile("examples/example_lua.lua");
+   Put_Line("Load" & (if Success /= OK then " not" else "") & " successful.");
+   if Success = OK then
+      L.Call(0, 0);
+      Put_Line("Compiled chunk. Result of calling triangle (5):");
+      L.GetGlobal("triangle"); L.PushNumber(5.0); L.Call(1, 1);
+   end if;
+   New_Line;
+
    L.Pop(L.GetTop);
    Put_Line("Registering an AdaFunction foobar in Lua");
    L.Register("foobar", AdaFunction'(Example_AdaFunctions.Foobar'Access));

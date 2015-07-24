@@ -53,6 +53,8 @@ package Lua is
    type Lua_Type is (TNONE, TNIL, TBOOLEAN, TLIGHTUSERDATA, TNUMBER, TSTRING,
                      TTABLE, TFUNCTION, TUSERDATA, TTHREAD, TNUMTAGS);
 
+   type Lua_ChunkMode is (Binary, Text, Binary_and_Text);
+
    Lua_Error : exception;
 
    -- Special stack positions and the registry
@@ -72,6 +74,10 @@ package Lua is
    function Status (L : in State) return Thread_Status;
    function LoadString (L : in State;
                         S : in String) return Thread_Status;
+   function LoadFile (L : in State;
+                      Name : in String;
+                      Mode : in Lua_ChunkMode := Binary_and_Text)
+                      return Thread_Status;
 
    -- Calling, yielding and functions
    procedure Call (L : in State; nargs : in Integer; nresults : in Integer);

@@ -92,6 +92,23 @@ package body Lua is
       return Int_To_Thread_Status(Result);
    end LoadString;
 
+   function LoadFile (L : in State;
+                      Name : in String;
+                      Mode : in Lua_ChunkMode := Binary_and_Text)
+                      return Thread_Status is
+      C_Name : C.Strings.chars_ptr := C.Strings.New_String(Name);
+      C_Mode : C.Strings.chars_ptr
+        := C.Strings.New_String(case Mode is
+                                   when Binary => "b",
+                                   when Text => "t",
+                                   when Binary_and_Text => "bt"
+                               );
+      Result : C.int;
+   begin
+      Result := AuxInternal.luaL_loadfilex(L.L, C_Name, C_Mode);
+      return Int_To_Thread_Status(Result);
+   end Loadfile;
+
    --
    -- *** Calling, yielding and functions
    --
