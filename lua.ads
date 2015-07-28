@@ -1,6 +1,5 @@
 -- Lua
-
--- An Ada 2012 interface to the Lua language
+-- an Ada 2012 interface to Lua
 
 -- Copyright (c) 2015, James Humphry
 

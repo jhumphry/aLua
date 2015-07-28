@@ -1,6 +1,7 @@
 -- Lua
+-- an Ada 2012 interface to Lua
 
--- An Ada 2012 interface to the Lua language
+-- Copyright (c) 2015, James Humphry - see LICENSE.md for terms
 
 with Ada.Unchecked_Conversion, Ada.Unchecked_Deallocation;
 

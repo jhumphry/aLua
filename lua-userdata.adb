@@ -1,6 +1,7 @@
 -- Lua.Userdata
-
 -- Adding Ada objects to Lua environment
+
+-- Copyright (c) 2015, James Humphry - see LICENSE.md for terms
 
 with System.Address_To_Access_Conversions;
 

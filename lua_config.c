@@ -2,10 +2,10 @@
 lua_config.c
 
 A small C file to extract certain details from luaconfig.h that explain
-how the library was compiled but which are not exported by the library
+how the library was compiled but which are not exported by the library.
 
-Copyright (c) 2015, James Humphry
- */
+Copyright (c) 2015, James Humphry - see LICENSE.md for terms
+*/
 
 #include <lua.h>
 #include <luaconf.h>

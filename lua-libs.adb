@@ -1,6 +1,7 @@
 -- Lua.Lib
-
 -- Supporting the Lua standard libraries
+
+-- Copyright (c) 2015, James Humphry - see LICENSE.md for terms
 
 with Interfaces; use Interfaces;
 with Interfaces.C;

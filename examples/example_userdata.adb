@@ -1,6 +1,7 @@
 -- Example_Userdata
+-- A simple example of an Ada type turned into a Lua userdata type
 
--- Copyright (c) 2015, James Humphry
+-- Copyright (c) 2015, James Humphry - see LICENSE.md for terms
 
 with Ada.Text_IO;
 
