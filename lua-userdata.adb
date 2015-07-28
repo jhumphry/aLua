@@ -82,9 +82,11 @@ package body Lua.Userdata is
    end GetMetaTable;
 
    procedure GetMetaTable (L : in State'Class) is
-      Discard : Boolean := GetMetaTable(L);
+      Success : Boolean := GetMetaTable(L);
    begin
-      null;
+      if not Success then
+         raise Program_Error with "No metatable exists for this type";
+      end if;
    end GetMetaTable;
 
    procedure AddOperation (L : in State'Class; Name : in String; Op : AdaFunction) is
