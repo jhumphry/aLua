@@ -53,7 +53,8 @@ package body Lua.Userdata is
       return UserData_Access.Data;
    end ToUserdata;
 
-   procedure NewMetaTable (L : in State'Class) is
+   procedure NewMetaTable (L : in State'Class;
+                           Set_Indexable : Boolean := True) is
       tname : C.Strings.chars_ptr
         := C.Strings.New_String("Ada_UserData:" & T'External_Tag);
       Result : C.int;
@@ -62,7 +63,7 @@ package body Lua.Userdata is
       C.Strings.Free(tname);
       if Result = 0 then
          raise Program_Error with "Metatable could not be created or already exists";
-      else
+      elsif Set_Indexable then
          -- Setting the metatables __index field to itself so any unidentified
          -- operations of the form object:operation() will be looked up in the
          -- metatable itself

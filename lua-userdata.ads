@@ -22,10 +22,10 @@ package Lua.Userdata is
                         return not null access T;
 
    -- Create a new metatable for this type. It will be stored in the registry
-   -- under 'Ada_UserData:ET' where ET is the result of T'External_Tag. By
-   -- default the key '__index' is set to the table itself, so a:foo() will
-   -- cause a call of metatable['foo'](a).
-   procedure NewMetaTable (L : in State'Class);
+   -- under 'Ada_UserData:ET' where ET is the result of T'External_Tag. If
+   -- Set_Indexable is true then the key '__index' is set to the table itself,
+   -- so writing 'a:foo()' in Lua will cause a call of metatable['foo'](a).
+   procedure NewMetaTable (L : in State'Class; Set_Indexable : Boolean := True);
 
    -- Get the metatable for the type and push it to the stack.
    -- Returns true if successful, false otherwise
