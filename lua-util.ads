@@ -6,6 +6,6 @@
 package Lua.Util is
 
    -- Print the stack out to the console
-   procedure Print_Stack(L : in State'Class);
+   procedure Print_Stack(L : in Lua_State'Class);
 
 end Lua.Util;

@@ -7,10 +7,10 @@ with Lua; use Lua;
 
 package Example_AdaFunctions is
 
-   function FooBar (L : State'Class) return Natural;
+   function FooBar (L : Lua_State'Class) return Natural;
 
-   function Multret (L : State'Class) return Natural;
+   function Multret (L : Lua_State'Class) return Natural;
 
-   function Closure (L : State'Class) return Natural;
+   function Closure (L : Lua_State'Class) return Natural;
 
 end Example_AdaFunctions;

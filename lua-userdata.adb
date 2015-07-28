@@ -22,7 +22,7 @@ package body Lua.Userdata is
    package Address_To_Ada_Userdata is
      new System.Address_To_Access_Conversions(Object => Ada_Userdata);
 
-   procedure Push (L : in State'Class; D : not null access T) is
+   procedure Push (L : in Lua_State'Class; D : not null access T) is
       UserData_Address : System.Address
         := Internal.lua_newuserdata(L.L, Ada_Userdata'Size);
       UserData_Access : access Ada_Userdata
@@ -37,7 +37,7 @@ package body Lua.Userdata is
       end if;
    end Push;
 
-   function ToUserdata (L : in State'Class; index : in Integer)
+   function ToUserdata (L : in Lua_State'Class; index : in Integer)
       return not null access T
    is
       UserData_Address : System.Address
@@ -53,7 +53,7 @@ package body Lua.Userdata is
       return UserData_Access.Data;
    end ToUserdata;
 
-   procedure NewMetaTable (L : in State'Class;
+   procedure NewMetaTable (L : in Lua_State'Class;
                            Set_Indexable : Boolean := True) is
       tname : C.Strings.chars_ptr
         := C.Strings.New_String("Ada_UserData:" & T'External_Tag);
@@ -72,7 +72,7 @@ package body Lua.Userdata is
       end if;
    end NewMetaTable;
 
-   function GetMetaTable (L : in State'Class) return Boolean is
+   function GetMetaTable (L : in Lua_State'Class) return Boolean is
        tname : C.Strings.chars_ptr
         := C.Strings.New_String("Ada_UserData:" & T'External_Tag);
       Result : C.int;
@@ -82,7 +82,7 @@ package body Lua.Userdata is
       return Result /= 0;
    end GetMetaTable;
 
-   procedure GetMetaTable (L : in State'Class) is
+   procedure GetMetaTable (L : in Lua_State'Class) is
       Success : Boolean := GetMetaTable(L);
    begin
       if not Success then
@@ -90,7 +90,7 @@ package body Lua.Userdata is
       end if;
    end GetMetaTable;
 
-   procedure AddOperation (L : in State'Class; Name : in String; Op : AdaFunction) is
+   procedure AddOperation (L : in Lua_State'Class; Name : in String; Op : AdaFunction) is
       C_name : C.Strings.chars_ptr := C.Strings.New_String(Name);
    begin
       L.PushAdaClosure(Op, 0);

@@ -14,7 +14,7 @@ with Example_Userdata;
 use Example_Userdata;
 
 procedure Userdata_Example is
-   L : State;
+   L : Lua_State;
    Result : Boolean;
    Success :Thread_Status;
 

@@ -9,7 +9,7 @@ with Ada.Integer_Text_IO; use Ada.Integer_Text_IO;
 
 package body Lua.Util is
 
-   procedure Print_Stack(L : State'Class) is
+   procedure Print_Stack(L : Lua_State'Class) is
    begin
       if L.GetTop = 0 then
          Put_Line("Stack now contains: -*- Stack is empty -*-");

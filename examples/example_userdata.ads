@@ -16,8 +16,8 @@ package Example_Userdata is
 
    package Userdata_Package is new Lua.Userdata(T => Example);
 
-   function Toggle (L : State'Class) return Natural;
+   function Toggle (L : Lua_State'Class) return Natural;
 
-   procedure Register_Operations(L : State'Class);
+   procedure Register_Operations(L : Lua_State'Class);
 
 end Example_Userdata;

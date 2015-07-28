@@ -11,7 +11,7 @@ with Lua; use Lua;
 with Lua.Util; use Lua.Util;
 
 procedure Simple_Example is
-   L : State;
+   L : Lua_State;
 
 begin
    Put_Line("A simple example of using Lua from within Ada");

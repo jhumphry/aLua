@@ -7,7 +7,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 package body Example_AdaFunctions is
 
-   function FooBar (L : State'Class) return Natural is
+   function FooBar (L : Lua_State'Class) return Natural is
       x : Long_Float := L.ToNumber(-1);
    begin
       Put_Line("* In Ada function foobar(" & Long_Float'Image(x) & ")");
@@ -16,7 +16,7 @@ package body Example_AdaFunctions is
       return 1;
    end FooBar;
 
-   function Multret (L : State'Class) return Natural is
+   function Multret (L : Lua_State'Class) return Natural is
       X : Long_Long_Integer := L.ToInteger(-1);
    begin
       Put_Line("* In Ada function multret(" & Long_Long_Integer'Image(X) & ")");
@@ -27,7 +27,7 @@ package body Example_AdaFunctions is
       return Integer(X);
    end Multret;
 
-   function Closure (L : State'Class) return Natural is
+   function Closure (L : Lua_State'Class) return Natural is
       p : Long_Float := L.ToNumber(UpvalueIndex(1));
       x : Long_Float := L.ToNumber(-1);
    begin

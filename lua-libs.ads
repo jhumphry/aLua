@@ -22,16 +22,16 @@ package Lua.Libs is
                                  Bit32_Lib);
 
    -- Ensure that all standard Lua libraries are available
-   procedure OpenLibs (L : in State);
+   procedure OpenLibs (L : in Lua_State);
 
    -- Ensure that a particular standard Lua library is available
-   procedure Require_Standard_Library (L : in State;
+   procedure Require_Standard_Library (L : in Lua_State;
                                        Library : in Lua_Standard_Library;
                                        Set_Global : in Boolean := True);
 
    -- This will add a Yield function to a Lua state for occasions where you
    -- do not wish to add the whole Coroutine library
-   procedure Add_Yield_Function (L : in State);
+   procedure Add_Yield_Function (L : in Lua_State);
 
 private
 

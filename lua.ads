@@ -67,148 +67,148 @@ package Lua is
    function UpvalueIndex (i : in Integer) return Integer;
 
    -- Basic state control
-   type State is tagged limited private;
-   type Thread;
-   function Version (L : in State) return Long_Float;
-   function Status (L : in State) return Thread_Status;
-   function LoadString (L : in State;
+   type Lua_State is tagged limited private;
+   type Lua_Thread;
+   function Version (L : in Lua_State) return Long_Float;
+   function Status (L : in Lua_State) return Thread_Status;
+   function LoadString (L : in Lua_State;
                         S : in String) return Thread_Status;
-   function LoadFile (L : in State;
+   function LoadFile (L : in Lua_State;
                       Name : in String;
                       Mode : in Lua_ChunkMode := Binary_and_Text)
                       return Thread_Status;
 
    -- Calling, yielding and functions
-   procedure Call (L : in State; nargs : in Integer; nresults : in Integer);
-   function PCall (L : in State;
+   procedure Call (L : in Lua_State; nargs : in Integer; nresults : in Integer);
+   function PCall (L : in Lua_State;
                    nargs : in Integer;
                    nresults : in Integer;
                    msgh : in Integer := 0)
                    return Thread_Status;
-   type AdaFunction is access function (L : State'Class) return Natural;
-   procedure Register(L : in State; name : in String; f : in AdaFunction);
+   type AdaFunction is access function (L : Lua_State'Class) return Natural;
+   procedure Register(L : in Lua_State; name : in String; f : in AdaFunction);
    MultRet_Sentinel : constant Integer
      with Import, Convention => C, Link_Name => "lua_conf_multret";
 
    -- Pushing values to the stack
-   procedure PushAdaClosure (L : in State; f : in AdaFunction; n : in Natural);
-   procedure PushAdaFunction (L : in State; f : in AdaFunction);
-   procedure PushBoolean (L : in  State; b : in Boolean);
-   procedure PushInteger (L : in State; n : in Lua_Integer);
-   procedure PushNil (L : in State);
-   procedure PushNumber (L : in State; n : in Lua_Number);
-   procedure PushString (L : in State; s : in String);
-   function PushThread (L : in State) return Boolean;
-   procedure PushThread (L : in State);
-   function StringToNumber (L : in State; s : in String) return Boolean;
+   procedure PushAdaClosure (L : in Lua_State; f : in AdaFunction; n : in Natural);
+   procedure PushAdaFunction (L : in Lua_State; f : in AdaFunction);
+   procedure PushBoolean (L : in  Lua_State; b : in Boolean);
+   procedure PushInteger (L : in Lua_State; n : in Lua_Integer);
+   procedure PushNil (L : in Lua_State);
+   procedure PushNumber (L : in Lua_State; n : in Lua_Number);
+   procedure PushString (L : in Lua_State; s : in String);
+   function PushThread (L : in Lua_State) return Boolean;
+   procedure PushThread (L : in Lua_State);
+   function StringToNumber (L : in Lua_State; s : in String) return Boolean;
 
    -- Pulling values from the stack
-   function ToAdaFunction (L : in State; index : in Integer) return AdaFunction;
-   function ToBoolean (L : in State; index : in Integer) return Boolean;
-   function ToInteger (L : in State; index : in Integer) return Lua_Integer;
-   function ToNumber (L : in State; index : in Integer) return Lua_Number;
-   function ToString (L : in State; index : in Integer) return String;
-   function ToThread (L : in State; index : in Integer) return Thread;
+   function ToAdaFunction (L : in Lua_State; index : in Integer) return AdaFunction;
+   function ToBoolean (L : in Lua_State; index : in Integer) return Boolean;
+   function ToInteger (L : in Lua_State; index : in Integer) return Lua_Integer;
+   function ToNumber (L : in Lua_State; index : in Integer) return Lua_Number;
+   function ToString (L : in Lua_State; index : in Integer) return String;
+   function ToThread (L : in Lua_State; index : in Integer) return Lua_Thread;
 
    -- Operations on values
-   procedure Arith (L : in State; op : in Arith_Op);
-   function Compare (L : in State;
+   procedure Arith (L : in Lua_State; op : in Arith_Op);
+   function Compare (L : in Lua_State;
                      index1 : in Integer;
                      index2 : in Integer;
                      op : in Comparison_Op) return Boolean;
-   procedure Len (L : in  State; index : Integer);
-   function RawEqual (L : in State; index1, index2 : in Integer) return Boolean;
-   function RawLen (L : in State; index : Integer) return Integer;
+   procedure Len (L : in  Lua_State; index : Integer);
+   function RawEqual (L : in Lua_State; index1, index2 : in Integer) return Boolean;
+   function RawLen (L : in Lua_State; index : Integer) return Integer;
 
    -- Garbage Collector control
-   procedure GC (L : in State; what : in GC_Op);
-   function GC (L : in State; what : in GC_Param; data : in Integer)
+   procedure GC (L : in Lua_State; what : in GC_Op);
+   function GC (L : in Lua_State; what : in GC_Param; data : in Integer)
                 return Integer;
-   function GC (L : in State) return Boolean;
+   function GC (L : in Lua_State) return Boolean;
 
    -- Stack manipulation and information
-   function AbsIndex (L : in State; idx : in Integer) return Integer;
-   function CheckStack (L : in State; n : in Integer) return Boolean;
-   procedure Copy (L : in State; fromidx : in Integer; toidx : in Integer);
-   function GetTop (L : in State) return Integer;
-   procedure Insert (L : in State; index : in Integer);
-   procedure Pop (L : in State; n : in Integer);
-   procedure PushValue (L : in State; index : in Integer);
-   procedure Remove (L : in State; index : in Integer);
-   procedure Replace (L : in State; index : in Integer);
-   procedure Rotate (L : in State; idx : in Integer; n : in Integer);
-   procedure SetTop (L : in State; index : in Integer);
+   function AbsIndex (L : in Lua_State; idx : in Integer) return Integer;
+   function CheckStack (L : in Lua_State; n : in Integer) return Boolean;
+   procedure Copy (L : in Lua_State; fromidx : in Integer; toidx : in Integer);
+   function GetTop (L : in Lua_State) return Integer;
+   procedure Insert (L : in Lua_State; index : in Integer);
+   procedure Pop (L : in Lua_State; n : in Integer);
+   procedure PushValue (L : in Lua_State; index : in Integer);
+   procedure Remove (L : in Lua_State; index : in Integer);
+   procedure Replace (L : in Lua_State; index : in Integer);
+   procedure Rotate (L : in Lua_State; idx : in Integer; n : in Integer);
+   procedure SetTop (L : in Lua_State; index : in Integer);
 
    -- Type information
-   function IsAdaFunction (L : in State; index : in Integer) return Boolean;
-   function IsBoolean (L : in State; index : in Integer) return Boolean;
-   function IsCFunction (L : in State; index : in Integer) return Boolean;
-   function IsFunction (L : in State; index : in Integer) return Boolean;
-   function IsInteger (L : in State; index : in Integer) return Boolean;
-   function IsLightuserdata (L : in State; index : in Integer) return Boolean;
-   function IsNil (L : in State; index : in Integer) return Boolean;
-   function IsNone (L : in State; index : in Integer) return Boolean;
-   function IsNoneOrNil (L : in State; index : in Integer) return Boolean;
-   function IsNumber (L : in State; index : in Integer) return Boolean;
-   function IsString (L : in State; index : in Integer) return Boolean;
-   function IsTable (L : in State; index : in Integer) return Boolean;
-   function IsThread (L : in State; index : in Integer) return Boolean;
-   function IsUserdata (L : in State; index : in Integer) return Boolean;
-   function TypeInfo (L : in State; index : in Integer) return Lua_Type;
-   function TypeName (L : in State; tp : in Lua_Type) return String;
-   function TypeName (L : in State; index : in Integer) return String is
+   function IsAdaFunction (L : in Lua_State; index : in Integer) return Boolean;
+   function IsBoolean (L : in Lua_State; index : in Integer) return Boolean;
+   function IsCFunction (L : in Lua_State; index : in Integer) return Boolean;
+   function IsFunction (L : in Lua_State; index : in Integer) return Boolean;
+   function IsInteger (L : in Lua_State; index : in Integer) return Boolean;
+   function IsLightuserdata (L : in Lua_State; index : in Integer) return Boolean;
+   function IsNil (L : in Lua_State; index : in Integer) return Boolean;
+   function IsNone (L : in Lua_State; index : in Integer) return Boolean;
+   function IsNoneOrNil (L : in Lua_State; index : in Integer) return Boolean;
+   function IsNumber (L : in Lua_State; index : in Integer) return Boolean;
+   function IsString (L : in Lua_State; index : in Integer) return Boolean;
+   function IsTable (L : in Lua_State; index : in Integer) return Boolean;
+   function IsThread (L : in Lua_State; index : in Integer) return Boolean;
+   function IsUserdata (L : in Lua_State; index : in Integer) return Boolean;
+   function TypeInfo (L : in Lua_State; index : in Integer) return Lua_Type;
+   function TypeName (L : in Lua_State; tp : in Lua_Type) return String;
+   function TypeName (L : in Lua_State; index : in Integer) return String is
      (TypeName(L, Typeinfo(L, index)));
 
 
    -- Table manipulation
-   procedure CreateTable (L : in State;
+   procedure CreateTable (L : in Lua_State;
                           narr : in Integer := 0;
                           nrec : in Integer := 0);
-   procedure NewTable (L : in State);
-   function GetField (L : in State; index : in Integer; k : in String)
+   procedure NewTable (L : in Lua_State);
+   function GetField (L : in Lua_State; index : in Integer; k : in String)
                   return Lua_Type;
-   procedure GetField (L : in State; index : in Integer; k : in String);
-   function Geti (L : in State; index : in Integer; i : in Integer)
+   procedure GetField (L : in Lua_State; index : in Integer; k : in String);
+   function Geti (L : in Lua_State; index : in Integer; i : in Integer)
                   return Lua_Type;
-   procedure Geti (L : in State; index : in Integer; i : in Integer);
-   function GetTable (L : in State; index : in Integer) return Lua_Type;
-   procedure GetTable (L : in State; index : in Integer);
-   function Next (L : in State; index : in Integer) return Boolean;
-   function RawGet (L : in State; index : in Integer) return Lua_Type;
-   procedure RawGet (L : in State; index : in Integer);
-   function RawGeti (L : in State; index : in Integer; i : in Integer)
+   procedure Geti (L : in Lua_State; index : in Integer; i : in Integer);
+   function GetTable (L : in Lua_State; index : in Integer) return Lua_Type;
+   procedure GetTable (L : in Lua_State; index : in Integer);
+   function Next (L : in Lua_State; index : in Integer) return Boolean;
+   function RawGet (L : in Lua_State; index : in Integer) return Lua_Type;
+   procedure RawGet (L : in Lua_State; index : in Integer);
+   function RawGeti (L : in Lua_State; index : in Integer; i : in Integer)
                   return Lua_Type;
-   procedure RawGeti (L : in State; index : in Integer; i : in Integer);
-   procedure RawSet (L : in State; index : in Integer);
-   procedure RawSeti (L : in State; index : in Integer; i : in Integer);
-   procedure SetField (L : in State; index : in Integer; k : in String);
-   procedure Seti (L : in State; index : in Integer; i : in Integer);
-   procedure SetTable (L : in State; index : in Integer);
+   procedure RawGeti (L : in Lua_State; index : in Integer; i : in Integer);
+   procedure RawSet (L : in Lua_State; index : in Integer);
+   procedure RawSeti (L : in Lua_State; index : in Integer; i : in Integer);
+   procedure SetField (L : in Lua_State; index : in Integer; k : in String);
+   procedure Seti (L : in Lua_State; index : in Integer; i : in Integer);
+   procedure SetTable (L : in Lua_State; index : in Integer);
 
    -- Globals and metatables
-   function GetGlobal (L : in State; name : in String) return Lua_Type;
-   procedure GetGlobal (L : in State; name : in String);
-   function GetMetatable (L : in State; index : in Integer) return Boolean;
-   procedure GetMetatable (L : in State; index : in Integer);
-   procedure PushGlobalTable (L : in State);
-   procedure SetGlobal (L : in State; name : in String);
-   procedure SetMetatable (L : in State; index : in Integer);
+   function GetGlobal (L : in Lua_State; name : in String) return Lua_Type;
+   procedure GetGlobal (L : in Lua_State; name : in String);
+   function GetMetatable (L : in Lua_State; index : in Integer) return Boolean;
+   procedure GetMetatable (L : in Lua_State; index : in Integer);
+   procedure PushGlobalTable (L : in Lua_State);
+   procedure SetGlobal (L : in Lua_State; name : in String);
+   procedure SetMetatable (L : in Lua_State; index : in Integer);
 
    -- Threads
-   type Thread is new State with private;
-   function IsYieldable (L : in State'Class) return Boolean;
-   function NewThread (L : in State'Class) return Thread;
-   function Resume(L : in State'Class; from : in State'Class; nargs : Integer)
+   type Lua_Thread is new Lua_State with private;
+   function IsYieldable (L : in Lua_State'Class) return Boolean;
+   function NewThread (L : in Lua_State'Class) return Lua_Thread;
+   function Resume(L : in Lua_State'Class; from : in Lua_State'Class; nargs : Integer)
      return Thread_Status;
-   procedure XMove (from, to : in Thread; n : in Integer);
-   procedure Yield (L : in State; nresults : Integer);
+   procedure XMove (from, to : in Lua_Thread; n : in Integer);
+   procedure Yield (L : in Lua_State; nresults : Integer);
 
    -- References
    type Lua_Reference is tagged private;
-   function Ref (L : in State'Class; t : in Integer := RegistryIndex)
+   function Ref (L : in Lua_State'Class; t : in Integer := RegistryIndex)
                  return Lua_Reference;
-   function Get (L : in State; R : Lua_Reference'Class) return Lua_Type;
-   procedure Get (L : in State; R : Lua_Reference'Class);
+   function Get (L : in Lua_State; R : Lua_Reference'Class) return Lua_Type;
+   procedure Get (L : in Lua_State; R : Lua_Reference'Class);
 
 private
 
@@ -232,23 +232,23 @@ private
    RIDX_Globals : constant Integer := 2;
    RIDX_Last : constant Integer := RIDX_Globals;
 
-   type State is new Ada.Finalization.Limited_Controlled with
+   type Lua_State is new Ada.Finalization.Limited_Controlled with
       record
          L : void_Ptr;
       end record;
 
-   overriding procedure Initialize (Object : in out State);
-   overriding procedure Finalize   (Object : in out State);
+   overriding procedure Initialize (Object : in out Lua_State);
+   overriding procedure Finalize   (Object : in out Lua_State);
 
    -- Existing_State is a clone of State but without automatic initialization
    -- It is used internally when lua_State* are returned from the Lua library
    -- and we don't want to re-initialize them when turning them into the
    -- State record type.
-   type Existing_State is new State with null record;
+   type Existing_State is new Lua_State with null record;
    overriding procedure Initialize (Object : in out Existing_State) is null;
    overriding procedure Finalize   (Object : in out Existing_State) is null;
 
-   type Thread is new Existing_State with null record;
+   type Lua_Thread is new Existing_State with null record;
 
    -- Trampolines
 

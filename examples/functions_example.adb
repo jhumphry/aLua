@@ -15,7 +15,7 @@ with Lua.Util; use Lua.Util;
 with Example_AdaFunctions;
 
 procedure Functions_Example is
-   L : State;
+   L : Lua_State;
    Success : Thread_Status;
    R : Lua_Reference;
 
@@ -125,7 +125,7 @@ begin
    L.Call(0, 0);
    Put_Line("Compiled coroutine code.");
    declare
-      Coroutine : Thread := L.NewThread;
+      Coroutine : Lua_Thread := L.NewThread;
       Coroutine_Status : Thread_Status;
    begin
       Put_Line("New thread created");

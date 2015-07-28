@@ -45,12 +45,12 @@ package body Lua.Libs is
       Bit32_Lib => luaopen_bit32'Access
      );
 
-   procedure OpenLibs (L : in State) is
+   procedure OpenLibs (L : in Lua_State) is
    begin
       LibInternal.luaL_openlibs(L.L);
    end OpenLibs;
 
-   procedure Require_Standard_Library (L : in State;
+   procedure Require_Standard_Library (L : in Lua_State;
                                        Library : in Lua_Standard_Library;
                                        Set_Global : in Boolean := True) is
       glb : constant C.int := C.Int((if Set_Global then 1 else 0));
@@ -61,7 +61,7 @@ package body Lua.Libs is
                                 glb);
    end Require_Standard_Library;
 
-   procedure Add_Yield_Function (L : in State) is
+   procedure Add_Yield_Function (L : in Lua_State) is
       Func_Name : C.Strings.chars_ptr := C.Strings.New_String("yield");
    begin
       Internal.lua_pushcclosure(L.L, Yield_CFunction'Access, 0);
