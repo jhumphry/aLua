@@ -161,47 +161,47 @@ package Lua is
 
 
    -- Table manipulation
-   procedure createtable (L : in State;
+   procedure CreateTable (L : in State;
                           narr : in Integer := 0;
                           nrec : in Integer := 0);
-   procedure newtable (L : in State);
-   function getfield (L : in State; index : in Integer; k : in String)
+   procedure NewTable (L : in State);
+   function GetField (L : in State; index : in Integer; k : in String)
                   return Lua_Type;
-   procedure getfield (L : in State; index : in Integer; k : in String);
-   function geti (L : in State; index : in Integer; i : in Integer)
+   procedure GetField (L : in State; index : in Integer; k : in String);
+   function Geti (L : in State; index : in Integer; i : in Integer)
                   return Lua_Type;
-   procedure geti (L : in State; index : in Integer; i : in Integer);
-   function gettable (L : in State; index : in Integer) return Lua_Type;
-   procedure gettable (L : in State; index : in Integer);
-   function next (L : in State; index : in Integer) return Boolean;
-   function rawget (L : in State; index : in Integer) return Lua_Type;
-   procedure rawget (L : in State; index : in Integer);
-   function rawgeti (L : in State; index : in Integer; i : in Integer)
+   procedure Geti (L : in State; index : in Integer; i : in Integer);
+   function GetTable (L : in State; index : in Integer) return Lua_Type;
+   procedure GetTable (L : in State; index : in Integer);
+   function Next (L : in State; index : in Integer) return Boolean;
+   function RawGet (L : in State; index : in Integer) return Lua_Type;
+   procedure RawGet (L : in State; index : in Integer);
+   function RawGeti (L : in State; index : in Integer; i : in Integer)
                   return Lua_Type;
-   procedure rawgeti (L : in State; index : in Integer; i : in Integer);
-   procedure rawset (L : in State; index : in Integer);
-   procedure rawseti (L : in State; index : in Integer; i : in Integer);
-   procedure setfield (L : in State; index : in Integer; k : in String);
-   procedure seti (L : in State; index : in Integer; i : in Integer);
-   procedure settable (L : in State; index : in Integer);
+   procedure RawGeti (L : in State; index : in Integer; i : in Integer);
+   procedure RawSet (L : in State; index : in Integer);
+   procedure RawSeti (L : in State; index : in Integer; i : in Integer);
+   procedure SetField (L : in State; index : in Integer; k : in String);
+   procedure Seti (L : in State; index : in Integer; i : in Integer);
+   procedure SetTable (L : in State; index : in Integer);
 
    -- Globals and metatables
-   function getglobal (L : in State; name : in String) return Lua_Type;
-   procedure getglobal (L : in State; name : in String);
-   function getmetatable (L : in State; index : in Integer) return Boolean;
-   procedure getmetatable (L : in State; index : in Integer);
-   procedure pushglobaltable (L : in State);
-   procedure setglobal (L : in State; name : in String);
-   procedure setmetatable (L : in State; index : in Integer);
+   function GetGlobal (L : in State; name : in String) return Lua_Type;
+   procedure GetGlobal (L : in State; name : in String);
+   function GetMetatable (L : in State; index : in Integer) return Boolean;
+   procedure GetMetatable (L : in State; index : in Integer);
+   procedure PushGlobalTable (L : in State);
+   procedure SetGlobal (L : in State; name : in String);
+   procedure SetMetatable (L : in State; index : in Integer);
 
    -- Threads
    type Thread is new State with private;
-   function isyieldable (L : in State'Class) return Boolean;
-   function newthread (L : in State'Class) return Thread;
-   function resume(L : in State'Class; from : in State'Class; nargs : Integer)
+   function IsYieldable (L : in State'Class) return Boolean;
+   function NewThread (L : in State'Class) return Thread;
+   function Resume(L : in State'Class; from : in State'Class; nargs : Integer)
      return Thread_Status;
-   procedure xmove (from, to : in Thread; n : in Integer);
-   procedure yield (L : in State; nresults : Integer);
+   procedure XMove (from, to : in Thread; n : in Integer);
+   procedure Yield (L : in State; nresults : Integer);
 
    -- References
    type Lua_Reference is tagged private;
