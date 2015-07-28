@@ -21,8 +21,10 @@ package Lua.Libs is
                                  Debug_Lib,
                                  Bit32_Lib);
 
+   -- Ensure that all standard Lua libraries are available
    procedure OpenLibs (L : in State);
 
+   -- Ensure that a particular standard Lua library is available
    procedure Require_Standard_Library (L : in State;
                                        Library : in Lua_Standard_Library;
                                        Set_Global : in Boolean := True);
