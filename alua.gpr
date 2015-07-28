@@ -4,7 +4,9 @@ project ALua is
    for Source_Dirs use (".", "tests", "examples");
    for Object_Dir use "build/";
    for Exec_Dir use "exec/";
-   for Main use ("simple_example.adb", "functions_example.adb");
+   for Main use ("simple_example.adb",
+                 "functions_example.adb",
+                 "userdata_example.adb");
 
    package Ide is
       for Vcs_Kind use "Git";

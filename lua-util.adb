@@ -16,11 +16,11 @@ package body Lua.Util is
       end if;
 
       Put_Line("Stack now contains:");
-      Put_Line("Rel index   : Abs index   : Type    : Contents");
+      Put_Line("Rel index   : Abs index   : Type     : Contents");
       for I in reverse 1..L.GetTop loop
          Put(I - L.GetTop - 1); Set_Col(13); Put(": ");
          Put(L.AbsIndex(I)); Set_Col(27); Put(": ");
-         Put(L.TypeName(L.TypeInfo(I))); Set_Col(37); Put(": ");
+         Put(L.TypeName(L.TypeInfo(I))); Set_Col(38); Put(": ");
          case L.TypeInfo(I) is
             when TBOOLEAN =>
                Put((if L.ToBoolean(I) then "true" else "false"));
