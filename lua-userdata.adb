@@ -14,6 +14,7 @@ package body Lua.Userdata is
 
    use type Ada.Tags.Tag;
    use type C.int;
+   use type C.size_t;
 
    --
    -- *** Conversions between C types and Ada types
@@ -24,7 +25,7 @@ package body Lua.Userdata is
 
    procedure Push (L : in Lua_State'Class; D : not null access T) is
       UserData_Address : System.Address
-        := Internal.lua_newuserdata(L.L, Ada_Userdata'Size);
+        := Internal.lua_newuserdata(L.L, (Ada_Userdata'Size+7)/8);
       UserData_Access : access Ada_Userdata
         := Address_To_Ada_Userdata.To_Pointer(UserData_Address);
       Has_Metatable : Boolean;
