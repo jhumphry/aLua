@@ -17,6 +17,24 @@ package body Lua.Userdata is
    use type C.size_t;
 
    --
+   -- *** Types used internally
+   --
+
+   -- It might seem more obvious to make Class_Wide a discriminant and to use a
+   -- variant record, but this would mean passing an indefinite type to/from C,
+   -- and would require changing the discriminant on new objects allocated by
+   -- Lua. As this type is only used in the package body, it is more practical
+   -- to use an approach that is less idiomatic in Ada by including both types
+   -- of pointers in every record and remembering to check each time before use.
+   type Ada_Userdata is
+      record
+         Class_Wide : Boolean;
+         Tag : Ada.Tags.Tag := T'Tag;
+         Data : access T;
+         Data_Class_Wide : access T'Class;
+      end record;
+
+   --
    -- *** Conversions between C types and Ada types
    --
 
@@ -30,13 +48,32 @@ package body Lua.Userdata is
         := Address_To_Ada_Userdata.To_Pointer(UserData_Address);
       Has_Metatable : Boolean;
    begin
-      UserData_Access.all.Tag := T'Tag;
-      UserData_Access.all.Data := D;
+      UserData_Access.all := Ada_Userdata'(Class_Wide => false,
+                                           Tag => T'Tag,
+                                           Data => D,
+                                           Data_Class_Wide => null);
       Has_Metatable := GetMetaTable(L);
       if Has_Metatable then
          Setmetatable(L, -2);
       end if;
    end Push;
+
+   procedure Push_Class_Wide (L : in Lua_State'Class; D : not null access T'Class) is
+      UserData_Address : System.Address
+        := Internal.lua_newuserdata(L.L, (Ada_Userdata'Size+7)/8);
+      UserData_Access : access Ada_Userdata
+        := Address_To_Ada_Userdata.To_Pointer(UserData_Address);
+      Has_Metatable : Boolean;
+   begin
+      UserData_Access.all := Ada_Userdata'(Class_Wide => true,
+                                           Tag => T'Tag,
+                                           Data => null,
+                                           Data_Class_Wide => D);
+      Has_Metatable := GetMetaTable(L);
+      if Has_Metatable then
+         Setmetatable(L, -2);
+      end if;
+   end Push_Class_Wide;
 
    function ToUserdata (L : in Lua_State'Class; index : in Integer)
       return not null access T
@@ -50,9 +87,31 @@ package body Lua.Userdata is
          raise Program_Error with "Attempting to access non-userdata as userdata";
       elsif UserData_Access.Tag /= T'Tag then
          raise Program_Error with "Attempting invalid userdata type conversion";
+      elsif UserData_Access.Class_Wide then
+         raise Program_Error with "Attempting use a class-wide userdata as a userdata of a specific type";
       end if;
       return UserData_Access.Data;
    end ToUserdata;
+
+   function ToUserdata_Class_Wide (L : in Lua_State'Class; index : in Integer)
+      return not null access T'Class
+   is
+      UserData_Address : System.Address
+        := Internal.lua_touserdata(L.L, C.int(index));
+      UserData_Access : access Ada_Userdata
+        := Address_To_Ada_Userdata.To_Pointer(UserData_Address);
+   begin
+      if UserData_Access = null then
+         raise Program_Error with "Attempting to access non-userdata as userdata";
+      elsif UserData_Access.Tag /= T'Tag then
+         raise Program_Error with "Attempting invalid userdata type conversion";
+      end if;
+      if UserData_Access.Class_Wide then
+         return UserData_Access.Data_Class_Wide;
+      else
+         return UserData_Access.Data;
+      end if;
+   end ToUserdata_Class_Wide;
 
    procedure NewMetaTable (L : in Lua_State'Class;
                            Set_Indexable : Boolean := True) is

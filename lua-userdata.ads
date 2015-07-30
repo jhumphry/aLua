@@ -15,11 +15,23 @@ package Lua.Userdata is
    -- new UserData value.
    procedure Push (L : in Lua_State'Class; D : not null access T);
 
+   -- Push an access-to-T'Class to the stack of Lua state L as a UserData value.
+   -- If a metatable has been registered for the type then it is associated
+   -- with the new UserData value.
+   procedure Push_Class_Wide (L : in Lua_State'Class; D : not null access T'Class);
+
    -- Retrieve an access-to-T from the stack of Lua state L at the given index.
-   -- Checks that the value indicated is a userdata value, and that the tag
-   -- is correct.
+   -- Checks that the value indicated is a non-class-wide userdata value, and
+   -- that the tag is correct.
    function ToUserdata (L : in Lua_State'Class; index : in Integer)
                         return not null access T;
+
+   -- Retrieve an access-to-T from the stack of Lua state L at the given index.
+   -- Checks that the value indicated is a userdata value, and that the tag
+   -- is correct. If the value is an access-to-T it will be converted to an
+   -- access-to-T'Class.
+   function ToUserdata_Class_Wide (L : in Lua_State'Class; index : in Integer)
+                        return not null access T'Class;
 
    -- Create a new metatable for this type. It will be stored in the registry
    -- under 'Ada_UserData:ET' where ET is the result of T'External_Tag. If
@@ -40,12 +52,4 @@ package Lua.Userdata is
    procedure AddOperation (L : in Lua_State'Class;
                            Name : in String;
                            Op : AdaFunction);
-
-private
-   type Ada_Userdata is
-      record
-         Tag : Ada.Tags.Tag := T'Tag;
-         Data : not null access T;
-      end record;
-
 end Lua.Userdata;
