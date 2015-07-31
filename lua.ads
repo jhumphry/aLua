@@ -36,7 +36,8 @@ package Lua is
 
    -- Enumerations
 
-   type Thread_Status is (OK, YIELD, ERRRUN, ERRSYNTAX, ERRMEM, ERRGCMM, ERRERR);
+   type Thread_Status is (OK, YIELD, ERRRUN, ERRSYNTAX,
+                          ERRMEM, ERRGCMM, ERRERR, ERRFILE);
 
    type Arith_Op is (OPADD, OPSUB, OPMUL, OPMOD, OPPOW, OPDIV, OPIDIV, OPBAND,
                      OPBOR, OPBXOR, OPSHL, OPSHR, OPUNM, OPBNOT);
@@ -249,7 +250,7 @@ private
    subtype void_ptr is System.Address;
 
    for Thread_Status use (OK => 0, YIELD => 1, ERRRUN => 2, ERRSYNTAX => 3,
-                          ERRMEM => 4, ERRGCMM => 5, ERRERR => 6);
+                          ERRMEM => 4, ERRGCMM => 5, ERRERR => 6, ERRFILE => 7);
 
    for Arith_Op use (OPADD => 0, OPSUB => 1, OPMUL => 2, OPMOD => 3, OPPOW => 4,
                      OPDIV => 5, OPIDIV => 6, OPBAND => 7, OPBOR => 8,
