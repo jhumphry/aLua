@@ -29,8 +29,12 @@ private with Interfaces.C;
 
 package Lua is
 
+   -- Types used by Lua
+
    subtype Lua_Number is Long_Float;
    subtype Lua_Integer is Long_Long_Integer;
+
+   -- Enumerations
 
    type Thread_Status is (OK, YIELD, ERRRUN, ERRSYNTAX, ERRMEM, ERRGCMM, ERRERR);
 
@@ -54,6 +58,12 @@ package Lua is
 
    type Lua_ChunkMode is (Binary, Text, Binary_and_Text);
 
+   -- Exceptions
+
+   -- Lua_Error is raised whenever there is a violation of a constraint
+   -- imposed by the semantics of the Lua interface - for example, trying to
+   -- retrieve a number from a non-numeric value on the stack or using a
+   -- reference on a different Lua_State than it was created on.
    Lua_Error : exception;
 
    -- Special stack positions and the registry

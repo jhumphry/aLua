@@ -84,11 +84,11 @@ package body Lua.Userdata is
         := Address_To_Ada_Userdata.To_Pointer(UserData_Address);
    begin
       if UserData_Access = null then
-         raise Program_Error with "Attempting to access non-userdata as userdata";
+         raise Lua_Error with "Attempting to access non-userdata as userdata";
       elsif UserData_Access.Tag /= T'Tag then
-         raise Program_Error with "Attempting invalid userdata type conversion";
+         raise Lua_Error with "Attempting invalid userdata type conversion";
       elsif UserData_Access.Class_Wide then
-         raise Program_Error with "Attempting use a class-wide userdata as a userdata of a specific type";
+         raise Lua_Error with "Attempting use a class-wide userdata as a userdata of a specific type";
       end if;
       return UserData_Access.Data;
    end ToUserdata;
@@ -102,9 +102,9 @@ package body Lua.Userdata is
         := Address_To_Ada_Userdata.To_Pointer(UserData_Address);
    begin
       if UserData_Access = null then
-         raise Program_Error with "Attempting to access non-userdata as userdata";
+         raise Lua_Error with "Attempting to access non-userdata as userdata";
       elsif UserData_Access.Tag /= T'Tag then
-         raise Program_Error with "Attempting invalid userdata type conversion";
+         raise Lua_Error with "Attempting invalid userdata type conversion";
       end if;
       if UserData_Access.Class_Wide then
          return UserData_Access.Data_Class_Wide;
@@ -122,7 +122,7 @@ package body Lua.Userdata is
       Result := AuxInternal.luaL_newmetatable(L.L, tname);
       C.Strings.Free(tname);
       if Result = 0 then
-         raise Program_Error with "Metatable could not be created or already exists";
+         raise Lua_Error with "Metatable could not be created or already exists";
       elsif Set_Indexable then
          -- Setting the metatables __index field to itself so any unidentified
          -- operations of the form object:operation() will be looked up in the
@@ -146,7 +146,7 @@ package body Lua.Userdata is
       Success : Boolean := GetMetaTable(L);
    begin
       if not Success then
-         raise Program_Error with "No metatable exists for this type";
+         raise Lua_Error with "No metatable exists for this type";
       end if;
    end GetMetaTable;
 

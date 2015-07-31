@@ -132,7 +132,7 @@ package body Lua is
    begin
       GetGlobal(L, name);
       if not IsFunction(L, -1) then
-         raise Program_Error with "Attempting to call non-existent Lua function";
+         raise Lua_Error with "Attempting to call a value that is not a Lua function";
       end if;
       Rotate(L, -1-nargs, 1);
       Internal.lua_callk(L.L,
@@ -170,7 +170,7 @@ package body Lua is
    begin
       GetGlobal(L, name);
       if not IsFunction(L, -1) then
-         raise Program_Error with "Attempting to call non-existent Lua function";
+         raise Lua_Error with "Attempting to call a value that is not a Lua function";
       end if;
       Rotate(L, -1-nargs, 1);
       Result := Internal.lua_pcallk(L.L,
@@ -267,8 +267,7 @@ package body Lua is
    begin
       Discard := Internal.lua_getupvalue(L.L, C.int(index), 1);
       if Discard = C.Strings.Null_Ptr then
-         raise Constraint_Error
-           with "Function referenced is not an AdaFunction";
+         raise Lua_Error with "Function referenced is not an AdaFunction";
       end if;
       Upvalue := Internal.lua_touserdata(L.L, -1);
       Internal.lua_settop(L.L, -2);
@@ -284,7 +283,7 @@ package body Lua is
    begin
       result := Internal.lua_tointegerx(L.L , C.int(index), isnum'Access);
       if isnum = 0 then
-         raise Constraint_Error with "Value at Lua stack index "
+         raise Lua_Error with "Value at Lua stack index "
            & Integer'Image(index)
            & " is not convertible to an integer.";
       end if;
@@ -297,7 +296,7 @@ package body Lua is
    begin
       result := Internal.lua_tonumberx(L.L , C.int(index), isnum'Access);
       if isnum = 0 then
-         raise Constraint_Error with "Value at Lua stack index "
+         raise Lua_Error with "Value at Lua stack index "
            & Integer'Image(index)
            & " is not convertible to a number.";
       end if;
@@ -790,9 +789,9 @@ package body Lua is
    function Get (L : in Lua_State; R : Lua_Reference'Class) return Lua_Type is
    begin
       if R.E = null then
-         raise Program_Error with "Empty Lua reference used";
+         raise Lua_Error with "Empty Lua reference used";
       elsif R.E.State /= L.L then
-         raise Program_Error with "Lua reference used on the wrong state!";
+         raise Lua_Error with "Lua reference used on the wrong state!";
       end if;
       return Int_To_Lua_Type(Internal.lua_rawgeti(R.E.all.State,
                              R.E.all.Table,
@@ -804,9 +803,9 @@ package body Lua is
       Discard : C.int;
    begin
       if R.E = null then
-         raise Program_Error with "Empty Lua reference used";
+         raise Lua_Error with "Empty Lua reference used";
       elsif R.E.State /= L.L then
-         raise Program_Error with "Lua reference used on the wrong state!";
+         raise Lua_Error with "Lua reference used on the wrong state!";
       end if;
       Discard := Internal.lua_rawgeti(R.E.all.State,
                                       R.E.all.Table,
