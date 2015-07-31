@@ -522,10 +522,10 @@ package body Lua is
       declare
          Name : String := L.ToString(-1);
       begin
-         if Name'Length > 13
-           and then Name(Name'First..Name'First+12) = "Ada_UserData:" then
+         if Name'Length > 4
+           and then Name(Name'First..Name'First+3) = "Ada:" then
              L.Pop(2); -- the metatable and the __name field
-            return (Name(Name'First+13..Name'Last));
+            return (Name(Name'First+4..Name'Last));
          else
              L.Pop(2); -- the metatable and the non-Ada __name field
             return "";

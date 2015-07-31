@@ -116,7 +116,7 @@ package body Lua.Userdata is
    procedure NewMetaTable (L : in Lua_State'Class;
                            Set_Indexable : Boolean := True) is
       tname : C.Strings.chars_ptr
-        := C.Strings.New_String("Ada_UserData:" & T'External_Tag);
+        := C.Strings.New_String("Ada:" & T'External_Tag);
       Result : C.int;
    begin
       Result := AuxInternal.luaL_newmetatable(L.L, tname);
@@ -134,7 +134,7 @@ package body Lua.Userdata is
 
    function GetMetaTable (L : in Lua_State'Class) return Boolean is
        tname : C.Strings.chars_ptr
-        := C.Strings.New_String("Ada_UserData:" & T'External_Tag);
+        := C.Strings.New_String("Ada:" & T'External_Tag);
       Result : C.int;
    begin
       Result := Internal.lua_getfield(L.L, C.int(RegistryIndex), tname);
