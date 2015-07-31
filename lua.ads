@@ -80,11 +80,21 @@ package Lua is
 
    -- Calling, yielding and functions
    procedure Call (L : in Lua_State; nargs : in Integer; nresults : in Integer);
+   procedure Call_Function (L : in Lua_State;
+                            name : in String;
+                            nargs : in Integer;
+                            nresults : in Integer);
    function PCall (L : in Lua_State;
                    nargs : in Integer;
                    nresults : in Integer;
                    msgh : in Integer := 0)
                    return Thread_Status;
+   function PCall_Function (L : in Lua_State;
+                            name : in String;
+                            nargs : in Integer;
+                            nresults : in Integer;
+                            msgh : in Integer := 0)
+                            return Thread_Status;
    type AdaFunction is access function (L : Lua_State'Class) return Natural;
    procedure Register(L : in Lua_State; name : in String; f : in AdaFunction);
    MultRet_Sentinel : constant Integer

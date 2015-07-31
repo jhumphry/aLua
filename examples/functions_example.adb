@@ -43,7 +43,8 @@ begin
    L.Call(0, 0);
    Put_Line("Compiled chunk.");
    Put("Result of calling f (3): ");
-   L.GetGlobal("f"); L.PushNumber(3.0); L.Call(1, 1);
+   L.PushInteger(3);
+   L.Call_Function(name => "f", nargs => 1, nresults => 1);
    Put(L.ToNumber(-1), Aft => 0, Exp => 0); New_Line;
    New_Line;
 
@@ -63,7 +64,8 @@ begin
    if Success = OK then
       L.Call(0, 0);
       Put_Line("Compiled chunk. Result of calling triangle (5):");
-      L.GetGlobal("triangle"); L.PushNumber(5.0); L.Call(1, 1);
+      L.PushNumber(5.0);
+      L.Call_Function(name => "triangle", nargs => 1, nresults => 0);
    end if;
    New_Line;
 
@@ -97,9 +99,8 @@ begin
    Put_Line("Registering an AdaFunction multret in Lua");
    L.Register("multret", AdaFunction'(Example_AdaFunctions.Multret'Access));
    Put_Line("Calling 'multret(5)' from Lua");
-   L.GetGlobal("multret");
    L.PushInteger(5);
-   L.Call(1, MultRet_Sentinel);
+   L.Call_Function(name => "multret", nargs => 1, nresults => MultRet_Sentinel);
    Print_Stack(L);
    New_Line;
 
@@ -109,9 +110,8 @@ begin
    L.PushAdaClosure(AdaFunction'(Example_AdaFunctions.Closure'Access), 1);
    L.SetGlobal("closure");
    Put_Line("Calling 'closure(3.5)' from Lua");
-   L.GetGlobal("closure");
    L.PushNumber(3.5);
-   L.Call(1, MultRet_Sentinel);
+   L.Call_Function(name => "closure", nargs => 1, nresults => MultRet_Sentinel);
    Print_Stack(L);
    New_Line;
 

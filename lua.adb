@@ -125,6 +125,23 @@ package body Lua is
                          null);
    end Call;
 
+   procedure Call_Function (L : in Lua_State;
+                            name : in String;
+                            nargs : in Integer;
+                            nresults : in Integer) is
+   begin
+      GetGlobal(L, name);
+      if not IsFunction(L, -1) then
+         raise Program_Error with "Attempting to call non-existent Lua function";
+      end if;
+      Rotate(L, -1-nargs, 1);
+      Internal.lua_callk(L.L,
+                         C.int(nargs),
+                         C.int(nresults),
+                         0,
+                         null);
+   end Call_Function;
+
    function PCall (L : in Lua_State;
                    nargs : in Integer;
                    nresults : in Integer;
@@ -142,6 +159,29 @@ package body Lua is
 
                           )
      );
+
+   function PCall_Function (L : in Lua_State;
+                            name : in String;
+                            nargs : in Integer;
+                            nresults : in Integer;
+                            msgh : in Integer := 0)
+                            return Thread_Status is
+      Result : C.int;
+   begin
+      GetGlobal(L, name);
+      if not IsFunction(L, -1) then
+         raise Program_Error with "Attempting to call non-existent Lua function";
+      end if;
+      Rotate(L, -1-nargs, 1);
+      Result := Internal.lua_pcallk(L.L,
+                                   C.int(nargs),
+                                   C.int(nresults),
+                                   C.int(msgh),
+                                   0,
+                                   null
+                                  );
+      return Int_To_Thread_Status(Result);
+     end PCall_Function;
 
    procedure Register(L : in Lua_State; name : in String; f : in AdaFunction) is
       C_name : C.Strings.chars_ptr := C.Strings.New_String(name);
