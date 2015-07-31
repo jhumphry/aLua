@@ -78,38 +78,95 @@ package Lua is
    function UpvalueIndex (i : in Integer) return Integer;
 
    -- Basic state control
+
+   -- Lua_State encapsulates the entire state of a Lua interpreter. Almost every
+   -- routine requires a Lua_State to be passed as the first parameter. This
+   -- is a Limited_Controlled type internally so it will automatically be
+   -- initialised on creation and finalized properly when it goes out of
+   -- Ada scope.
    type Lua_State is tagged limited private;
+
    type Lua_Thread;
+
+   -- This function retrieves the version of the C Lua interpreter that the
+   -- program has been compiled against.
+   -- Returns a Long_Float value consisting of the Major version * 100 plus the
+   -- minor version, so version 5.3 of Lua will return 503.0.
    function Version (L : in Lua_State) return Long_Float;
+
+   -- Status returns the status of a particular interpreter state or thread
+   -- using a custom enumeration type.
    function Status (L : in Lua_State) return Thread_Status;
+
+   -- Loads and runs a string containing code. Currently makes a duplicate to
+   -- cope with the Ada-C mismatch, so very, very large strings may not work.
    function LoadString (L : in Lua_State;
                         S : in String) return Thread_Status;
+
+   -- Loads and runs a file of a given Name. The Mode parameter allows
+   -- specification of whether the file can be in Binary, Text or either format.
    function LoadFile (L : in Lua_State;
                       Name : in String;
                       Mode : in Lua_ChunkMode := Binary_and_Text)
                       return Thread_Status;
 
    -- Calling, yielding and functions
+
+   -- Calls a function (including an anonymous block of code) on the stack. The
+   -- arguments should be pushed onto the stack on top of the function. The
+   -- arguments and function will be popped from the stack and replaced with the
+   -- results. If nresults is specified using the magic constant
+   -- MultRet_Sentinel then a variable number of results can be retrieved. Any
+   -- errors will cause the Lua interpreter to panic, which will end the
+   -- whole Ada program.
    procedure Call (L : in Lua_State; nargs : in Integer; nresults : in Integer)
      with Inline, Pre => IsFunction(L, -nargs-1);
+
+   -- This procedure looks up the name of a function stored in the global
+   -- environment and pushes it onto the stack in the correct place before
+   -- invoking Call.
    procedure Call_Function (L : in Lua_State;
                             name : in String;
                             nargs : in Integer;
                             nresults : in Integer);
+
+   -- Calls a function (including an anonymous block of code) on the stack. The
+   -- arguments should be pushed onto the stack on top of the function. The
+   -- arguments and function will be popped from the stack and replaced with the
+   -- results. If nresults is specified using the magic constant
+   -- MultRet_Sentinel then a variable number of results can be retrieved. If an
+   -- error occurrs then an error message will be pushed to the stack and the
+   -- Thread_Status value returned will be an error code. If msgh is non-zero,
+   -- it indicates the index of a function on the stack that will be called on
+   -- an error which can provide additional debugging infomation.
    function PCall (L : in Lua_State;
                    nargs : in Integer;
                    nresults : in Integer;
                    msgh : in Integer := 0)
                    return Thread_Status
      with Inline, Pre => IsFunction(L, -nargs-1);
+
+   -- This procedure looks up the name of a function stored in the global
+   -- environment and pushes it onto the stack in the correct place before
+   -- invoking PCall.
    function PCall_Function (L : in Lua_State;
                             name : in String;
                             nargs : in Integer;
                             nresults : in Integer;
                             msgh : in Integer := 0)
                             return Thread_Status;
+
+   -- AdaFunction is used to refer to Ada functions that are suitable for
+   -- use by Lua. They are given a Lua_State'Class parameter and other
+   -- parameters should be retrieved from the stack. The results should be
+   -- pushed onto the stack and the number of results returned.
+   -- Note that the function does NOT have to have Convention=>C set.
    type AdaFunction is access function (L : Lua_State'Class) return Natural;
+
+   -- Register an Ada function f under name in the global environment.
    procedure Register(L : in Lua_State; name : in String; f : in AdaFunction);
+
+   -- A magic value that indicates that multiple results may be returned
    MultRet_Sentinel : constant Integer
      with Import, Convention => C, Link_Name => "lua_conf_multret";
 
@@ -239,10 +296,22 @@ package Lua is
    procedure Yield (L : in Lua_State; nresults : Integer);
 
    -- References
+
+   -- Lua_Reference is a reference-counted way of referring to objects inside an
+   -- interpreter state.
    type Lua_Reference is tagged private;
+
+   -- Create a reference to the object at the top of the stack. By default the
+   -- Lua side of this reference is stored in the Registry but this can be
+   -- changed by specifying a reference to a different table through parameter
+   -- t.
    function Ref (L : in Lua_State'Class; t : in Integer := RegistryIndex)
                  return Lua_Reference;
+
+   -- Retrieve a Lua object from a reference and return the type of the object.
    function Get (L : in Lua_State; R : Lua_Reference'Class) return Lua_Type;
+
+   -- Retrieve a Lua object from a reference and return the type of the object.
    procedure Get (L : in Lua_State; R : Lua_Reference'Class);
 
 private
