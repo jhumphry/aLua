@@ -20,6 +20,16 @@ package Lua.Userdata is
    -- with the new UserData value.
    procedure Push_Class_Wide (L : in Lua_State'Class; D : not null access T'Class);
 
+   -- Check that the value at the index given is a valid Userdata that represents
+   -- an Ada access-to-T (non-class-wide).
+   function IsAdaUserdata (L : in Lua_State'Class; index : in Integer)
+                           return Boolean;
+
+   -- Check that the value at the index given is a valid Userdata that represents
+   -- an Ada access-to-T or an access-to-T'Class.
+   function IsAdaUserdata_Class_Wide (L : in Lua_State'Class; index : in Integer)
+                                      return Boolean;
+
    -- Retrieve an access-to-T from the stack of Lua state L at the given index.
    -- Checks that the value indicated is a non-class-wide userdata value, and
    -- that the tag is correct.

@@ -75,6 +75,34 @@ package body Lua.Userdata is
       end if;
    end Push_Class_Wide;
 
+   function IsAdaUserdata (L : in Lua_State'Class; index : in Integer)
+                           return Boolean is
+      UserData_Address : System.Address
+        := Internal.lua_touserdata(L.L, C.int(index));
+      UserData_Access : access Ada_Userdata
+        := Address_To_Ada_Userdata.To_Pointer(UserData_Address);
+   begin
+      if UserData_Access = null
+        or else UserData_Access.Tag /= T'Tag
+        or else UserData_Access.Class_Wide then
+         return False;
+      end if;
+      return True;
+   end IsAdaUserdata;
+
+   function IsAdaUserdata_Class_Wide (L : in Lua_State'Class; index : in Integer)
+                                      return Boolean is
+      UserData_Address : System.Address
+        := Internal.lua_touserdata(L.L, C.int(index));
+      UserData_Access : access Ada_Userdata
+        := Address_To_Ada_Userdata.To_Pointer(UserData_Address);
+   begin
+      if UserData_Access = null or else UserData_Access.Tag /= T'Tag then
+         return False;
+      end if;
+      return True;
+   end IsAdaUserdata_Class_Wide;
+
    function ToUserdata (L : in Lua_State'Class; index : in Integer)
       return not null access T
    is
