@@ -40,7 +40,9 @@ begin
    L.Pop(3);
    Print_Stack(L);
    Put_Line("Is Stack(-2) <= Stack(-1)? " &
-            (if L.Compare(-2, -1, OPLE) then "Yes" else "No"));
+            (if L.Compare(index1 => -2, index2 => -1, op => OPLE)
+               then "Yes"
+               else "No"));
    Put_Line("Duplicating element at index 2. ");
    L.PushValue(2);
    Print_Stack(L);
@@ -48,23 +50,25 @@ begin
    L.Arith(OPADD);
    Print_Stack(L);
    Put_Line("Is Stack(-2) <= Stack(-1)? " &
-            (if L.Compare(-2, -1, OPLE) then "Yes" else "No"));
+            (if L.Compare(index1 => -2, index2 => -1, op => OPLE)
+               then "Yes"
+               else "No"));
    New_Line;
 
    Put_Line("Setting global foobar to 5");
    L.PushNumber(5.0);
-   L.Setglobal("foobar");
+   L.SetGlobal("foobar");
    L.GetGlobal("foobar");
    Put("Global foobar = "); Put(L.ToNumber(-1), Aft => 0, Exp => 0); New_Line;
    New_Line;
 
    Put_Line("Manually triggering garbage collection...");
-   L.GC(GCCOLLECT);
+   L.GC(what => GCCOLLECT);
    New_Line;
 
    Put("Checking type of main thread: ");
-   L.geti(RegistryIndex, RIDX_MainThread);
-   Put(L.TypeName(L.TypeInfo(-1)));
+   L.geti(index => RegistryIndex, i => RIDX_MainThread);
+   Put(L.TypeName(-1));
    New_Line;
 
 end Simple_Example;

@@ -40,7 +40,7 @@ begin
    Put_Line("Loading chunk: function f (x) return 2*x end");
    Success := L.LoadString("function f (x) return 2*x end");
    Put_Line("Load" & (if Success /= OK then " not" else "") & " successful.");
-   L.Call(0, 0);
+   L.Call(nargs => 0, nresults =>0);
    Put_Line("Compiled chunk.");
    Put("Result of calling f (3): ");
    L.PushInteger(3);
@@ -62,7 +62,7 @@ begin
    Success := L.LoadFile("examples/example_lua.lua");
    Put_Line("Load" & (if Success /= OK then " not" else "") & " successful.");
    if Success = OK then
-      L.Call(0, 0);
+      L.Call(nargs => 0, nresults =>0);
       Put_Line("Compiled chunk. Result of calling triangle (5):");
       L.PushNumber(5.0);
       L.Call_Function(name => "triangle", nargs => 1, nresults => 0);
@@ -76,7 +76,7 @@ begin
    Put_Line("Loading code snippet 'baz = foobar(5.0)'" &
             (if Success /= OK then " not" else "") & " successful.");
    Put_Line("Calling 'baz = foobar(5.0)' from Lua");
-   L.Call(0, 0);
+   L.Call(nargs => 0, nresults =>0);
    Put("baz = ");
    L.GetGlobal("baz");
    Put(L.ToNumber(-1), Aft => 0, Exp => 0); New_Line;
@@ -122,7 +122,7 @@ begin
    Put_Line(Coroutine_Source);
    Success := L.LoadString(Coroutine_Source);
    Put_Line("Load" & (if Success /= OK then " not" else "") & " successful.");
-   L.Call(0, 0);
+   L.Call(nargs => 0, nresults =>0);
    Put_Line("Compiled coroutine code.");
    declare
       Coroutine : Lua_Thread := L.NewThread;
@@ -132,7 +132,7 @@ begin
       Put_Line("Resuming coroutine with parameter 3 in this thread:");
       Coroutine.GetGlobal("co");
       Coroutine.PushInteger(3);
-      Coroutine_Status := Coroutine.resume(L, 1);
+      Coroutine_Status := Coroutine.resume(from => L, nargs => 1);
       Put("Coroutine status : " & Thread_Status'Image(Coroutine_Status));
       Put(" Result: "); Put(Coroutine.ToNumber(-1)); New_Line;
       L.Pop(1); -- argument no longer needed in this example

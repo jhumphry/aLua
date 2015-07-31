@@ -55,13 +55,13 @@ begin
 
    Put_Line("Calling 'foo:increment()' in Lua");
    Success := L.LoadString("foo:increment()");
-   L.Call(0, 0);
+   L.Call(nargs => 0, nresults => 0);
    Put_Line("Calling 'foo:toggle()' (a class-wide operation) in Lua");
    Success := L.LoadString("foo:toggle()");
-   L.Call(0, 0);
+   L.Call(nargs => 0, nresults => 0);
    Put_Line("Calling 'bar:toggle()' (a class-wide operation) in Lua");
    Success := L.LoadString("bar:toggle()");
-   L.Call(0, 0);
+   L.Call(nargs => 0, nresults => 0);
    New_Line;
 
 
