@@ -79,7 +79,8 @@ package Lua is
                       return Thread_Status;
 
    -- Calling, yielding and functions
-   procedure Call (L : in Lua_State; nargs : in Integer; nresults : in Integer);
+   procedure Call (L : in Lua_State; nargs : in Integer; nresults : in Integer)
+     with Inline, Pre => IsFunction(L, -nargs-1);
    procedure Call_Function (L : in Lua_State;
                             name : in String;
                             nargs : in Integer;
@@ -88,7 +89,8 @@ package Lua is
                    nargs : in Integer;
                    nresults : in Integer;
                    msgh : in Integer := 0)
-                   return Thread_Status;
+                   return Thread_Status
+     with Inline, Pre => IsFunction(L, -nargs-1);
    function PCall_Function (L : in Lua_State;
                             name : in String;
                             nargs : in Integer;
@@ -170,31 +172,42 @@ package Lua is
      (TypeName(L, Typeinfo(L, index)));
    function Userdata_Name (L : in Lua_State; index : in Integer) return String;
 
-
    -- Table manipulation
    procedure CreateTable (L : in Lua_State;
                           narr : in Integer := 0;
                           nrec : in Integer := 0);
    procedure NewTable (L : in Lua_State);
    function GetField (L : in Lua_State; index : in Integer; k : in String)
-                  return Lua_Type;
-   procedure GetField (L : in Lua_State; index : in Integer; k : in String);
+                      return Lua_Type with Inline, Pre => IsTable(L, index);
+   procedure GetField (L : in Lua_State; index : in Integer; k : in String)
+     with Inline, Pre => IsTable(L, index);
    function Geti (L : in Lua_State; index : in Integer; i : in Integer)
-                  return Lua_Type;
-   procedure Geti (L : in Lua_State; index : in Integer; i : in Integer);
-   function GetTable (L : in Lua_State; index : in Integer) return Lua_Type;
-   procedure GetTable (L : in Lua_State; index : in Integer);
+                  return Lua_Type with Inline, Pre => IsTable(L, index);
+   procedure Geti (L : in Lua_State; index : in Integer; i : in Integer)
+     with Inline, Pre => IsTable(L, index);
+   function GetTable (L : in Lua_State; index : in Integer) return Lua_Type
+     with Inline, Pre => IsTable(L, index);
+   procedure GetTable (L : in Lua_State; index : in Integer)
+     with Inline, Pre => IsTable(L, index);
    function Next (L : in Lua_State; index : in Integer) return Boolean;
-   function RawGet (L : in Lua_State; index : in Integer) return Lua_Type;
-   procedure RawGet (L : in Lua_State; index : in Integer);
+   function RawGet (L : in Lua_State; index : in Integer) return Lua_Type
+     with Inline, Pre => IsTable(L, index);
+   procedure RawGet (L : in Lua_State; index : in Integer)
+     with Inline, Pre => IsTable(L, index);
    function RawGeti (L : in Lua_State; index : in Integer; i : in Integer)
-                  return Lua_Type;
-   procedure RawGeti (L : in Lua_State; index : in Integer; i : in Integer);
-   procedure RawSet (L : in Lua_State; index : in Integer);
-   procedure RawSeti (L : in Lua_State; index : in Integer; i : in Integer);
-   procedure SetField (L : in Lua_State; index : in Integer; k : in String);
-   procedure Seti (L : in Lua_State; index : in Integer; i : in Integer);
-   procedure SetTable (L : in Lua_State; index : in Integer);
+                     return Lua_Type with Inline, Pre => IsTable(L, index);
+   procedure RawGeti (L : in Lua_State; index : in Integer; i : in Integer)
+     with Inline, Pre => IsTable(L, index);
+   procedure RawSet (L : in Lua_State; index : in Integer)
+     with Inline, Pre => IsTable(L, index);
+   procedure RawSeti (L : in Lua_State; index : in Integer; i : in Integer)
+     with Inline, Pre => IsTable(L, index);
+   procedure SetField (L : in Lua_State; index : in Integer; k : in String)
+     with Inline, Pre => IsTable(L, index);
+   procedure Seti (L : in Lua_State; index : in Integer; i : in Integer)
+     with Inline, Pre => IsTable(L, index);
+   procedure SetTable (L : in Lua_State; index : in Integer)
+     with Inline, Pre => IsTable(L, index);
 
    -- Globals and metatables
    function GetGlobal (L : in Lua_State; name : in String) return Lua_Type;
