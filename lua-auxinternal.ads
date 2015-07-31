@@ -17,7 +17,6 @@ with Lua.Internal;
 
 private package Lua.AuxInternal is
 
-   --  unsupported macro: LUA_ERRFILE (LUA_ERRERR+1)
    --  unsupported macro: LUAL_NUMSIZES (sizeof(lua_Integer)*16 + sizeof(lua_Number))
    --  arg-macro: procedure luaL_checkversion (L)
    --    luaL_checkversion_(L, LUA_VERSION_NUM, LUAL_NUMSIZES)
@@ -63,12 +62,6 @@ private package Lua.AuxInternal is
    --  arg-macro: function lua_writestringerror (s, p)
    --    return fprintf(stderr, (s), (p)), fflush(stderr);
 
-  --** $Id: lauxlib.h,v 1.128 2014/10/29 16:11:17 roberto Exp $
-  --** Auxiliary functions for building Lua libraries
-  --** See Copyright Notice in lua.h
-  --
-
-  -- extra error code for 'luaL_load'
    type luaL_Reg is record
       name : Interfaces.C.Strings.chars_ptr;  -- /usr/include/lauxlib.h:24
       func : Internal.lua_CFunction;  -- /usr/include/lauxlib.h:25
@@ -258,11 +251,6 @@ private package Lua.AuxInternal is
       arg4 : int);  -- /usr/include/lauxlib.h:98
    pragma Import (C, luaL_requiref, "luaL_requiref");
 
-  --** ===============================================================
-  --** some useful macros
-  --** ===============================================================
-  --
-
   --** {======================================================
   --** Generic Buffer manipulation
   --** =======================================================
@@ -312,42 +300,4 @@ private package Lua.AuxInternal is
       arg3 : Interfaces.C.size_t) return Interfaces.C.Strings.chars_ptr;  -- /usr/include/lauxlib.h:162
    pragma Import (C, luaL_buffinitsize, "luaL_buffinitsize");
 
-  -- }======================================================
-  --** {======================================================
-  --** File handles for IO library
-  --** =======================================================
-  --
-
-  --** A file handle is a userdata with metatable 'LUA_FILEHANDLE' and
-  --** initial structure 'luaL_Stream' (it may contain other fields
-  --** after that initial structure).
-  --
-
-  -- stream (NULL for incompletely created streams)
---     type luaL_Stream is record
---        f : access stdio_h.FILE;  -- /usr/include/lauxlib.h:186
---        closef : Internal.lua_CFunction;  -- /usr/include/lauxlib.h:187
---     end record;
---     pragma Convention (C_Pass_By_Copy, luaL_Stream);  -- /usr/include/lauxlib.h:185
--- *** TO FIX ***
-
-
-  -- to close stream (NULL for closed streams)
-  -- }======================================================
-  -- compatibility with old module system
-  --** {==================================================================
-  --** "Abstraction Layer" for basic report of messages and errors
-  --** ===================================================================
-  --
-
-  -- print a string
-  -- print a newline and flush the output
-  -- print an error message
-  -- }==================================================================
-  --** {============================================================
-  --** Compatibility with deprecated conversions
-  --** =============================================================
-  --
-
-  -- }============================================================
 end Lua.AuxInternal;
