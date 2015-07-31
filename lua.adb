@@ -501,6 +501,39 @@ package body Lua is
       C.Strings.Value(Internal.lua_typename(L.L, C.int(Lua_Type_To_Int(tp))))
      );
 
+   function Userdata_Name (L : in Lua_State; index : in Integer) return String is
+      Has_Metatable : Boolean;
+      Name_Field_Type : Lua_Type;
+   begin
+      Has_Metatable := GetMetatable(L, index);
+      if not Has_Metatable then
+         return "";
+      end if;
+
+      Name_Field_Type := L.GetField(-1, "__name");
+      if Name_Field_Type = TNIL then
+         L.Pop(1); -- just the metatable
+         return "";
+      elsif Name_Field_Type /= TSTRING then
+         L.Pop(2); -- the metatable and the non-standard __name field
+         return "";
+      end if;
+
+      declare
+         Name : String := L.ToString(-1);
+      begin
+         if Name'Length > 13
+           and then Name(Name'First..Name'First+12) = "Ada_UserData:" then
+             L.Pop(2); -- the metatable and the __name field
+            return (Name(Name'First+13..Name'Last));
+         else
+             L.Pop(2); -- the metatable and the non-Ada __name field
+            return "";
+         end if;
+      end;
+
+   end Userdata_Name;
+
    --
    -- *** Table Manipulation
    --

@@ -29,6 +29,16 @@ package body Lua.Util is
                Put(L.ToNumber(I), Aft => 0, Exp => 0);
             when TSTRING =>
                Put("'" & L.ToString(I) & "'");
+            when TUSERDATA =>
+               declare
+                  Name : String := L.Userdata_Name(I);
+               begin
+                  if Name = "" then
+                     Put(" - Non-Ada userdata");
+                  else
+                     Put(Name);
+                  end if;
+               end;
             when others =>
                Put("-");
          end case;

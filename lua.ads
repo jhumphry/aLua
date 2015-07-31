@@ -168,6 +168,7 @@ package Lua is
    function TypeName (L : in Lua_State; tp : in Lua_Type) return String;
    function TypeName (L : in Lua_State; index : in Integer) return String is
      (TypeName(L, Typeinfo(L, index)));
+   function Userdata_Name (L : in Lua_State; index : in Integer) return String;
 
 
    -- Table manipulation
