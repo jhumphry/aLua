@@ -20,7 +20,7 @@ procedure Functions_Example is
    R : Lua_Reference;
 
    LF : Character renames Ada.Characters.Latin_1.LF;
-   Coroutine_Source : String := "" &
+   Coroutine_Source : constant String := "" &
      "function co (x) " & LF &
      " for i = 1, x do " & LF &
      "  yield(i) " & LF &
@@ -125,7 +125,7 @@ begin
    L.Call(nargs => 0, nresults =>0);
    Put_Line("Compiled coroutine code.");
    declare
-      Coroutine : Lua_Thread := L.NewThread;
+      Coroutine : constant Lua_Thread := L.NewThread;
       Coroutine_Status : Thread_Status;
    begin
       Put_Line("New thread created");
@@ -146,7 +146,7 @@ begin
 
    L.Pop(L.GetTop);
    declare
-      S : Lua_Reference := R;
+      S : constant Lua_Reference := R;
    begin
       Put_Line("Retrieving a copy of reference saved earlier...");
       L.Get(S);

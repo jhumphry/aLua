@@ -8,7 +8,7 @@ with Ada.Text_IO;
 package body Example_Userdata is
 
    function Increment (L : Lua_State'Class) return Natural is
-      Object : access Example_Parent
+      Object : constant access Example_Parent
         := Userdata_Package.ToUserdata(L, -1);
    begin
       Ada.Text_IO.Put_Line(" - Now incrementing the userdata object's counter -");
@@ -17,7 +17,7 @@ package body Example_Userdata is
    end Increment;
 
    function Toggle (L : Lua_State'Class) return Natural is
-      Object : access Example_Parent'Class
+      Object : constant access Example_Parent'Class
         := Userdata_Package.ToUserdata_Class_Wide(L, -1);
    begin
       Ada.Text_IO.Put_Line(" - Now toggling the userdata object's flag from Lua -");

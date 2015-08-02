@@ -31,7 +31,7 @@ package body Lua.Util is
                Put("'" & L.ToString(I) & "'");
             when TUSERDATA =>
                declare
-                  Name : String := L.Userdata_Name(I);
+                  Name : constant String := L.Userdata_Name(I);
                begin
                   if Name = "" then
                      Put(" - Non-Ada userdata");

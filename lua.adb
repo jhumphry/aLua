@@ -519,7 +519,7 @@ package body Lua is
       end if;
 
       declare
-         Name : String := L.ToString(-1);
+         Name : constant String := L.ToString(-1);
       begin
          if Name'Length > 4
            and then Name(Name'First..Name'First+3) = "Ada:" then
@@ -758,9 +758,9 @@ package body Lua is
 
    function CFunction_Trampoline (L : System.Address) return C.int is
       S : Existing_State;
-      f_index : C.int := C.Int(RegistryIndex-1);
-      f_address : System.Address := Internal.lua_touserdata(L, f_index);
-      f : AdaFunction := Address_To_AdaFunction(f_address);
+      f_index : constant C.int := C.Int(RegistryIndex-1);
+      f_address : constant System.Address := Internal.lua_touserdata(L, f_index);
+      f : constant AdaFunction := Address_To_AdaFunction(f_address);
    begin
       S.L := L;
       return C.int(f(S));

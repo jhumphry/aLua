@@ -42,9 +42,9 @@ package body Lua.Userdata is
      new System.Address_To_Access_Conversions(Object => Ada_Userdata);
 
    procedure Push (L : in Lua_State'Class; D : not null access T) is
-      UserData_Address : System.Address
+      UserData_Address : constant System.Address
         := Internal.lua_newuserdata(L.L, (Ada_Userdata'Size+7)/8);
-      UserData_Access : access Ada_Userdata
+      UserData_Access : constant access Ada_Userdata
         := Address_To_Ada_Userdata.To_Pointer(UserData_Address);
       Has_Metatable : Boolean;
    begin
@@ -59,9 +59,9 @@ package body Lua.Userdata is
    end Push;
 
    procedure Push_Class_Wide (L : in Lua_State'Class; D : not null access T'Class) is
-      UserData_Address : System.Address
+      UserData_Address : constant System.Address
         := Internal.lua_newuserdata(L.L, (Ada_Userdata'Size+7)/8);
-      UserData_Access : access Ada_Userdata
+      UserData_Access : constant access Ada_Userdata
         := Address_To_Ada_Userdata.To_Pointer(UserData_Address);
       Has_Metatable : Boolean;
    begin
@@ -77,9 +77,9 @@ package body Lua.Userdata is
 
    function IsAdaUserdata (L : in Lua_State'Class; index : in Integer)
                            return Boolean is
-      UserData_Address : System.Address
+      UserData_Address : constant System.Address
         := Internal.lua_touserdata(L.L, C.int(index));
-      UserData_Access : access Ada_Userdata
+      UserData_Access : constant access Ada_Userdata
         := Address_To_Ada_Userdata.To_Pointer(UserData_Address);
    begin
       if UserData_Access = null
@@ -92,9 +92,9 @@ package body Lua.Userdata is
 
    function IsAdaUserdata_Class_Wide (L : in Lua_State'Class; index : in Integer)
                                       return Boolean is
-      UserData_Address : System.Address
+      UserData_Address : constant System.Address
         := Internal.lua_touserdata(L.L, C.int(index));
-      UserData_Access : access Ada_Userdata
+      UserData_Access : constant access Ada_Userdata
         := Address_To_Ada_Userdata.To_Pointer(UserData_Address);
    begin
       if UserData_Access = null or else UserData_Access.Tag /= T'Tag then
@@ -106,9 +106,9 @@ package body Lua.Userdata is
    function ToUserdata (L : in Lua_State'Class; index : in Integer)
       return not null access T
    is
-      UserData_Address : System.Address
+      UserData_Address : constant System.Address
         := Internal.lua_touserdata(L.L, C.int(index));
-      UserData_Access : access Ada_Userdata
+      UserData_Access : constant access Ada_Userdata
         := Address_To_Ada_Userdata.To_Pointer(UserData_Address);
    begin
       if UserData_Access = null then
@@ -124,9 +124,9 @@ package body Lua.Userdata is
    function ToUserdata_Class_Wide (L : in Lua_State'Class; index : in Integer)
       return not null access T'Class
    is
-      UserData_Address : System.Address
+      UserData_Address : constant System.Address
         := Internal.lua_touserdata(L.L, C.int(index));
-      UserData_Access : access Ada_Userdata
+      UserData_Access : constant access Ada_Userdata
         := Address_To_Ada_Userdata.To_Pointer(UserData_Address);
    begin
       if UserData_Access = null then
@@ -171,7 +171,7 @@ package body Lua.Userdata is
    end GetMetaTable;
 
    procedure GetMetaTable (L : in Lua_State'Class) is
-      Success : Boolean := GetMetaTable(L);
+      Success : constant Boolean := GetMetaTable(L);
    begin
       if not Success then
          raise Lua_Error with "No metatable exists for this type";
