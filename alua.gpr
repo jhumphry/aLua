@@ -1,12 +1,34 @@
-project ALua is
+-- Lua
+-- an Ada 2012 interface to Lua
+
+-- Copyright (c) 2015, James Humphry - see LICENSE.md for terms
+
+library project ALua is
+
+   type Mode_Type is ("debug", "memdebug", "optimize");
+   Mode : Mode_Type := external ("mode", "debug");
 
    for Languages use ("Ada", "C");
-   for Source_Dirs use (".", "tests", "examples");
+
+   for Library_Name use "alua";
+   for Library_Kind use "static";
+
+   -- Note that despite being private packages, Lua.Internal and
+   -- Lua.AuxInternal must be in the interface - this may be to do with
+   -- the need for the main routine to initialize and finalize certain
+   -- things
+   for Library_Interface use (  "Lua",
+                                "Lua.Libs",
+                                "Lua.Userdata",
+                                "Lua.Util",
+                                "Lua.Internal",
+                                "Lua.AuxInternal"
+                              );
+
+   for Source_Dirs use ("./");
+   for Excluded_Source_Dirs use ("examples");
    for Object_Dir use "build/";
-   for Exec_Dir use "exec/";
-   for Main use ("simple_example.adb",
-                 "functions_example.adb",
-                 "userdata_example.adb");
+   for Library_Dir use "lib/";
 
    package Ide is
       for Vcs_Kind use "Git";
@@ -22,11 +44,12 @@ project ALua is
    end Builder;
 
    package Compiler is
-      for Default_Switches ("ada") use ("-gnat12", "-gnata", "-gnato", "-g", "-fstack-check", "-gnatf", "-gnatwZ");
+      case Mode is
+         when "debug"|"memdebug" =>
+            for Default_Switches ("ada") use ("-fstack-check", "-g", "-gnat2012", "-gnata", "-gnatf", "-gnato", "-gnatVa", "-gnatwa", "-gnatwZ");
+         when "optimize" =>
+               for Default_Switches ("ada") use ("-gnat2012", "-O3", "-gnatn");
+      end case;
    end Compiler;
-
-   package Linker is
-      for Default_Switches ("ada") use ("-g", "-llua", "-lm");
-   end Linker;
 
 end ALua;
