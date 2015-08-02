@@ -668,9 +668,9 @@ package body Lua is
 
    procedure GetGlobal (L : in Lua_State; name : in String) is
       C_name : C.Strings.chars_ptr := C.Strings.New_String(name);
-      Result : C.int;
+      Discard : C.int;
    begin
-      Result := Internal.lua_getglobal(L.L, C_name);
+      Discard := Internal.lua_getglobal(L.L, C_name);
       C.Strings.Free(C_Name);
    end GetGlobal;
 

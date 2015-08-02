@@ -16,7 +16,7 @@ procedure Userdata_Example is
    L : Lua_State;
    Result : Boolean;
    Counter : Integer;
-   Success :Thread_Status;
+   Discard :Thread_Status;
 
    Example_Object : aliased Example_Parent := (Counter => 5, Flag => True);
    Example_Child_Object : aliased Example_Child := (Counter => 3, Flag => False);
@@ -53,13 +53,13 @@ begin
    New_Line;
 
    Put_Line("Calling 'foo:increment()' in Lua");
-   Success := L.LoadString("foo:increment()");
+   Discard := L.LoadString("foo:increment()");
    L.Call(nargs => 0, nresults => 0);
    Put_Line("Calling 'foo:toggle()' (a class-wide operation) in Lua");
-   Success := L.LoadString("foo:toggle()");
+   Discard := L.LoadString("foo:toggle()");
    L.Call(nargs => 0, nresults => 0);
    Put_Line("Calling 'bar:toggle()' (a class-wide operation) in Lua");
-   Success := L.LoadString("bar:toggle()");
+   Discard := L.LoadString("bar:toggle()");
    L.Call(nargs => 0, nresults => 0);
    New_Line;
 
