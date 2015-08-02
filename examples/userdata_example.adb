@@ -7,7 +7,6 @@ with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Long_Float_Text_IO; use Ada.Long_Float_Text_IO;
 
 with Lua; use Lua;
-with Lua.Libs;
 with Lua.Util; use Lua.Util;
 
 with Example_Userdata;

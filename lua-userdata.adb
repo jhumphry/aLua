@@ -3,6 +3,8 @@
 
 -- Copyright (c) 2015, James Humphry - see LICENSE.md for terms
 
+with Ada.Tags;
+
 with System.Address_To_Access_Conversions;
 
 with Interfaces, Interfaces.C, Interfaces.C.Strings;

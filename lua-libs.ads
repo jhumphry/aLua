@@ -3,10 +3,6 @@
 
 -- Copyright (c) 2015, James Humphry - see LICENSE.md for terms
 
-with Ada.Finalization;
-
-private with Interfaces.C.Strings;
-
 package Lua.Libs is
 
    type Lua_Standard_Library is (Base_Lib,

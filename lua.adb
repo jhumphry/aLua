@@ -14,8 +14,7 @@ use type Interfaces.C.Strings.chars_ptr;
 with System;
 use type System.Address;
 
-with Lua.Internal, Lua.AuxInternal, Lua.LibInternal;
-with Ada.Finalization;
+with Lua.Internal, Lua.AuxInternal;
 
 package body Lua is
 

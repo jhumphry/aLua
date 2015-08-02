@@ -3,9 +3,6 @@
 
 -- Copyright (c) 2015, James Humphry - see LICENSE.md for terms
 
-private with Ada.Tags;
-private with Lua.Internal;
-
 generic
    type T is tagged private;
 package Lua.Userdata is
