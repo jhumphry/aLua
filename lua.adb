@@ -106,6 +106,8 @@ package body Lua is
       Result : C.int;
    begin
       Result := AuxInternal.luaL_loadfilex(L.L, C_Name, C_Mode);
+      C.Strings.Free(C_Name);
+      C.Strings.Free(C_Mode);
       return Int_To_Thread_Status(Result);
    end Loadfile;
 
