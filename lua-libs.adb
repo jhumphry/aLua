@@ -53,11 +53,11 @@ package body Lua.Libs is
    procedure Require_Standard_Library (L : in Lua_State;
                                        Library : in Lua_Standard_Library;
                                        Set_Global : in Boolean := True) is
-      glb : constant C.int := C.Int((if Set_Global then 1 else 0));
+      glb : constant C.int := C.int((if Set_Global then 1 else 0));
    begin
-      Lua.AuxInternal.lual_requiref(L.L,
-                                Libnames(Library),
-                                Libfunctions(Library),
+      Lua.AuxInternal.luaL_requiref(L.L,
+                                LibNames(Library),
+                                LibFunctions(Library),
                                 glb);
    end Require_Standard_Library;
 

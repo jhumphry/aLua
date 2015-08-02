@@ -9,7 +9,6 @@
 
 -- See LICENSE.md for details
 
-
 with Interfaces.C; use Interfaces.C;
 with Interfaces.C.Extensions;
 with System;
@@ -27,7 +26,6 @@ private package Lua.Internal is
 
   -- minimum Lua stack available to a C function
    LUA_MINSTACK : constant := 20;  --  /usr/include/lua.h:79
-
 
    --  arg-macro: procedure lua_call (L, n, r)
    --    lua_callk(L, (n), (r), 0, NULL)
@@ -633,6 +631,5 @@ private package Lua.Internal is
    pragma Convention (C_Pass_By_Copy, lua_Debug);  -- /usr/include/lua.h:441
 
   -- }======================================================================
-
 
 end Lua.Internal;

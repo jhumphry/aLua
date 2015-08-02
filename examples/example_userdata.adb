@@ -33,5 +33,4 @@ package body Example_Userdata is
       L.Pop(L.GetTop);
    end Register_Operations;
 
-
 end Example_Userdata;

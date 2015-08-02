@@ -50,13 +50,13 @@ package body Lua.Userdata is
         := Address_To_Ada_Userdata.To_Pointer(UserData_Address);
       Has_Metatable : Boolean;
    begin
-      UserData_Access.all := Ada_Userdata'(Class_Wide => false,
+      UserData_Access.all := Ada_Userdata'(Class_Wide => False,
                                            Tag => T'Tag,
                                            Data => D,
                                            Data_Class_Wide => null);
       Has_Metatable := GetMetaTable(L);
       if Has_Metatable then
-         Setmetatable(L, -2);
+         SetMetatable(L, -2);
       end if;
    end Push;
 
@@ -67,13 +67,13 @@ package body Lua.Userdata is
         := Address_To_Ada_Userdata.To_Pointer(UserData_Address);
       Has_Metatable : Boolean;
    begin
-      UserData_Access.all := Ada_Userdata'(Class_Wide => true,
+      UserData_Access.all := Ada_Userdata'(Class_Wide => True,
                                            Tag => T'Tag,
                                            Data => null,
                                            Data_Class_Wide => D);
       Has_Metatable := GetMetaTable(L);
       if Has_Metatable then
-         Setmetatable(L, -2);
+         SetMetatable(L, -2);
       end if;
    end Push_Class_Wide;
 
@@ -86,7 +86,8 @@ package body Lua.Userdata is
    begin
       if UserData_Access = null
         or else UserData_Access.Tag /= T'Tag
-        or else UserData_Access.Class_Wide then
+        or else UserData_Access.Class_Wide
+      then
          return False;
       end if;
       return True;
@@ -99,7 +100,8 @@ package body Lua.Userdata is
       UserData_Access : constant access Ada_Userdata
         := Address_To_Ada_Userdata.To_Pointer(UserData_Address);
    begin
-      if UserData_Access = null or else UserData_Access.Tag /= T'Tag then
+      if UserData_Access = null or else UserData_Access.Tag /= T'Tag
+      then
          return False;
       end if;
       return True;
@@ -187,6 +189,5 @@ package body Lua.Userdata is
       Internal.lua_setfield(L.L, -2, C_name);
       C.Strings.Free(C_name);
    end AddOperation;
-
 
 end Lua.Userdata;

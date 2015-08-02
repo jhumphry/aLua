@@ -237,7 +237,7 @@ package Lua is
    function TypeInfo (L : in Lua_State; index : in Integer) return Lua_Type;
    function TypeName (L : in Lua_State; tp : in Lua_Type) return String;
    function TypeName (L : in Lua_State; index : in Integer) return String is
-     (TypeName(L, Typeinfo(L, index)));
+     (TypeName(L, TypeInfo(L, index)));
    function Userdata_Name (L : in Lua_State; index : in Integer) return String;
 
    -- Table manipulation
@@ -338,7 +338,7 @@ private
 
    type Lua_State is new Ada.Finalization.Limited_Controlled with
       record
-         L : void_Ptr;
+         L : void_ptr;
       end record;
 
    overriding procedure Initialize (Object : in out Lua_State);
@@ -363,9 +363,9 @@ private
 
    type Lua_Reference_Value is
       record
-         State : void_Ptr;
-         Table : Interfaces.C.Int;
-         Ref : Interfaces.C.Int;
+         State : void_ptr;
+         Table : Interfaces.C.int;
+         Ref : Interfaces.C.int;
          Count : Natural := 0;
       end record;
 

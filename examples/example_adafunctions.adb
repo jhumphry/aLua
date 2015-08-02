@@ -11,7 +11,7 @@ package body Example_AdaFunctions is
       x : constant Long_Float := L.ToNumber(-1);
    begin
       Put_Line("* In Ada function foobar(" & Long_Float'Image(x) & ")");
-      L.pop(1);
+      L.Pop(1);
       L.PushNumber(x*x);
       return 1;
    end FooBar;
@@ -20,7 +20,7 @@ package body Example_AdaFunctions is
       X : constant Long_Long_Integer := L.ToInteger(-1);
    begin
       Put_Line("* In Ada function multret(" & Long_Long_Integer'Image(X) & ")");
-      L.pop(1);
+      L.Pop(1);
       for I in reverse Long_Long_Integer range 1..X loop
          L.PushInteger(I);
       end loop;
@@ -34,7 +34,7 @@ package body Example_AdaFunctions is
       Put_Line("* In Ada closure foobar" &
                  "<" & Long_Float'Image(p) & ">" &
                  "(" & Long_Float'Image(x) & ")");
-      L.pop(1);
+      L.Pop(1);
       L.PushNumber(x*p);
       return 1;
    end Closure;

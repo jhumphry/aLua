@@ -67,7 +67,7 @@ begin
    New_Line;
 
    Put("Checking type of main thread: ");
-   L.geti(index => RegistryIndex, i => RIDX_MainThread);
+   L.Geti(index => RegistryIndex, i => RIDX_MainThread);
    Put(L.TypeName(-1));
    New_Line;
 

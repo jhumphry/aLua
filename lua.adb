@@ -22,7 +22,6 @@ package body Lua is
    -- *** Types only used internally
    --
 
-
    --
    -- *** Conversions between Ada enumerations and C integer constants
    --
@@ -43,9 +42,9 @@ package body Lua is
                               Target => C.int);
 
    function Lua_Type_To_Int is new Ada.Unchecked_Conversion(Source => Lua_Type,
-                                                            Target => C.Int);
+                                                            Target => C.int);
 
-   function Int_To_Lua_Type is new Ada.Unchecked_Conversion(Source => C.Int,
+   function Int_To_Lua_Type is new Ada.Unchecked_Conversion(Source => C.int,
                                                             Target => Lua_Type);
 
    --
@@ -109,7 +108,7 @@ package body Lua is
       C.Strings.Free(C_Name);
       C.Strings.Free(C_Mode);
       return Int_To_Thread_Status(Result);
-   end Loadfile;
+   end LoadFile;
 
    --
    -- *** Calling, yielding and functions
@@ -276,7 +275,7 @@ package body Lua is
    end ToAdaFunction;
 
    function ToBoolean (L : in Lua_State; index : in Integer) return Boolean is
-      (Internal.lua_toboolean(L.L, C.int(Index)) /= 0);
+      (Internal.lua_toboolean(L.L, C.int(index)) /= 0);
 
    function ToInteger (L : in Lua_State; index : in Integer) return Lua_Integer is
       isnum : aliased C.int := 0;
@@ -442,39 +441,39 @@ package body Lua is
       if IsCFunction(L, index) then
          if Internal.lua_getupvalue(L.L, C.int(index),1) /= C.Strings.Null_Ptr then
             Internal.lua_settop(L.L, -2);
-            return true;
+            return True;
          else
             Internal.lua_settop(L.L, -2);
-            return false;
+            return False;
          end if;
       else
-         return false;
+         return False;
       end if;
    end IsAdaFunction;
 
    function IsBoolean (L : in Lua_State; index : in Integer) return Boolean is
-     (Typeinfo(L, index) = TBOOLEAN);
+     (TypeInfo(L, index) = TBOOLEAN);
 
    function IsCFunction (L : in Lua_State; index : in Integer) return Boolean is
      (Internal.lua_iscfunction(L.L, C.int(index)) /= 0);
 
    function IsFunction (L : in Lua_State; index : in Integer) return Boolean is
-     (Typeinfo(L, index) = TFUNCTION);
+     (TypeInfo(L, index) = TFUNCTION);
 
    function IsInteger (L : in Lua_State; index : in Integer) return Boolean is
      (Internal.lua_isinteger(L.L, C.int(index)) /= 0);
 
    function IsLightuserdata (L : in Lua_State; index : in Integer) return Boolean is
-     (Typeinfo(L, index) = TLIGHTUSERDATA);
+     (TypeInfo(L, index) = TLIGHTUSERDATA);
 
    function IsNil (L : in Lua_State; index : in Integer) return Boolean is
-     (Typeinfo(L, index) = TNIL);
+     (TypeInfo(L, index) = TNIL);
 
    function IsNone (L : in Lua_State; index : in Integer) return Boolean is
-     (Typeinfo(L, index) = TNONE);
+     (TypeInfo(L, index) = TNONE);
 
    function IsNoneOrNil (L : in Lua_State; index : in Integer) return Boolean is
-     (Typeinfo(L, index) = TNONE or Typeinfo(L, index) = TNIL);
+     (TypeInfo(L, index) = TNONE or TypeInfo(L, index) = TNIL);
 
    function IsNumber (L : in Lua_State; index : in Integer) return Boolean is
      (Internal.lua_isnumber(L.L, C.int(index)) /= 0);
@@ -483,10 +482,10 @@ package body Lua is
      (Internal.lua_isstring(L.L, C.int(index)) /= 0);
 
    function IsTable (L : in Lua_State; index : in Integer) return Boolean is
-     (Typeinfo(L, index) = TTABLE);
+     (TypeInfo(L, index) = TTABLE);
 
    function IsThread (L : in Lua_State; index : in Integer) return Boolean is
-     (Typeinfo(L, index) = TTHREAD);
+     (TypeInfo(L, index) = TTHREAD);
 
    function IsUserdata (L : in Lua_State; index : in Integer) return Boolean is
      (Internal.lua_isuserdata(L.L, C.int(index)) /= 0);
@@ -523,7 +522,8 @@ package body Lua is
          Name : constant String := L.ToString(-1);
       begin
          if Name'Length > 4
-           and then Name(Name'First..Name'First+3) = "Ada:" then
+           and then Name(Name'First..Name'First+3) = "Ada:"
+         then
              L.Pop(2); -- the metatable and the __name field
             return (Name(Name'First+4..Name'Last));
          else
@@ -651,7 +651,7 @@ package body Lua is
    procedure SetTable (L : in Lua_State; index : in Integer) is
    begin
       Internal.lua_settable(L.L, C.int(index));
-   end settable;
+   end SetTable;
 
    --
    -- *** Globals and Metatables
@@ -662,7 +662,7 @@ package body Lua is
       Result : C.int;
    begin
       Result := Internal.lua_getglobal(L.L, C_name);
-      C.Strings.Free(C_Name);
+      C.Strings.Free(C_name);
       return Int_To_Lua_Type(Result);
    end GetGlobal;
 
@@ -671,7 +671,7 @@ package body Lua is
       Discard : C.int;
    begin
       Discard := Internal.lua_getglobal(L.L, C_name);
-      C.Strings.Free(C_Name);
+      C.Strings.Free(C_name);
    end GetGlobal;
 
    function GetMetatable (L : in Lua_State; index : in Integer) return Boolean is
@@ -726,7 +726,7 @@ package body Lua is
 
    function Resume(L : in Lua_State'Class; from : in Lua_State'Class; nargs : Integer)
                    return Thread_Status is
-      (Int_To_Thread_Status(Internal.lua_resume(L.L, from.l, C.int(nargs))));
+      (Int_To_Thread_Status(Internal.lua_resume(L.L, from.L, C.int(nargs))));
 
    procedure XMove (from, to : in Lua_Thread; n : in Integer) is
    begin
@@ -759,7 +759,7 @@ package body Lua is
 
    function CFunction_Trampoline (L : System.Address) return C.int is
       S : Existing_State;
-      f_index : constant C.int := C.Int(RegistryIndex-1);
+      f_index : constant C.int := C.int(RegistryIndex-1);
       f_address : constant System.Address := Internal.lua_touserdata(L, f_index);
       f : constant AdaFunction := Address_To_AdaFunction(f_address);
    begin
@@ -782,7 +782,7 @@ package body Lua is
          R.E := new Lua_Reference_Value;
          R.E.State := L.L;
          R.E.Table := C.int(t);
-         R.E.Ref := AuxInternal.lual_ref(L.L, C.int(t));
+         R.E.Ref := AuxInternal.luaL_ref(L.L, C.int(t));
          R.E.Count := 1;
       end return;
    end Ref;
@@ -798,7 +798,6 @@ package body Lua is
                              R.E.all.Table,
                              Long_Long_Integer(R.E.all.Ref)));
    end Get;
-
 
    procedure Get (L : in Lua_State; R : Lua_Reference'Class) is
       Discard : C.int;
@@ -827,13 +826,12 @@ package body Lua is
          if Object.E.Count = 0 then
             -- Note this relies on the Lua state not having been destroyed
             -- before the references stop being used.
-            AuxInternal.lual_unref(Object.E.State,
+            AuxInternal.luaL_unref(Object.E.State,
                                    Object.E.Table,
                                    Object.E.Ref);
             Free(Object.E);
          end if;
       end if;
    end Finalize;
-
 
 end Lua;

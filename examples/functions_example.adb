@@ -57,7 +57,7 @@ begin
    New_Line;
 
    Put_Line("Loading IO library and running example Lua file");
-   Libs.Require_Standard_Library(L, LIbs.IO_Lib);
+   Libs.Require_Standard_Library(L, Libs.IO_Lib);
    Success := L.LoadFile("examples/example_lua.lua");
    Put_Line("Load" & (if Success /= OK then " not" else "") & " successful.");
    if Success = OK then
@@ -70,7 +70,7 @@ begin
 
    L.Pop(L.GetTop);
    Put_Line("Registering an AdaFunction foobar in Lua");
-   L.Register("foobar", AdaFunction'(Example_AdaFunctions.Foobar'Access));
+   L.Register("foobar", AdaFunction'(Example_AdaFunctions.FooBar'Access));
    Success := L.LoadString("baz = foobar(5.0)");
    Put_Line("Loading code snippet 'baz = foobar(5.0)'" &
             (if Success /= OK then " not" else "") & " successful.");
@@ -87,7 +87,7 @@ begin
    if not L.IsAdaFunction(-1) then
       Put_Line("Error - foobar does not contain an AdaFunction?");
    end if;
-   if L.ToAdaFunction(-1) = AdaFunction'(Example_AdaFunctions.Foobar'Access) then
+   if L.ToAdaFunction(-1) = AdaFunction'(Example_AdaFunctions.FooBar'Access) then
       Put_Line("AdaFunction foobar retrieved successfully from Lua");
    else
       Put_Line("AdaFunction foobar was NOT retrieved from Lua");
@@ -131,12 +131,12 @@ begin
       Put_Line("Resuming coroutine with parameter 3 in this thread:");
       Coroutine.GetGlobal("co");
       Coroutine.PushInteger(3);
-      Coroutine_Status := Coroutine.resume(from => L, nargs => 1);
+      Coroutine_Status := Coroutine.Resume(from => L, nargs => 1);
       Put("Coroutine status : " & Thread_Status'Image(Coroutine_Status));
       Put(" Result: "); Put(Coroutine.ToNumber(-1)); New_Line;
       L.Pop(1); -- argument no longer needed in this example
       while Coroutine_Status = YIELD loop
-         Coroutine_Status := Coroutine.resume(from => L, nargs => 0);
+         Coroutine_Status := Coroutine.Resume(from => L, nargs => 0);
          Put("Coroutine status : " & Thread_Status'Image(Coroutine_Status));
          Put(" Result: "); Put(Coroutine.ToNumber(-1)); New_Line;
       end loop;

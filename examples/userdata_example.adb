@@ -40,7 +40,7 @@ begin
    L.SetGlobal("foo");
    Print_Stack(L);
    Put_Line("Retrieving the value of 'Flag' from the value at the top of the stack.");
-   Result := Userdata_Package.ToUserdata(L, -1).flag;
+   Result := Userdata_Package.ToUserdata(L, -1).Flag;
    Put_Line((if Result then "Foo.Flag is now true"
             else "Foo.Flag is now false"));
    New_Line;
@@ -63,16 +63,15 @@ begin
    L.Call(nargs => 0, nresults => 0);
    New_Line;
 
-
    Put_Line("Retrieving the value of 'Flag' and 'Counter' from foo & bar.");
    L.GetGlobal("foo");
-   Result := Userdata_Package.ToUserdata(L, -1).flag;
+   Result := Userdata_Package.ToUserdata(L, -1).Flag;
    Put_Line((if Result then "foo.Flag is now true"
             else "foo.Flag is now false"));
    Counter := Userdata_Package.ToUserdata(L, -1).Counter;
    Put_Line("foo.Counter = " & Integer'Image(Counter));
    L.GetGlobal("bar");
-   Result := Userdata_Package.ToUserdata_Class_Wide(L, -1).flag;
+   Result := Userdata_Package.ToUserdata_Class_Wide(L, -1).Flag;
    Put_Line((if Result then "bar.Flag is now true"
             else "bar.Flag is now false"));
    Counter := Userdata_Package.ToUserdata_Class_Wide(L, -1).Counter;
