@@ -8,18 +8,23 @@ use Lua;
 
 package Example_Userdata is
 
-   type Example_Parent is tagged
+   type Grandparent is abstract tagged
       record
-         Counter : Integer := 0;
          Flag : Boolean;
       end record;
 
-   type Example_Child is new Example_Parent with null record;
+   type Parent is new Grandparent with null record;
 
-   package Userdata_Package is new Lua.Userdata(T => Example_Parent);
+   type Child is new Parent with
+      record
+         Counter : Integer := 0;
+      end record;
 
-   function Increment (L : Lua_State'Class) return Natural;
+   package Grandparent_Userdata is new Lua.Userdata(T => Grandparent);
+   package Child_Userdata is new Lua.Userdata(T => Child);
+
    function Toggle (L : Lua_State'Class) return Natural;
+   function Increment (L : Lua_State'Class) return Natural;
 
    procedure Register_Operations(L : Lua_State'Class);
 

@@ -116,6 +116,12 @@ P'Class but not C'Class) is not visible at all in Lua and so any use of
 the distinction would likely to lead to error-strewn code. It is
 therefore not supported.
 
+In practice it is probably best to avoid instantiating multiple types
+of Lua userdata for every point in an Ada tagged type hierarchy. Often
+it will be appropriate just to instantiate a userdata type for a tagged
+type (possibly abstract) towards the top of the hierarchy and to
+conceal the further fine distinctions from the code written in Lua.
+
 ### Keeping references to Lua objects in Ada
 
 If a reference to a Lua object has to be stored in Ada, a
