@@ -11,9 +11,11 @@ programming methodologies including procedural, object-oriented, and
 functional approaches. This project currently supports Lua version 5.3.
 
 Both Lua and this Ada interface are free software (MIT-style licence)
-and are provided with no guarantees, as set out in the file LICENSE.md.
+and are provided with no guarantees, as set out in the file LICENSE.
 
-## Ada - Lua interface design
+## Usage notes
+
+### Ada - Lua interface design
 
 The main design goal of this project is to provide a full interface to
 the Lua library API, but with appropriate changes to ensure that the
@@ -33,20 +35,14 @@ allows Ada and C functions to be distinguished in Ada (although to Lua
 code they are equivalent). Most uses of constants in the C API have been
 replaced with suitable enumeration types.
 
+### `Lua_State` and coroutines
+
 The centre of the API is the `Lua_State` type. Values of this type
 encapsulate the entirety of the state of a Lua interpreter and a value
 has to be passed to almost every other routine as the first parameter.
 Internally these are `Limited_Controlled` types so they are
 automatically initialised when created and finalised when they go out
 of scope.
-
-Communication with Lua code is done via a stack. In general, everything
-in Lua (including functions) is a value that can be push onto the stack
-and retrieved when required. The generic package `Lua.Userdata` can be
-used to push and retrieve Ada tagged types to/from the stack and to
-register operations for the type which can be called by Lua code using
-the standard syntax `value:op()`. The Ada function can then retrieve
-the relevant tagged type value as the top parameter on the stack.
 
 The Lua standard libraries can be added to the global environment of a
 particular `Lua_State` using the routines in `Lua.Libs`.
@@ -66,9 +62,65 @@ continuation function are not supported. In the C API they use
 `longjmp` to jump out of scope but in Ada this would cause serious
 problems for continued execution.
 
+### Communicating values between Lua and Ada
+
+Communication with Lua code is done via a stack. In general, everything
+in Lua (including functions) is a value that can be push onto the stack
+and retrieved when required. There are many functions in the package
+Lua for manipulating the stack. Pay particular attention to the fact
+that some routines such as `ToString` and `ToNumber` can do silent
+conversion of the values on the stack if they are compatible - this
+side-effect can be a trap if you are not careful.
+
+The generic package `Lua.Userdata` can be used to push and retrieve Ada
+tagged types or type classes to/from the stack, and to register
+operations for the type which can then be called by Lua code using the
+standard syntax `value:op()`. The Ada function can then retrieve the
+relevant tagged type value as the first parameter - the top of the
+stack. Alternatively Ada functions registered as global functions in
+Lua can take parameters of the new userdata type.
+
+The `Push`, `Push_Class`, `ToUserdata`, `ToUserdata_Class` and
+`IsAdaUserdata` routines allow for compatible conversions between
+userdata types. Suppose a tagged type P has a derived type C. If
+`Lua.Userdata` is instantiated for the type P then a new P-userdata
+type is created in Lua. Access to P objects can be pushed as direct or
+class-wide access values to create P-userdata values on the stack. C
+objects can only be pushed as P'class-wide access values. From Lua, the
+P-userdata created from C objects have exactly the same metatable as
+the P-userdata created from P objects so `C:op()` will call the same
+Ada routine as `P:op()`. When `ToUserdata` and `ToUserdata_Class` are
+invoked on P-userdata created from C objects, the conversion to an
+access-to-P or access-to-P'Class will always succeed as type C is
+covered by type P.
+
+Now consider what happens if `Lua.Userdata` is instantiated for type C
+to create a C-userdata type in Lua. First it is important to realise
+that there is no automatic inheritance of the metatable from P-userdata
+types so all the routines will need to be explicitly re-registered for
+C-userdata (if they are not to be overridden). However any
+re-registered routines will work without modification as all the
+C-userdata are convertible into P-userdata. Additional routines that
+only expect C-userdata can be written in Ada and registered with Lua
+against the C-userdata metatable only.
+
+However a routine that expects to work with C-userdata will not work
+with a P-userdata that happens to have been created from a C object
+which was pushed via an access-to-P'Class value. The conversion from
+access-to-P'Class to access-to-C or access-to-C'Class would be valid at
+run-time from an Ada point of view, but it would not make any sense
+from a Lua point of view. The difference between P-userdata values that
+can be passed to such a routine (based on objects that are in both
+C'Class and P'Class) and values that cannot (based on objects in
+P'Class but not C'Class) is not visible at all in Lua and so any use of
+the distinction would likely to lead to error-strewn code. It is
+therefore not supported.
+
+### Keeping references to Lua objects in Ada
+
 If a reference to a Lua object has to be stored in Ada, a
 `Lua_Reference` should be used. This is a reference-counting type so the
-Lua library should not garbage-collect the value before the last Ada
+Lua interpreter should not garbage-collect the value before the last Ada
 reference has been released.
 
 ## Example usage
