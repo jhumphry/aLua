@@ -13,7 +13,7 @@ package body Example_Userdata is
    begin
       Ada.Text_IO.Put_Line(" - Now incrementing the userdata object's counter -");
       Object.Counter := Object.Counter + 1;
-      return Object.Counter;
+      return 0;
    end Increment;
 
    function Toggle (L : Lua_State'Class) return Natural is
