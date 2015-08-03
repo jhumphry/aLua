@@ -45,20 +45,20 @@ begin
             else "Foo.Flag is now false"));
    New_Line;
 
-   Put_Line("Pushing an 'Example_Child' value (Counter => 5, Flag => False) to the stack.");
-   Userdata_Package.Push_Class_Wide(L, Example_Child_Object'Unchecked_Access);
+   Put_Line("Pushing an 'Example_Child' value (Counter => 3, Flag => False) to the stack.");
+   Userdata_Package.Push_Class(L, Example_Child_Object'Unchecked_Access);
    Print_Stack(L);
    Put_Line("Saving userdata in global 'bar'");
    L.SetGlobal("bar");
    New_Line;
 
-   Put_Line("Calling 'foo:increment()' in Lua");
-   Discard := L.LoadString("foo:increment()");
+   Put_Line("Calling 'bar:increment()' in Lua");
+   Discard := L.LoadString("bar:increment()");
    L.Call(nargs => 0, nresults => 0);
-   Put_Line("Calling 'foo:toggle()' (a class-wide operation) in Lua");
+   Put_Line("Calling 'foo:toggle()' in Lua");
    Discard := L.LoadString("foo:toggle()");
    L.Call(nargs => 0, nresults => 0);
-   Put_Line("Calling 'bar:toggle()' (a class-wide operation) in Lua");
+   Put_Line("Calling 'bar:toggle()' in Lua");
    Discard := L.LoadString("bar:toggle()");
    L.Call(nargs => 0, nresults => 0);
    New_Line;
@@ -71,10 +71,10 @@ begin
    Counter := Userdata_Package.ToUserdata(L, -1).Counter;
    Put_Line("foo.Counter = " & Integer'Image(Counter));
    L.GetGlobal("bar");
-   Result := Userdata_Package.ToUserdata_Class_Wide(L, -1).Flag;
+   Result := Userdata_Package.ToUserdata(L, -1).Flag;
    Put_Line((if Result then "bar.Flag is now true"
             else "bar.Flag is now false"));
-   Counter := Userdata_Package.ToUserdata_Class_Wide(L, -1).Counter;
+   Counter := Userdata_Package.ToUserdata(L, -1).Counter;
    Put_Line("bar.Counter = " & Integer'Image(Counter));
    New_Line;
 

@@ -11,16 +11,16 @@ package body Example_Userdata is
       Object : constant access Example_Parent
         := Userdata_Package.ToUserdata(L, -1);
    begin
-      Ada.Text_IO.Put_Line(" - Now incrementing the userdata object's counter -");
+      Ada.Text_IO.Put_Line(" - Now incrementing the userdata object's counter in an Ada function called from Lua -");
       Object.Counter := Object.Counter + 1;
       return 0;
    end Increment;
 
    function Toggle (L : Lua_State'Class) return Natural is
       Object : constant access Example_Parent'Class
-        := Userdata_Package.ToUserdata_Class_Wide(L, -1);
+        := Userdata_Package.ToUserdata_Class(L, -1);
    begin
-      Ada.Text_IO.Put_Line(" - Now toggling the userdata object's flag from Lua -");
+      Ada.Text_IO.Put_Line(" - Now toggling the userdata object's flag in an Ada function called from Lua -");
       Object.Flag := not Object.Flag;
       return 0;
    end Toggle;

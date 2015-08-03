@@ -1,5 +1,5 @@
 -- Lua.Userdata
--- Adding Ada objects to Lua environment
+-- Adding Ada objects of a specified tagged type to the Lua environment
 
 -- Copyright (c) 2015, James Humphry - see LICENSE.md for terms
 
@@ -60,7 +60,7 @@ package body Lua.Userdata is
       end if;
    end Push;
 
-   procedure Push_Class_Wide (L : in Lua_State'Class; D : not null access T'Class) is
+   procedure Push_Class (L : in Lua_State'Class; D : not null access T'Class) is
       UserData_Address : constant System.Address
         := Internal.lua_newuserdata(L.L, (Ada_Userdata'Size+7)/8);
       UserData_Access : constant access Ada_Userdata
@@ -75,7 +75,7 @@ package body Lua.Userdata is
       if Has_Metatable then
          SetMetatable(L, -2);
       end if;
-   end Push_Class_Wide;
+   end Push_Class;
 
    function IsAdaUserdata (L : in Lua_State'Class; index : in Integer)
                            return Boolean is
@@ -84,31 +84,16 @@ package body Lua.Userdata is
       UserData_Access : constant access Ada_Userdata
         := Address_To_Ada_Userdata.To_Pointer(UserData_Address);
    begin
-      if UserData_Access = null
-        or else UserData_Access.Tag /= T'Tag
-        or else UserData_Access.Class_Wide
-      then
+      if UserData_Access = null then
+         return False;
+      elsif not Ada.Tags.Is_Descendant_At_Same_Level(UserData_Access.Tag, T'Tag) then
          return False;
       end if;
       return True;
    end IsAdaUserdata;
 
-   function IsAdaUserdata_Class_Wide (L : in Lua_State'Class; index : in Integer)
-                                      return Boolean is
-      UserData_Address : constant System.Address
-        := Internal.lua_touserdata(L.L, C.int(index));
-      UserData_Access : constant access Ada_Userdata
-        := Address_To_Ada_Userdata.To_Pointer(UserData_Address);
-   begin
-      if UserData_Access = null or else UserData_Access.Tag /= T'Tag
-      then
-         return False;
-      end if;
-      return True;
-   end IsAdaUserdata_Class_Wide;
-
    function ToUserdata (L : in Lua_State'Class; index : in Integer)
-      return not null access T
+                        return Access_Userdata
    is
       UserData_Address : constant System.Address
         := Internal.lua_touserdata(L.L, C.int(index));
@@ -117,16 +102,29 @@ package body Lua.Userdata is
    begin
       if UserData_Access = null then
          raise Lua_Error with "Attempting to access non-userdata as userdata";
-      elsif UserData_Access.Tag /= T'Tag then
-         raise Lua_Error with "Attempting invalid userdata type conversion";
-      elsif UserData_Access.Class_Wide then
-         raise Lua_Error with "Attempting use a class-wide userdata as a userdata of a specific type";
+      elsif not Ada.Tags.Is_Descendant_At_Same_Level(UserData_Access.Tag, T'Tag) then
+         raise Lua_Error with "Attempting invalid userdata type conversion: " &
+           Ada.Tags.External_Tag(UserData_Access.Tag) &
+           (if UserData_Access.Class_Wide then "'Class" else "") &
+           " to " & T'External_Tag;
       end if;
-      return UserData_Access.Data;
+
+      -- Note that because we did an unchecked conversion, Ada already assumes
+      -- that Data/Data_Class_Wide is an access-to-T/T'Class type, so this
+      -- conversion might not be checked thoroughly enough. However, as we have
+      -- done an explicit check that the actual target of Data/Data_Class_Wide
+      -- is covered by T and accessable at the same level this should be safe
+      -- enough.
+      if UserData_Access.Class_Wide then
+         return Access_Userdata(UserData_Access.Data_Class_Wide);
+      else
+         return Access_Userdata(UserData_Access.Data);
+      end if;
+
    end ToUserdata;
 
-   function ToUserdata_Class_Wide (L : in Lua_State'Class; index : in Integer)
-      return not null access T'Class
+   function ToUserdata_Class (L : in Lua_State'Class; index : in Integer)
+                        return Access_Userdata_Class
    is
       UserData_Address : constant System.Address
         := Internal.lua_touserdata(L.L, C.int(index));
@@ -135,15 +133,25 @@ package body Lua.Userdata is
    begin
       if UserData_Access = null then
          raise Lua_Error with "Attempting to access non-userdata as userdata";
-      elsif UserData_Access.Tag /= T'Tag then
-         raise Lua_Error with "Attempting invalid userdata type conversion";
+      elsif not Ada.Tags.Is_Descendant_At_Same_Level(UserData_Access.Tag, T'Tag) then
+         raise Lua_Error with "Attempting invalid userdata type conversion: " &
+           Ada.Tags.External_Tag(UserData_Access.Tag) &
+           (if UserData_Access.Class_Wide then "'Class" else "") &
+           " to " & T'External_Tag & "'Class";
       end if;
+
+      -- Note that because we did an unchecked conversion, Ada already assumes
+      -- that Data/Data_Class_Wide is an access-to-T/T'Class type, so this
+      -- conversion might not be checked thoroughly enough. However, as we have
+      -- done an explicit check that the actual target of Data/Data_Class_Wide
+      -- is covered by T and accessable at the same level this should be safe
+      -- enough.
       if UserData_Access.Class_Wide then
-         return UserData_Access.Data_Class_Wide;
+         return Access_Userdata_Class(UserData_Access.Data_Class_Wide);
       else
-         return UserData_Access.Data;
+         return Access_Userdata_Class(UserData_Access.Data);
       end if;
-   end ToUserdata_Class_Wide;
+   end ToUserdata_Class;
 
    procedure NewMetaTable (L : in Lua_State'Class;
                            Set_Indexable : Boolean := True) is
@@ -182,7 +190,9 @@ package body Lua.Userdata is
       end if;
    end GetMetaTable;
 
-   procedure AddOperation (L : in Lua_State'Class; Name : in String; Op : AdaFunction) is
+   procedure AddOperation (L : in Lua_State'Class;
+                           Name : in String;
+                           Op : AdaFunction) is
       C_name : C.Strings.chars_ptr := C.Strings.New_String(Name);
    begin
       L.PushAdaClosure(Op, 0);
