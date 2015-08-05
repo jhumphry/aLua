@@ -82,8 +82,10 @@ package Lua is
    -- Lua_State encapsulates the entire state of a Lua interpreter. Almost every
    -- routine requires a Lua_State to be passed as the first parameter. This
    -- is a Limited_Controlled type internally so it will automatically be
-   -- initialised on creation and finalized properly when it goes out of
-   -- Ada scope.
+   -- initialised on creation and finalized properly when it goes out of Ada
+   -- scope. Every Lua_State contains a main thread of execution, but other
+   -- threads may be created with shared global environment, but separate
+   -- stacks - see Lua_Thread for details.
    type Lua_State is tagged limited private;
 
    type Lua_Thread;
@@ -191,19 +193,47 @@ package Lua is
    function ToThread (L : in Lua_State; index : in Integer) return Lua_Thread;
 
    -- Operations on values
-   procedure Arith (L : in Lua_State; op : in Arith_Op);
+
+   -- Carry out the specified arithmetical or bitwise operation on the top
+   -- one or two values on the stack. If the values have special metamethods
+   -- defined, they will be used.
+   procedure Arith (L : in Lua_State; op : in Arith_Op) with Inline;
+
+   -- Carry out the specified comparison between the two indicated indexes on
+   -- the stack. If the values have special metamethods defined, they will be
+   -- used. Returns False if either of the indexes is invalid.
    function Compare (L : in Lua_State;
                      index1 : in Integer;
                      index2 : in Integer;
-                     op : in Comparison_Op) return Boolean;
-   procedure Len (L : in  Lua_State; index : Integer);
-   function RawEqual (L : in Lua_State; index1, index2 : in Integer) return Boolean;
-   function RawLen (L : in Lua_State; index : Integer) return Integer;
+                     op : in Comparison_Op) return Boolean with Inline;
+
+   -- Push the length of the value at the given index onto the stack. Like the
+   -- '#' operator, this follows the Lua semantics, so will use the '__len'
+   -- metamethod.
+   procedure Len (L : in  Lua_State; index : Integer) with Inline;
+
+   -- Compare the two specified indexes without considering the Lua semantics.
+   -- Returns False if either of the indexes is invalid.
+   function RawEqual (L : in Lua_State; index1, index2 : in Integer)
+                      return Boolean with Inline;
+
+   -- Return the length of the value at the given index without considering
+   -- the Lua semantics. This does not give a meaningful value for Ada userdata.
+   function RawLen (L : in Lua_State; index : Integer)
+                    return Integer with Inline;
 
    -- Garbage Collector control
+
+   -- Instruct the garbage collector to carry out the specified operation.
    procedure GC (L : in Lua_State; what : in GC_Op);
+
+   -- Set a given parameter of the garbage collector and return the previous
+   -- value.
    function GC (L : in Lua_State; what : in GC_Param; data : in Integer)
                 return Integer;
+
+   -- Return whether the garbage collector is currently running
+   -- (i.e. not stopped by a GCSTOP operation)
    function GC_IsRunning (L : in Lua_State) return Boolean;
 
    -- Stack manipulation and information
@@ -287,16 +317,29 @@ package Lua is
    procedure SetMetatable (L : in Lua_State; index : in Integer);
 
    -- Threads
+
+   -- A Lua_Thread represents a context in which a coroutine can run. It shares
+   -- a global environment with all of the other threads in the Lua_State which
+   -- it shares but it has a separate stack. Threads are Lua objects so garbage
+   -- collected when not longer referenced by anything in the Lua_State. To
+   -- extend the lifetime of threads it may wise to make a reference to them
+   -- (see Lua_Reference).
    type Lua_Thread is new Lua_State with private;
-   function IsYieldable (L : in Lua_State'Class) return Boolean;
-   function NewThread (L : in Lua_State'Class) return Lua_Thread;
-   procedure XMove (from, to : in Lua_Thread; n : in Integer);
-   procedure Yield (L : in Lua_State; nresults : Integer);
 
    -- This constant is used in calls to Resume to indicate that no thread is
    -- responsible for yielding to this one.
    Null_Thread : constant Lua_Thread;
 
+   -- Returns whether a given Lua_State can yield. The main thread of a
+   -- Lua_State cannot yield and neither can threads that have called API
+   -- functions. (While the C API gives the possibility of API functions
+   -- yielding, this is not supported in the Ada API as the change of
+   -- context would not be compatible with the Ada runtime environment).
+   function IsYieldable (L : in Lua_State'Class) return Boolean with Inline;
+
+   -- Create and return a new Lua_Thread in a given Lua_State. The new thread
+   -- is also pushed onto the stack.
+   function NewThread (L : in Lua_State'Class) return Lua_Thread with Inline;
 
    -- Resume the execution of a thread L with parameters. On the first execution
    -- for a thread the main function is on the stack with its parameters. On
@@ -309,6 +352,15 @@ package Lua is
                    from : in Lua_State'Class := Null_Thread
                   )
                    return Thread_Status with Inline;
+
+   -- Pop n values from the stack of 'from' and push them to the stack of 'to'.
+   procedure XMove (from, to : in Lua_Thread; n : in Integer) with Inline;
+
+   -- Yield a thread and return the specified number of results. When the thread
+   -- is 'Resume'd it will continue from the point at which this function was
+   -- called. 'nresults' gives the number of results passed to the call of
+   -- 'Resume' that resumed the execution of the thread.
+   procedure Yield (L : in Lua_State; nresults : Integer) with Inline;
 
    -- References
 
@@ -331,7 +383,7 @@ package Lua is
 
 private
 
-   subtype void_ptr is System.Address;
+   -- Representation clauses
 
    for Thread_Status use (OK => 0, YIELD => 1, ERRRUN => 2, ERRSYNTAX => 3,
                           ERRMEM => 4, ERRGCMM => 5, ERRERR => 6, ERRFILE => 7);
@@ -347,17 +399,21 @@ private
                      TNUMBER => 3, TSTRING => 4, TTABLE => 5, TFUNCTION => 6,
                      TUSERDATA => 7, TTHREAD => 8, TNUMTAGS => 9);
 
+   -- Deferred constants
    RIDX_MainThread : constant Integer := 1;
    RIDX_Globals : constant Integer := 2;
    RIDX_Last : constant Integer := RIDX_Globals;
+
+   -- Main Lua_State type and derivatives
+   subtype void_ptr is System.Address;
 
    type Lua_State is new Ada.Finalization.Limited_Controlled with
       record
          L : void_ptr;
       end record;
 
-   overriding procedure Initialize (Object : in out Lua_State);
-   overriding procedure Finalize   (Object : in out Lua_State);
+   overriding procedure Initialize (Object : in out Lua_State) with inline;
+   overriding procedure Finalize   (Object : in out Lua_State) with inline;
 
    -- Existing_State is a clone of State but without automatic initialization
    -- It is used internally when lua_State* are returned from the Lua library
