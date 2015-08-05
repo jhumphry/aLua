@@ -724,9 +724,12 @@ package body Lua is
       end return;
    end NewThread;
 
-   function Resume(L : in Lua_State'Class; from : in Lua_State'Class; nargs : Integer)
+   function Resume(L : in Lua_State'Class;
+                   nargs : in Integer;
+                   from : in Lua_State'Class := Null_Thread
+                  )
                    return Thread_Status is
-      (Int_To_Thread_Status(Internal.lua_resume(L.L, from.L, C.int(nargs))));
+     (Int_To_Thread_Status(Internal.lua_resume(L.L, from.L, C.int(nargs))));
 
    procedure XMove (from, to : in Lua_Thread; n : in Integer) is
    begin

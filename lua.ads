@@ -290,10 +290,25 @@ package Lua is
    type Lua_Thread is new Lua_State with private;
    function IsYieldable (L : in Lua_State'Class) return Boolean;
    function NewThread (L : in Lua_State'Class) return Lua_Thread;
-   function Resume(L : in Lua_State'Class; from : in Lua_State'Class; nargs : Integer)
-     return Thread_Status;
    procedure XMove (from, to : in Lua_Thread; n : in Integer);
    procedure Yield (L : in Lua_State; nresults : Integer);
+
+   -- This constant is used in calls to Resume to indicate that no thread is
+   -- responsible for yielding to this one.
+   Null_Thread : constant Lua_Thread;
+
+
+   -- Resume the execution of a thread L with parameters. On the first execution
+   -- for a thread the main function is on the stack with its parameters. On
+   -- subsequent calls (after the thread has 'yield'ed and the host program has
+   -- resumed the thread's execution) the stack should contain the arguments
+   -- the thread will see as the result of its 'yield'. The 'from' parameter
+   -- contains the thread that yielded to this one, and is not essential.
+   function Resume(L : in Lua_State'Class;
+                   nargs : in Integer;
+                   from : in Lua_State'Class := Null_Thread
+                  )
+                   return Thread_Status with Inline;
 
    -- References
 
@@ -353,6 +368,9 @@ private
    overriding procedure Finalize   (Object : in out Existing_State) is null;
 
    type Lua_Thread is new Existing_State with null record;
+
+   Null_Thread : constant Lua_Thread
+     := (Ada.Finalization.Limited_Controlled with L => System.Null_Address);
 
    -- Trampolines
 

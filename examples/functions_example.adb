@@ -131,12 +131,12 @@ begin
       Put_Line("Resuming coroutine with parameter 3 in this thread:");
       Coroutine.GetGlobal("co");
       Coroutine.PushInteger(3);
-      Coroutine_Status := Coroutine.Resume(from => L, nargs => 1);
+      Coroutine_Status := Coroutine.Resume(nargs => 1);
       Put("Coroutine status : " & Thread_Status'Image(Coroutine_Status));
       Put(" Result: "); Put(Coroutine.ToNumber(-1)); New_Line;
       L.Pop(1); -- argument no longer needed in this example
       while Coroutine_Status = YIELD loop
-         Coroutine_Status := Coroutine.Resume(from => L, nargs => 0);
+         Coroutine_Status := Coroutine.Resume(nargs => 0);
          Put("Coroutine status : " & Thread_Status'Image(Coroutine_Status));
          Put(" Result: "); Put(Coroutine.ToNumber(-1)); New_Line;
       end loop;
