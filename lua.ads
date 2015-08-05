@@ -204,7 +204,7 @@ package Lua is
    procedure GC (L : in Lua_State; what : in GC_Op);
    function GC (L : in Lua_State; what : in GC_Param; data : in Integer)
                 return Integer;
-   function GC (L : in Lua_State) return Boolean;
+   function GC_IsRunning (L : in Lua_State) return Boolean;
 
    -- Stack manipulation and information
    function AbsIndex (L : in Lua_State; idx : in Integer) return Integer;

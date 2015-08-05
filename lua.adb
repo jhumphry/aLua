@@ -374,7 +374,7 @@ package body Lua is
                 return Integer is
       (Integer(Internal.lua_gc(L.L, GC_Inputs_To_Int(what), C.int(data))));
 
-   function GC (L : in Lua_State) return Boolean is
+   function GC_IsRunning (L : in Lua_State) return Boolean is
        (Internal.lua_gc(L.L, GC_Inputs_To_Int(GCISRUNNING), 0) /= 0);
 
    --
