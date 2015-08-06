@@ -72,9 +72,9 @@ package Lua is
      with Import, Convention => C, Link_Name => "lua_conf_luai_maxstack";
    RegistryIndex : constant Integer
      with Import, Convention => C, Link_Name => "lua_conf_registry_index";
-   RIDX_MainThread : constant Integer;
-   RIDX_Globals : constant Integer;
-   RIDX_Last : constant Integer;
+   RIDX_MainThread : constant Lua_Integer;
+   RIDX_Globals : constant Lua_Integer;
+   RIDX_Last : constant Lua_Integer;
    function UpvalueIndex (i : in Integer) return Integer;
 
    -- Basic state control
@@ -298,13 +298,13 @@ package Lua is
    -- Pushes the value t[i] onto the stack, where t is the table at the index
    -- specified (or a value of another type with a suitable metamethod for
    -- __index defined). Returns the type of the pushed value.
-   function Geti (L : in Lua_State; index : in Integer; i : in Integer)
+   function Geti (L : in Lua_State; index : in Integer; i : in Lua_Integer)
                   return Lua_Type with Inline;
 
    -- Pushes the value t[i] onto the stack, where t is the table at the index
    -- specified (or a value of another type with a suitable metamethod for
    -- __index defined).
-   procedure Geti (L : in Lua_State; index : in Integer; i : in Integer)
+   procedure Geti (L : in Lua_State; index : in Integer; i : in Lua_Integer)
      with Inline;
 
    -- Pushes the value t[k] onto the stack, where t is the table at the index
@@ -344,12 +344,12 @@ package Lua is
    -- Pushes the value t[i] onto the stack, where t is the table at the index
    -- specified (without using metamethods). Returns the type of the pushed
    -- value.
-   function RawGeti (L : in Lua_State; index : in Integer; i : in Integer)
+   function RawGeti (L : in Lua_State; index : in Integer; i : in Lua_Integer)
                      return Lua_Type with Inline, Pre => IsTable(L, index);
 
    -- Pushes the value t[i] onto the stack, where t is the table at the index
    -- specified (without using metamethods).
-   procedure RawGeti (L : in Lua_State; index : in Integer; i : in Integer)
+   procedure RawGeti (L : in Lua_State; index : in Integer; i : in Lua_Integer)
      with Inline, Pre => IsTable(L, index);
 
    -- Set t[k]=v onto the stack, where t is the table at the index specified
@@ -362,7 +362,7 @@ package Lua is
    -- Set t[i]=v onto the stack, where t is the table at the index specified
    -- (without using metamethods) and v is the value at the top of the stack.
    -- The v value is popped from the stack.
-   procedure RawSeti (L : in Lua_State; index : in Integer; i : in Integer)
+   procedure RawSeti (L : in Lua_State; index : in Integer; i : in Lua_Integer)
      with Inline, Pre => IsTable(L, index);
 
    -- Set t[k]=v onto the stack, where t is the table at the index specified (or
@@ -376,7 +376,7 @@ package Lua is
    -- a value of another type with a suitable metamethod for __newindex defined)
    -- and v is the value at the top of the stack. The v value is popped from the
    -- stack.
-   procedure Seti (L : in Lua_State; index : in Integer; i : in Integer)
+   procedure Seti (L : in Lua_State; index : in Integer; i : in Lua_Integer)
      with Inline;
 
    -- Set t[k]=v onto the stack, where t is the table at the index specified
@@ -478,9 +478,9 @@ private
                      TUSERDATA => 7, TTHREAD => 8, TNUMTAGS => 9);
 
    -- Deferred constants
-   RIDX_MainThread : constant Integer := 1;
-   RIDX_Globals : constant Integer := 2;
-   RIDX_Last : constant Integer := RIDX_Globals;
+   RIDX_MainThread : constant Lua_Integer := 1;
+   RIDX_Globals : constant Lua_Integer := 2;
+   RIDX_Last : constant Lua_Integer := RIDX_Globals;
 
    -- Main Lua_State type and derivatives
    subtype void_ptr is System.Address;

@@ -572,7 +572,7 @@ package body Lua is
       C.Strings.Free(C_k);
    end GetField;
 
-   function Geti (L : in Lua_State; index : in Integer; i : in Integer)
+   function Geti (L : in Lua_State; index : in Integer; i : in Lua_Integer)
                   return Lua_Type is
      (
       Int_To_Lua_Type(Internal.lua_geti(L.L,
@@ -580,7 +580,7 @@ package body Lua is
                                         Long_Long_Integer(i)))
      );
 
-   procedure Geti (L : in Lua_State; index : in Integer; i : in Integer) is
+   procedure Geti (L : in Lua_State; index : in Integer; i : in Lua_Integer) is
      Discard : C.int;
    begin
       Discard := Internal.lua_geti(L.L, C.int(index), Long_Long_Integer(i));
@@ -611,7 +611,7 @@ package body Lua is
       Discard := Internal.lua_rawget(L.L, C.int(index));
    end RawGet;
 
-   function RawGeti (L : in Lua_State; index : in Integer; i : in Integer)
+   function RawGeti (L : in Lua_State; index : in Integer; i : in Lua_Integer)
                   return Lua_Type is
      (
       Int_To_Lua_Type(Internal.lua_rawgeti(L.L,
@@ -620,7 +620,7 @@ package body Lua is
                      )
      );
 
-   procedure RawGeti (L : in Lua_State; index : in Integer; i : in Integer) is
+   procedure RawGeti (L : in Lua_State; index : in Integer; i : in Lua_Integer) is
      Discard : C.int;
    begin
       Discard := Internal.lua_rawgeti(L.L, C.int(index), Long_Long_Integer(i));
@@ -631,7 +631,8 @@ package body Lua is
       Internal.lua_rawset(L.L, C.int(index));
    end RawSet;
 
-   procedure RawSeti (L : in Lua_State; index : in Integer; i : in Integer) is
+   procedure RawSeti (L : in Lua_State; index : in Integer; i : in Lua_Integer)
+   is
    begin
       Internal.lua_rawseti(L.L, C.int(index), Long_Long_Integer(i));
    end RawSeti;
@@ -643,7 +644,7 @@ package body Lua is
       C.Strings.Free(C_k);
    end SetField;
 
-   procedure Seti (L : in Lua_State; index : in Integer; i : in Integer) is
+   procedure Seti (L : in Lua_State; index : in Integer; i : in Lua_Integer) is
    begin
       Internal.lua_seti(L.L, C.int(index), Long_Long_Integer(i));
    end Seti;
