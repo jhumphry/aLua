@@ -244,6 +244,8 @@ package body Lua is
    procedure PushThread (L : in Lua_State) is
       Discard : C.int;
    begin
+      -- Not interested if this thread is the main thread of its state, so the
+      -- boolean result is discarded.
       Discard := Internal.lua_pushthread(L.L);
    end PushThread;
 
@@ -263,10 +265,10 @@ package body Lua is
    function ToAdaFunction (L : in Lua_State; index : in Integer)
                            return AdaFunction is
       Upvalue : System.Address;
-      Discard : C.Strings.chars_ptr;
+      Upvalue_Name : C.Strings.chars_ptr;
    begin
-      Discard := Internal.lua_getupvalue(L.L, C.int(index), 1);
-      if Discard = C.Strings.Null_Ptr then
+      Upvalue_Name := Internal.lua_getupvalue(L.L, C.int(index), 1);
+      if Upvalue_Name = C.Strings.Null_Ptr then
          raise Lua_Error with "Function referenced is not an AdaFunction";
       end if;
       Upvalue := Internal.lua_touserdata(L.L, -1);
@@ -367,6 +369,8 @@ package body Lua is
    procedure GC (L : in Lua_State; what : in GC_Op) is
       Discard : C.int;
    begin
+      -- For the operations within subtype GC_Op, this will not return anything
+      -- interesting
       Discard := Internal.lua_gc(L.L, GC_Inputs_To_Int(what), 0);
    end GC;
 
@@ -556,20 +560,23 @@ package body Lua is
       C_k : C.Strings.chars_ptr := C.Strings.New_String(k);
    begin
       Result := Internal.lua_getfield(L.L,
-                                       C.int(index),
-                                       C_k);
+                                      C.int(index),
+                                      C_k);
       C.Strings.Free(C_k);
       return Int_To_Lua_Type(Result);
    end GetField;
 
    procedure GetField (L : in Lua_State; index : in Integer; k : in String) is
-      Discard : C.int;
+      Result_Type : C.int;
       C_k : C.Strings.chars_ptr := C.Strings.New_String(k);
    begin
-      Discard := Internal.lua_getfield(L.L,
-                                       C.int(index),
-                                       C_k);
+      Result_Type := Internal.lua_getfield(L.L,
+                                           C.int(index),
+                                           C_k);
       C.Strings.Free(C_k);
+      if Int_To_Lua_Type(Result_Type) = TNIL then
+         raise Lua_Error with "No value for key: '" & k & "'.";
+      end if;
    end GetField;
 
    function Geti (L : in Lua_State; index : in Integer; i : in Lua_Integer)
@@ -581,9 +588,13 @@ package body Lua is
      );
 
    procedure Geti (L : in Lua_State; index : in Integer; i : in Lua_Integer) is
-     Discard : C.int;
+      Result_Type : C.int;
    begin
-      Discard := Internal.lua_geti(L.L, C.int(index), Long_Long_Integer(i));
+      Result_Type := Internal.lua_geti(L.L, C.int(index), Long_Long_Integer(i));
+      if Int_To_Lua_Type(Result_Type) = TNIL then
+         raise Lua_Error with "No value for key: '" & Lua_Integer'Image(i) &
+           "'.";
+      end if;
    end Geti;
 
    function GetTable (L : in Lua_State; index : in Integer) return Lua_Type is
@@ -592,9 +603,12 @@ package body Lua is
      );
 
    procedure GetTable (L : in Lua_State; index : in Integer) is
-     Discard : C.int;
+      Result_Type : C.int;
    begin
-      Discard := Internal.lua_gettable(L.L, C.int(index));
+      Result_Type := Internal.lua_gettable(L.L, C.int(index));
+      if Int_To_Lua_Type(Result_Type) = TNIL then
+         raise Lua_Error with "No value for key and target specified.";
+      end if;
    end GetTable;
 
    function Next (L : in Lua_State; index : in Integer) return Boolean is
@@ -606,9 +620,12 @@ package body Lua is
      );
 
    procedure RawGet (L : in Lua_State; index : in Integer) is
-     Discard : C.int;
+     Result_Type : C.int;
    begin
-      Discard := Internal.lua_rawget(L.L, C.int(index));
+      Result_Type := Internal.lua_rawget(L.L, C.int(index));
+      if Int_To_Lua_Type(Result_Type) = TNIL then
+         raise Lua_Error with "No value for key and target specified.";
+      end if;
    end RawGet;
 
    function RawGeti (L : in Lua_State; index : in Integer; i : in Lua_Integer)
@@ -621,9 +638,13 @@ package body Lua is
      );
 
    procedure RawGeti (L : in Lua_State; index : in Integer; i : in Lua_Integer) is
-     Discard : C.int;
+      Result_Type : C.int;
    begin
-      Discard := Internal.lua_rawgeti(L.L, C.int(index), Long_Long_Integer(i));
+      Result_Type := Internal.lua_rawgeti(L.L, C.int(index), Long_Long_Integer(i));
+      if Int_To_Lua_Type(Result_Type) = TNIL then
+         raise Lua_Error with "No value for key: '" & Lua_Integer'Image(i) &
+           "'.";
+      end if;
    end RawGeti;
 
    procedure RawSet (L : in Lua_State; index : in Integer) is
@@ -669,10 +690,13 @@ package body Lua is
 
    procedure GetGlobal (L : in Lua_State; name : in String) is
       C_name : C.Strings.chars_ptr := C.Strings.New_String(name);
-      Discard : C.int;
+      Result_Type : C.int;
    begin
-      Discard := Internal.lua_getglobal(L.L, C_name);
+      Result_Type := Internal.lua_getglobal(L.L, C_name);
       C.Strings.Free(C_name);
+      if Int_To_Lua_Type(Result_Type) = TNIL then
+         raise Lua_Error with "No global by the name of :'" & name & "' found.";
+      end if;
    end GetGlobal;
 
    function GetMetatable (L : in Lua_State; index : in Integer) return Boolean is
@@ -689,6 +713,7 @@ package body Lua is
    procedure PushGlobalTable (L : in Lua_State) is
       Discard : C.int;
    begin
+      -- The global table should always exist so no test is performed.
       Discard := Internal.lua_rawgeti(L.L,
                                       C.int(RegistryIndex),
                                       Long_Long_Integer(RIDX_Globals));
@@ -740,6 +765,7 @@ package body Lua is
    procedure Yield (L : in Lua_State; nresults : Integer) is
       Discard : C.int;
    begin
+      -- Return value does not appear to be useful.
       Discard := Internal.lua_yieldk(L.L, C.int(nresults), 0, null);
    end Yield;
 
@@ -804,16 +830,19 @@ package body Lua is
    end Get;
 
    procedure Get (L : in Lua_State; R : Lua_Reference'Class) is
-      Discard : C.int;
+      Result_Type : C.int;
    begin
       if R.E = null then
          raise Lua_Error with "Empty Lua reference used";
       elsif R.E.State /= L.L then
          raise Lua_Error with "Lua reference used on the wrong state!";
       end if;
-      Discard := Internal.lua_rawgeti(R.E.all.State,
-                                      R.E.all.Table,
-                                      Long_Long_Integer(R.E.all.Ref));
+      Result_Type := Internal.lua_rawgeti(R.E.all.State,
+                                          R.E.all.Table,
+                                          Long_Long_Integer(R.E.all.Ref));
+      if Int_To_Lua_Type(Result_Type) = TNIL then
+         raise Lua_Error with "Lua reference somehow pointing to nil value.";
+      end if;
    end Get;
 
    overriding procedure Adjust (Object : in out Lua_Reference) is

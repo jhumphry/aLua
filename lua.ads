@@ -291,7 +291,7 @@ package Lua is
 
    -- Pushes the value t[k] onto the stack, where t is the table at the index
    -- specified (or a value of another type with a suitable metamethod for
-   -- __index defined).
+   -- __index defined). Raises Lua_Error if nothing is found.
    procedure GetField (L : in Lua_State; index : in Integer; k : in String)
      with Inline;
 
@@ -303,7 +303,7 @@ package Lua is
 
    -- Pushes the value t[i] onto the stack, where t is the table at the index
    -- specified (or a value of another type with a suitable metamethod for
-   -- __index defined).
+   -- __index defined). Raises Lua_Error if nothing is found.
    procedure Geti (L : in Lua_State; index : in Integer; i : in Lua_Integer)
      with Inline;
 
@@ -316,7 +316,8 @@ package Lua is
 
    -- Pushes the value t[k] onto the stack, where t is the table at the index
    -- specified (or a value of another type with a suitable metamethod for
-   -- __index defined) and k is the value at the top of the stack.
+   -- __index defined) and k is the value at the top of the stack. Raises
+   -- Lua_Error if nothing is found.
    procedure GetTable (L : in Lua_State; index : in Integer) with Inline;
 
    -- Pops a key from the stack and returns the next key-value pair from the
@@ -337,7 +338,7 @@ package Lua is
 
    -- Pushes the value t[k] onto the stack, where t is the table at the index
    -- specified (without using metamethods) and k is the value at the top of
-   -- the stack.
+   -- the stack. Raises Lua_Error if nothing is found.
    procedure RawGet (L : in Lua_State; index : in Integer)
      with Inline, Pre => IsTable(L, index);
 
@@ -348,7 +349,8 @@ package Lua is
                      return Lua_Type with Inline, Pre => IsTable(L, index);
 
    -- Pushes the value t[i] onto the stack, where t is the table at the index
-   -- specified (without using metamethods).
+   -- specified (without using metamethods). Raises Lua_Error if nothing is
+   -- found.
    procedure RawGeti (L : in Lua_State; index : in Integer; i : in Lua_Integer)
      with Inline, Pre => IsTable(L, index);
 
