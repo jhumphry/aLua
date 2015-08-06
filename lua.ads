@@ -458,7 +458,8 @@ package Lua is
    -- Retrieve a Lua object from a reference and return the type of the object.
    function Get (L : in Lua_State; R : Lua_Reference'Class) return Lua_Type;
 
-   -- Retrieve a Lua object from a reference and return the type of the object.
+   -- Retrieve a Lua object from a reference. Raise Lua_Error if the value
+   -- cannot be found.
    procedure Get (L : in Lua_State; R : Lua_Reference'Class);
 
 private
