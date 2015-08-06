@@ -208,6 +208,10 @@ package Lua is
                      index2 : in Integer;
                      op : in Comparison_Op) return Boolean with Inline;
 
+   -- Concatenate the top n values on the stack, using metamethods where
+   -- appropriate
+   procedure Concat (L : in Lua_State; n : in Integer) with Inline;
+
    -- Push the length of the value at the given index onto the stack. Like the
    -- '#' operator, this follows the Lua semantics, so will use the '__len'
    -- metamethod.

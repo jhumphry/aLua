@@ -355,6 +355,11 @@ package body Lua is
                            C.int(index2),
                            Comparison_Op_To_Int(op)) = 1);
 
+   procedure Concat (L : in Lua_State; n : in Integer) is
+   begin
+      Internal.lua_concat(L.L, C.int(n));
+   end Concat;
+
    procedure Len (L : in  Lua_State; index : Integer) is
    begin
       Internal.lua_len(L.L, C.int(index));
