@@ -173,17 +173,48 @@ package Lua is
      with Import, Convention => C, Link_Name => "lua_conf_multret";
 
    -- Pushing values to the stack
-   procedure PushAdaClosure (L : in Lua_State; f : in AdaFunction; n : in Natural);
-   procedure PushAdaFunction (L : in Lua_State; f : in AdaFunction);
-   procedure PushBoolean (L : in  Lua_State; b : in Boolean);
-   procedure PushInteger (L : in Lua_State; n : in Lua_Integer);
-   procedure PushNil (L : in Lua_State);
-   procedure PushNumber (L : in Lua_State; n : in Lua_Number);
-   procedure PushString (L : in Lua_State; s : in String);
-   function PushThread (L : in Lua_State) return Boolean;
-   procedure PushThread (L : in Lua_State);
-   procedure SetUserValue (L : in Lua_State; index : in Integer);
-   function StringToNumber (L : in Lua_State; s : in String) return Boolean;
+
+   -- Create an Ada closure f which has n upvalues on the stack. Pop the
+   -- upvalues and push the Ada closure onto the stack.
+   procedure PushAdaClosure (L : in Lua_State;
+                             f : in AdaFunction;
+                             n : in Natural)
+     with Inline;
+
+   -- Push the Ada function f to the stack.
+   procedure PushAdaFunction (L : in Lua_State; f : in AdaFunction) with Inline;
+
+   -- Push the Boolean value b to the stack.
+   procedure PushBoolean (L : in  Lua_State; b : in Boolean) with Inline;
+
+   -- Push the Integer value n to the stack.
+   procedure PushInteger (L : in Lua_State; n : in Lua_Integer) with Inline;
+
+   -- Push a Nil value to the stack. Nil is used to represent missing data.
+   procedure PushNil (L : in Lua_State) with Inline;
+
+   -- Push a Number value to the stack.
+   procedure PushNumber (L : in Lua_State; n : in Lua_Number) with Inline;
+
+   -- Push a String value to the stack.
+   procedure PushString (L : in Lua_State; s : in String) with Inline;
+
+   -- Push the thread represented by L to the stack and return a Boolean that
+   -- indicates whether it is the main thread of its interpreter.
+   function PushThread (L : in Lua_State) return Boolean with Inline;
+
+   -- Push the thread represented by L to the stack.
+   procedure PushThread (L : in Lua_State) with Inline;
+
+   -- Pop a value from the top of the stack and set it as the userdata value for
+   -- the userdata at the specified stack index.
+   procedure SetUserValue (L : in Lua_State; index : in Integer) with Inline;
+
+   -- If possible, convert the string s to a number following Lua conversion
+   -- rules and push it to the stack. Returns a Boolean to indicate if the
+   -- conversion was successful.
+   function StringToNumber (L : in Lua_State; s : in String)
+                            return Boolean with Inline;
 
    -- Pulling values from the stack
 
