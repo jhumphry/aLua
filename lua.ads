@@ -271,38 +271,118 @@ package Lua is
    function Userdata_Name (L : in Lua_State; index : in Integer) return String;
 
    -- Table manipulation
+
+   -- Create a new empty table and push it onto the stack. 'narr' and 'nrec'
+   -- are hints about the number of sequence and non-sequence elements that the
+   -- table is expected to have - however they are not limits and can be omitted
+   -- if unknown.
    procedure CreateTable (L : in Lua_State;
                           narr : in Integer := 0;
-                          nrec : in Integer := 0);
-   procedure NewTable (L : in Lua_State);
+                          nrec : in Integer := 0) with Inline;
+
+   -- Push a new empty table onto the stack.
+   procedure NewTable (L : in Lua_State) with Inline;
+
+   -- Pushes the value t[k] onto the stack, where t is the table at the index
+   -- specified (or a value of another type with a suitable metamethod for
+   -- __index defined). Returns the type of the pushed value.
    function GetField (L : in Lua_State; index : in Integer; k : in String)
                       return Lua_Type with Inline;
+
+   -- Pushes the value t[k] onto the stack, where t is the table at the index
+   -- specified (or a value of another type with a suitable metamethod for
+   -- __index defined).
    procedure GetField (L : in Lua_State; index : in Integer; k : in String)
      with Inline;
+
+   -- Pushes the value t[i] onto the stack, where t is the table at the index
+   -- specified (or a value of another type with a suitable metamethod for
+   -- __index defined). Returns the type of the pushed value.
    function Geti (L : in Lua_State; index : in Integer; i : in Integer)
                   return Lua_Type with Inline;
+
+   -- Pushes the value t[i] onto the stack, where t is the table at the index
+   -- specified (or a value of another type with a suitable metamethod for
+   -- __index defined).
    procedure Geti (L : in Lua_State; index : in Integer; i : in Integer)
      with Inline;
+
+   -- Pushes the value t[k] onto the stack, where t is the table at the index
+   -- specified (or a value of another type with a suitable metamethod for
+   -- __index defined) and k is the value at the top of the stack. Returns
+   -- the type of the pushed value.
    function GetTable (L : in Lua_State; index : in Integer) return Lua_Type
      with Inline;
+
+   -- Pushes the value t[k] onto the stack, where t is the table at the index
+   -- specified (or a value of another type with a suitable metamethod for
+   -- __index defined) and k is the value at the top of the stack.
    procedure GetTable (L : in Lua_State; index : in Integer) with Inline;
-   function Next (L : in Lua_State; index : in Integer) return Boolean;
+
+   -- Pops a key from the stack and returns the next key-value pair from the
+   -- table at the index specified (so stack position -1 will contain the value
+   -- and -2 the key). The order in which key-value pairs will be returned is
+   -- arbitrary. When using this function to iterate over all the keys in a
+   -- table, it is important not to change or mutate the table or unexpected
+   -- behaviour can occur. Push a nil value to start the iteration and end the
+   -- iteration when Next returns false.
+   function Next (L : in Lua_State; index : in Integer)
+                  return Boolean with Inline;
+
+   -- Pushes the value t[k] onto the stack, where t is the table at the index
+   -- specified (without using metamethods) and k is the value at the top of
+   -- the stack. Returns the type of the pushed value.
    function RawGet (L : in Lua_State; index : in Integer) return Lua_Type
      with Inline, Pre => IsTable(L, index);
+
+   -- Pushes the value t[k] onto the stack, where t is the table at the index
+   -- specified (without using metamethods) and k is the value at the top of
+   -- the stack.
    procedure RawGet (L : in Lua_State; index : in Integer)
      with Inline, Pre => IsTable(L, index);
+
+   -- Pushes the value t[i] onto the stack, where t is the table at the index
+   -- specified (without using metamethods). Returns the type of the pushed
+   -- value.
    function RawGeti (L : in Lua_State; index : in Integer; i : in Integer)
                      return Lua_Type with Inline, Pre => IsTable(L, index);
+
+   -- Pushes the value t[i] onto the stack, where t is the table at the index
+   -- specified (without using metamethods).
    procedure RawGeti (L : in Lua_State; index : in Integer; i : in Integer)
      with Inline, Pre => IsTable(L, index);
+
+   -- Set t[k]=v onto the stack, where t is the table at the index specified
+   -- (without using metamethods), v is the value at the top of the stack and
+   -- k is the value just below. Both the k and v values are popped from the
+   -- stack.
    procedure RawSet (L : in Lua_State; index : in Integer)
      with Inline, Pre => IsTable(L, index);
+
+   -- Set t[i]=v onto the stack, where t is the table at the index specified
+   -- (without using metamethods) and v is the value at the top of the stack.
+   -- The v value is popped from the stack.
    procedure RawSeti (L : in Lua_State; index : in Integer; i : in Integer)
      with Inline, Pre => IsTable(L, index);
+
+   -- Set t[k]=v onto the stack, where t is the table at the index specified (or
+   -- a value of another type with a suitable metamethod for __newindex defined)
+   -- and v is the value at the top of the stack. The v value is popped from the
+   -- stack.
    procedure SetField (L : in Lua_State; index : in Integer; k : in String)
      with Inline;
+
+   -- Set t[i]=v onto the stack, where t is the table at the index specified (or
+   -- a value of another type with a suitable metamethod for __newindex defined)
+   -- and v is the value at the top of the stack. The v value is popped from the
+   -- stack.
    procedure Seti (L : in Lua_State; index : in Integer; i : in Integer)
      with Inline;
+
+   -- Set t[k]=v onto the stack, where t is the table at the index specified
+   -- (or a value of another type with a suitable metamethod for __newindex
+   -- defined), v is the value at the top of the stack and k is the value
+   -- just below. Both the k and v values are popped from the stack.
    procedure SetTable (L : in Lua_State; index : in Integer) with Inline;
 
    -- Globals and metatables
