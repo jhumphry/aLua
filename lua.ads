@@ -276,17 +276,16 @@ package Lua is
                           nrec : in Integer := 0);
    procedure NewTable (L : in Lua_State);
    function GetField (L : in Lua_State; index : in Integer; k : in String)
-                      return Lua_Type with Inline, Pre => IsTable(L, index);
+                      return Lua_Type with Inline;
    procedure GetField (L : in Lua_State; index : in Integer; k : in String)
-     with Inline, Pre => IsTable(L, index);
+     with Inline;
    function Geti (L : in Lua_State; index : in Integer; i : in Integer)
-                  return Lua_Type with Inline, Pre => IsTable(L, index);
+                  return Lua_Type with Inline;
    procedure Geti (L : in Lua_State; index : in Integer; i : in Integer)
-     with Inline, Pre => IsTable(L, index);
+     with Inline;
    function GetTable (L : in Lua_State; index : in Integer) return Lua_Type
-     with Inline, Pre => IsTable(L, index);
-   procedure GetTable (L : in Lua_State; index : in Integer)
-     with Inline, Pre => IsTable(L, index);
+     with Inline;
+   procedure GetTable (L : in Lua_State; index : in Integer) with Inline;
    function Next (L : in Lua_State; index : in Integer) return Boolean;
    function RawGet (L : in Lua_State; index : in Integer) return Lua_Type
      with Inline, Pre => IsTable(L, index);
@@ -301,11 +300,10 @@ package Lua is
    procedure RawSeti (L : in Lua_State; index : in Integer; i : in Integer)
      with Inline, Pre => IsTable(L, index);
    procedure SetField (L : in Lua_State; index : in Integer; k : in String)
-     with Inline, Pre => IsTable(L, index);
+     with Inline;
    procedure Seti (L : in Lua_State; index : in Integer; i : in Integer)
-     with Inline, Pre => IsTable(L, index);
-   procedure SetTable (L : in Lua_State; index : in Integer)
-     with Inline, Pre => IsTable(L, index);
+     with Inline;
+   procedure SetTable (L : in Lua_State; index : in Integer) with Inline;
 
    -- Globals and metatables
    function GetGlobal (L : in Lua_State; name : in String) return Lua_Type;
