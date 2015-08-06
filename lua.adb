@@ -316,7 +316,9 @@ package body Lua is
    begin
       result := Internal.lua_tolstring(L.L, C.int(index), len'Access);
       if len = 0 then
-         return "";
+         raise Lua_Error with "Value at Lua stack index "
+           & Integer'Image(index)
+           & " is not convertible to a string.";
       else
          declare
             converted_result : String(1..Integer(len+1));
@@ -334,6 +336,11 @@ package body Lua is
    begin
       return R : Lua_Thread do
          R.L := Internal.lua_tothread(L.L, C.int(index));
+         if R.L = System.Null_Address then
+            raise Lua_Error with "Value at Lua stack index "
+              & Integer'Image(index)
+              & " is not a thread value.";
+         end if;
       end return;
    end ToThread;
 
