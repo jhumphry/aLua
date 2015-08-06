@@ -249,6 +249,11 @@ package body Lua is
       Discard := Internal.lua_pushthread(L.L);
    end PushThread;
 
+   procedure SetUserValue (L : in Lua_State; index : in Integer) is
+   begin
+      Internal.lua_setuservalue(L.L, C.int(index));
+   end SetUserValue;
+
    function StringToNumber (L : in Lua_State; s : in String) return Boolean is
       C_String : C.Strings.chars_ptr := C.Strings.New_String(s);
       Result : C.size_t;

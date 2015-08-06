@@ -182,6 +182,7 @@ package Lua is
    procedure PushString (L : in Lua_State; s : in String);
    function PushThread (L : in Lua_State) return Boolean;
    procedure PushThread (L : in Lua_State);
+   procedure SetUserValue (L : in Lua_State; index : in Integer);
    function StringToNumber (L : in Lua_State; s : in String) return Boolean;
 
    -- Pulling values from the stack
