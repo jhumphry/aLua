@@ -5,7 +5,9 @@
 
 -- This library project file will not recompile libalua.a, and assumes
 -- that the existing library is up-to-date and compiled with suitable
--- compiler flags.
+-- compiler flags. It may be better to recompile libalua.a each time
+-- if possible as it gives more opportunity for inlining small
+-- functions
 
 library project ALua_Static is
 
