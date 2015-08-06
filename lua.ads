@@ -388,12 +388,31 @@ package Lua is
    procedure SetTable (L : in Lua_State; index : in Integer) with Inline;
 
    -- Globals and metatables
+
+   -- Push the value of the global with the given name onto the stack and return
+   -- its type. A TNIL value is pushed if there is no global with that name.
    function GetGlobal (L : in Lua_State; name : in String) return Lua_Type;
+
+   -- Push the value of the global with the given name onto the stack and return
+   -- its type. Raises Lua_Error if there is no global with that name.
    procedure GetGlobal (L : in Lua_State; name : in String);
+
+   -- If the value at the specified index has a metatable, push it to the stack
+   -- and return True else return False.
    function GetMetatable (L : in Lua_State; index : in Integer) return Boolean;
+
+   -- If the value at the specified index has a metatable, push it to the stack
+   -- and return True else raise Lua_Error.
    procedure GetMetatable (L : in Lua_State; index : in Integer);
+
+   -- Push the global environment table to the stack.
    procedure PushGlobalTable (L : in Lua_State);
+
+   -- Set the global with the given name to the value at the top of the stack.
    procedure SetGlobal (L : in Lua_State; name : in String);
+
+   -- Pop a table from the stack and use it as the metatable for the value at
+   -- the given index.
    procedure SetMetatable (L : in Lua_State; index : in Integer);
 
    -- Threads
