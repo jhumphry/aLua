@@ -58,7 +58,7 @@ begin
    New_Line;
 
    Put_Line("Clearing the stack");
-   L.Pop(L.GetTop);
+   L.SetTop(0);
    New_Line;
 
    Put_Line("Calling 'foo:toggle()' in Lua");
@@ -81,7 +81,7 @@ begin
    Result := Grandparent_Userdata.ToUserdata(L, -1).Flag;
    Put_Line((if Result then "foo.Flag is now true"
             else "foo.Flag is now false"));
-   L.Pop(L.GetTop);
+   L.SetTop(0);
    L.GetGlobal("bar");
    Result := Grandparent_Userdata.ToUserdata(L, -1).Flag;
    Put_Line((if Result then "bar.Flag is now true"

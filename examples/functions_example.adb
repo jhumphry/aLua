@@ -49,7 +49,7 @@ begin
 
    Put_Line("Saving a reference to the top of the stack and clearing it.");
    R := Ref(L);
-   L.Pop(L.GetTop);
+   L.SetTop(0);
    Print_Stack(L);
    Put_Line("Retrieving reference...");
    L.Get(R);
@@ -68,7 +68,7 @@ begin
    end if;
    New_Line;
 
-   L.Pop(L.GetTop);
+   L.SetTop(0);
    Put_Line("Registering an AdaFunction foobar in Lua");
    L.Register("foobar", AdaFunction'(Example_AdaFunctions.FooBar'Access));
    Success := L.LoadString("baz = foobar(5.0)");
@@ -81,7 +81,7 @@ begin
    Put(L.ToNumber(-1), Aft => 0, Exp => 0); New_Line;
    New_Line;
 
-   L.Pop(L.GetTop);
+   L.SetTop(0);
    Put_Line("Checking foobar can be retrieved");
    L.GetGlobal("foobar");
    if not L.IsAdaFunction(-1) then
@@ -94,7 +94,7 @@ begin
    end if;
    New_Line;
 
-   L.Pop(L.GetTop);
+   L.SetTop(0);
    Put_Line("Registering an AdaFunction multret in Lua");
    L.Register("multret", AdaFunction'(Example_AdaFunctions.Multret'Access));
    Put_Line("Calling 'multret(5)' from Lua");
@@ -103,7 +103,7 @@ begin
    Print_Stack(L);
    New_Line;
 
-   L.Pop(L.GetTop);
+   L.SetTop(0);
    Put_Line("Registering an AdaFunction closure (with upvalue 2.0) in Lua");
    L.PushNumber(2.0);
    L.PushAdaClosure(AdaFunction'(Example_AdaFunctions.Closure'Access), 1);
@@ -114,7 +114,7 @@ begin
    Print_Stack(L);
    New_Line;
 
-   L.Pop(L.GetTop);
+   L.SetTop(0);
    Put_Line("Now to look at using coroutines");
    Libs.Add_Yield_Function(L);
    Put_Line("Loading coroutine source: ");
@@ -143,7 +143,7 @@ begin
    end;
    New_Line;
 
-   L.Pop(L.GetTop);
+   L.SetTop(0);
    declare
       S : constant Lua_Reference := R;
    begin
