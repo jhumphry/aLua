@@ -244,46 +244,50 @@ package Lua is
    -- Stack manipulation and information
 
    -- Convert an acceptable index into an equivalent absolute index
-   function AbsIndex (L : in Lua_State; idx : in Integer) return Integer;
+   function AbsIndex (L : in Lua_State; idx : in Integer)
+                      return Integer with Inline;
 
    -- Returns whether the stack can be expanded by at least n extra slots. This
    -- can return False if there is not enough memory or if the maximum stack
    -- size would be exceeded.
-   function CheckStack (L : in Lua_State; n : in Integer) return Boolean;
+   function CheckStack (L : in Lua_State; n : in Integer)
+                        return Boolean with Inline;
 
    -- Copy the value at fromidx to toidx, overwriting anything previously at
    -- fromidx.
-   procedure Copy (L : in Lua_State; fromidx : in Integer; toidx : in Integer);
+   procedure Copy (L : in Lua_State; fromidx : in Integer; toidx : in Integer)
+     with Inline;
 
    -- Return the index of the top value on the stack. This will also be the
    -- number of items on the stack.
-   function GetTop (L : in Lua_State) return Integer;
+   function GetTop (L : in Lua_State) return Integer with Inline;
 
    -- Move the value at the top of the stack to the (absolute) index value given
    -- moving the values above that point upwards.
-   procedure Insert (L : in Lua_State; index : in Integer);
+   procedure Insert (L : in Lua_State; index : in Integer) with Inline;
 
    -- Remove n values from the top of the stack.
-   procedure Pop (L : in Lua_State; n : in Integer);
+   procedure Pop (L : in Lua_State; n : in Integer) with Inline;
 
    -- Push a copy of the value at the given index to the top of the stack.
-   procedure PushValue (L : in Lua_State; index : in Integer);
+   procedure PushValue (L : in Lua_State; index : in Integer) with Inline;
 
    -- Remove the value at the given (absolute) index and move values down to
    -- fill the gap.
-   procedure Remove (L : in Lua_State; index : in Integer);
+   procedure Remove (L : in Lua_State; index : in Integer) with Inline;
 
    -- Move the top value on the stack to the index position given, and then
    -- pop the top value.
-   procedure Replace (L : in Lua_State; index : in Integer);
+   procedure Replace (L : in Lua_State; index : in Integer) with Inline;
 
    -- Rotate the stack values between idx and the top of the stack by n values
    -- (positive towards the top, negative towards the bottom).
-   procedure Rotate (L : in Lua_State; idx : in Integer; n : in Integer);
+   procedure Rotate (L : in Lua_State; idx : in Integer; n : in Integer)
+      with Inline;
 
    -- Set the top of the stack to the given index value. If index is zero, the
    -- result is to empty the stack.
-   procedure SetTop (L : in Lua_State; index : in Integer);
+   procedure SetTop (L : in Lua_State; index : in Integer) with Inline;
 
    -- Type information
    function IsAdaFunction (L : in Lua_State; index : in Integer) return Boolean;
