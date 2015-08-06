@@ -186,12 +186,36 @@ package Lua is
    function StringToNumber (L : in Lua_State; s : in String) return Boolean;
 
    -- Pulling values from the stack
-   function ToAdaFunction (L : in Lua_State; index : in Integer) return AdaFunction;
-   function ToBoolean (L : in Lua_State; index : in Integer) return Boolean;
+
+   -- Return the AdaFunction value at the specified stack index. Raises
+   -- Lua_Error if the value does not appear to be an AdaFunction.
+   function ToAdaFunction (L : in Lua_State; index : in Integer)
+                           return AdaFunction;
+
+   -- Return the value at the given stack index converted to a Boolean. All
+   -- values except for False and Nil return True. Use IsBoolean if you want to
+   -- only accept true Boolean values.
+   function ToBoolean (L : in Lua_State; index : in Integer)
+                       return Boolean with Inline;
+
+   -- Convert the integer, number or string at the given index to an integer and
+   -- return it. Raises Lua_Error if the conversion fails.
    function ToInteger (L : in Lua_State; index : in Integer) return Lua_Integer;
+
+   -- Convert the integer, number or string at the given index to an number and
+   -- return it. Raises Lua_Error if the conversion fails.
    function ToNumber (L : in Lua_State; index : in Integer) return Lua_Number;
+
+   -- Convert the value at the given stack index to a string and return it.
+   -- Raises Lua_Error if the conversion fails. NOTE: this function also
+   -- converts the value on the stack. Use IsString before using this
+   -- function if you need to avoid this.
    function ToString (L : in Lua_State; index : in Integer) return String;
-   function ToThread (L : in Lua_State; index : in Integer) return Lua_Thread;
+
+   -- Return the Lua_Thread value at the given stack index. Raises Lua_Error if
+   -- the conversion fails.
+   function ToThread (L : in Lua_State; index : in Integer)
+                      return Lua_Thread with Inline;
 
    -- Operations on values
 
