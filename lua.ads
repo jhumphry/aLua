@@ -29,12 +29,16 @@ private with Interfaces.C;
 
 package Lua is
 
-   -- Types used by Lua
+   -- *
+   -- ** Types used by Lua
+   -- *
 
    subtype Lua_Number is Long_Float;
    subtype Lua_Integer is Long_Long_Integer;
 
-   -- Enumerations
+   -- *
+   -- ** Enumerations
+   -- *
 
    type Thread_Status is (OK, YIELD, ERRRUN, ERRSYNTAX,
                           ERRMEM, ERRGCMM, ERRERR, ERRFILE);
@@ -59,7 +63,9 @@ package Lua is
 
    type Lua_ChunkMode is (Binary, Text, Binary_and_Text);
 
-   -- Exceptions
+   -- *
+   -- ** Exceptions
+   -- *
 
    -- Lua_Error is raised whenever there is a violation of a constraint
    -- imposed by the semantics of the Lua interface - for example, trying to
@@ -77,7 +83,9 @@ package Lua is
    RIDX_Last : constant Lua_Integer;
    function UpvalueIndex (i : in Integer) return Integer;
 
-   -- Basic state control
+   -- *
+   -- ** Basic state control
+   -- *
 
    -- Lua_State encapsulates the entire state of a Lua interpreter. Almost every
    -- routine requires a Lua_State to be passed as the first parameter. This
@@ -112,7 +120,9 @@ package Lua is
                       Mode : in Lua_ChunkMode := Binary_and_Text)
                       return Thread_Status;
 
-   -- Calling, yielding and functions
+   -- *
+   -- ** Calling, yielding and functions
+   -- *
 
    -- Calls a function (including an anonymous block of code) on the stack. The
    -- arguments should be pushed onto the stack on top of the function. The
@@ -172,7 +182,9 @@ package Lua is
    MultRet_Sentinel : constant Integer
      with Import, Convention => C, Link_Name => "lua_conf_multret";
 
-   -- Pushing values to the stack
+   -- *
+   -- ** Pushing values to the stack
+   -- *
 
    -- Create an Ada closure f which has n upvalues on the stack. Pop the
    -- upvalues and push the Ada closure onto the stack.
@@ -216,7 +228,9 @@ package Lua is
    function StringToNumber (L : in Lua_State; s : in String)
                             return Boolean with Inline;
 
-   -- Pulling values from the stack
+   -- *
+   -- ** Pulling values from the stack
+   -- *
 
    -- Return the AdaFunction value at the specified stack index. Raises
    -- Lua_Error if the value does not appear to be an AdaFunction.
@@ -248,7 +262,9 @@ package Lua is
    function ToThread (L : in Lua_State; index : in Integer)
                       return Lua_Thread with Inline;
 
-   -- Operations on values
+   -- *
+   -- ** Operations on values
+   -- *
 
    -- Carry out the specified arithmetical or bitwise operation on the top
    -- one or two values on the stack. If the values have special metamethods
@@ -282,7 +298,9 @@ package Lua is
    function RawLen (L : in Lua_State; index : Integer)
                     return Integer with Inline;
 
-   -- Garbage Collector control
+   -- *
+   -- ** Garbage Collector control
+   -- *
 
    -- Instruct the garbage collector to carry out the specified operation.
    procedure GC (L : in Lua_State; what : in GC_Op);
@@ -296,7 +314,9 @@ package Lua is
    -- (i.e. not stopped by a GCSTOP operation)
    function GC_IsRunning (L : in Lua_State) return Boolean;
 
-   -- Stack manipulation and information
+   -- *
+   -- ** Stack manipulation and information
+   -- *
 
    -- Convert an acceptable index into an equivalent absolute index
    function AbsIndex (L : in Lua_State; idx : in Integer)
@@ -344,7 +364,10 @@ package Lua is
    -- result is to empty the stack.
    procedure SetTop (L : in Lua_State; index : in Integer) with Inline;
 
-   -- Type information
+   -- *
+   -- ** Type information
+   -- *
+
    function IsAdaFunction (L : in Lua_State; index : in Integer) return Boolean;
    function IsBoolean (L : in Lua_State; index : in Integer) return Boolean;
    function IsCFunction (L : in Lua_State; index : in Integer) return Boolean;
@@ -365,7 +388,9 @@ package Lua is
      (TypeName(L, TypeInfo(L, index)));
    function Userdata_Name (L : in Lua_State; index : in Integer) return String;
 
-   -- Table manipulation
+   -- *
+   -- ** Table manipulation
+   -- *
 
    -- Create a new empty table and push it onto the stack. 'narr' and 'nrec'
    -- are hints about the number of sequence and non-sequence elements that the
@@ -482,7 +507,9 @@ package Lua is
    -- just below. Both the k and v values are popped from the stack.
    procedure SetTable (L : in Lua_State; index : in Integer) with Inline;
 
-   -- Globals and metatables
+   -- *
+   -- ** Globals and metatables
+   -- *
 
    -- Push the value of the global with the given name onto the stack and return
    -- its type. A TNIL value is pushed if there is no global with that name.
@@ -510,7 +537,9 @@ package Lua is
    -- the given index.
    procedure SetMetatable (L : in Lua_State; index : in Integer);
 
-   -- Threads
+   -- *
+   -- ** Threads
+   -- *
 
    -- A Lua_Thread represents a context in which a coroutine can run. It shares
    -- a global environment with all of the other threads in the Lua_State which
@@ -556,7 +585,9 @@ package Lua is
    -- 'Resume' that resumed the execution of the thread.
    procedure Yield (L : in Lua_State; nresults : Integer) with Inline;
 
-   -- References
+   -- *
+   -- ** References
+   -- *
 
    -- Lua_Reference is a reference-counted way of referring to objects inside an
    -- interpreter state.
@@ -578,7 +609,9 @@ package Lua is
 
 private
 
-   -- Representation clauses
+   -- *
+   -- ** Representation clauses
+   -- *
 
    for Thread_Status use (OK => 0, YIELD => 1, ERRRUN => 2, ERRSYNTAX => 3,
                           ERRMEM => 4, ERRGCMM => 5, ERRERR => 6, ERRFILE => 7);
@@ -594,12 +627,18 @@ private
                      TNUMBER => 3, TSTRING => 4, TTABLE => 5, TFUNCTION => 6,
                      TUSERDATA => 7, TTHREAD => 8, TNUMTAGS => 9);
 
-   -- Deferred constants
+   -- *
+   -- ** Deferred constants
+   -- *
+
    RIDX_MainThread : constant Lua_Integer := 1;
    RIDX_Globals : constant Lua_Integer := 2;
    RIDX_Last : constant Lua_Integer := RIDX_Globals;
 
-   -- Main Lua_State type and derivatives
+   -- *
+   -- ** Main Lua_State type and derivatives
+   -- *
+
    subtype void_ptr is System.Address;
 
    type Lua_State is new Ada.Finalization.Limited_Controlled with
@@ -623,12 +662,16 @@ private
    Null_Thread : constant Lua_Thread
      := (Ada.Finalization.Limited_Controlled with L => System.Null_Address);
 
-   -- Trampolines
+   -- *
+   -- ** Trampolines
+   -- *
 
    function CFunction_Trampoline (L : System.Address) return Interfaces.C.int
      with Convention => C;
 
-   -- References
+   -- *
+   -- ** References
+   -- *
 
    type Lua_Reference_Value is
       record
