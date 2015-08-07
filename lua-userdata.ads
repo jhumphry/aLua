@@ -39,9 +39,9 @@ package Lua.Userdata is
                         return Access_Userdata_Class;
 
    -- Create a new metatable for this type. It will be stored in the registry
-   -- under 'Ada_UserData:ET' where ET is the result of T'External_Tag. If
-   -- Set_Indexable is true then the key '__index' is set to the table itself,
-   -- so writing 'a:foo()' in Lua will cause a call of metatable['foo'](a).
+   -- under 'Ada:ET' where ET is the result of T'External_Tag. If Set_Indexable
+   -- is true then the key '__index' is set to the table itself, so writing
+   -- 'a:foo()' in Lua will cause a call of metatable['foo'](a).
    procedure NewMetaTable (L : in Lua_State'Class;
                            Set_Indexable : Boolean := True);
 
