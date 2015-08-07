@@ -3,6 +3,7 @@
 
 -- Copyright (c) 2015, James Humphry - see LICENSE.md for terms
 
+with Ada.IO_Exceptions;
 with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Long_Float_Text_IO; use Ada.Long_Float_Text_IO;
 with Ada.Characters.Latin_1;
@@ -54,6 +55,18 @@ begin
    Put_Line("Retrieving reference...");
    L.Get(R);
    Print_Stack(L);
+   New_Line;
+
+   Put_Line("Attempting to save function f to a file as a binary chunk.");
+   L.GetGlobal("f");
+   begin
+      L.DumpFile("function_f.luachunk");
+      Put_Line("Saving function f to a file appears to have succeeded.");
+   exception
+      when Lua_Error |  Ada.IO_Exceptions.Status_Error |
+           Ada.IO_Exceptions.Name_Error | Ada.IO_Exceptions.Use_Error =>
+         Put_Line("Saving function f to a file failed!");
+   end;
    New_Line;
 
    Put_Line("Loading IO library and running example Lua file");

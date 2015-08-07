@@ -108,6 +108,13 @@ package Lua is
    -- using a custom enumeration type.
    function Status (L : in Lua_State) return Thread_Status;
 
+   -- Dumps the function at the top of the stack to the file with the given name
+   -- as a binary chunk. Does not pop the function from the stack. If Strip is
+   -- set some debug information removed from the generated chunk to save space.
+   procedure DumpFile(L : in Lua_State;
+                      Name : in String;
+                      Strip : in Boolean := False);
+
    -- Loads and runs a string containing code. Currently makes a duplicate to
    -- cope with the Ada-C mismatch, so very, very large strings may not work.
    function LoadString (L : in Lua_State;

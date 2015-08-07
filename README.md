@@ -62,6 +62,33 @@ continuation function are not supported. In the C API they use
 `longjmp` to jump out of scope but in Ada this would cause serious
 problems for continued execution.
 
+### Loading and saving Lua code
+
+The routines `DumpFile`, `LoadFile` and `LoadString` can be used to
+save Lua code in pre-compiled as pre-compiled binary chunks and to load
+Lua code as either text or binary format. Note that the format for
+pre-compiled chunks may change between Lua versions.
+
+The semantics for loading text files can cause confusion. Consider the
+following file:
+
+```lua
+function triangle(x)
+   for i = 1, x do
+      for j = 1, i do
+         io.write("*")
+      end
+      io.write("\n")
+   end
+end
+```
+
+This file does not define the function `triangle`. Rather, it defines an
+anonymous block that defines a function `triangle` when it is executed.
+After using `LoadFile` to load a file like this, it should be called to
+actually compile the functions contained and insert them into the global
+namespace of the interpreter.
+
 ### Communicating values between Lua and Ada
 
 Communication with Lua code is done via a stack. In general, everything

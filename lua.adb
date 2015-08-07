@@ -4,12 +4,14 @@
 -- Copyright (c) 2015, James Humphry - see LICENSE.md for terms
 
 with Ada.Unchecked_Conversion, Ada.Unchecked_Deallocation;
+with Ada.Streams, Ada.Streams.Stream_IO;
 
 with Interfaces; use Interfaces;
 with Interfaces.C;
 use type Interfaces.C.int, Interfaces.C.size_t;
 with Interfaces.C.Strings;
 use type Interfaces.C.Strings.chars_ptr;
+with Interfaces.C.Pointers;
 
 with System;
 use type System.Address;
@@ -59,6 +61,28 @@ package body Lua is
      Ada.Unchecked_Conversion(Source => System.Address,
                               Target => AdaFunction);
 
+    function Stream_Access_To_Address is new
+     Ada.Unchecked_Conversion(Source => Ada.Streams.Stream_IO.Stream_Access,
+                              Target => System.Address);
+
+    function Address_To_Stream_Access is new
+     Ada.Unchecked_Conversion(Source => System.Address,
+                              Target => Ada.Streams.Stream_IO.Stream_Access);
+
+   --
+   -- *** Conversions between a C void * and a Stream_Element_Array
+   --
+
+   package Void_Ptr_To_Stream_Array is new
+      Interfaces.C.Pointers(Index => Ada.Streams.Stream_Element_Offset,
+                            Element => Ada.Streams.Stream_Element,
+                            Element_Array => Ada.Streams.Stream_Element_Array,
+                            Default_Terminator => 0);
+
+   function Address_To_Stream_Element_Access is new
+     Ada.Unchecked_Conversion(Source => System.Address,
+                              Target => Void_Ptr_To_Stream_Array.Pointer);
+
    --
    -- *** Special stack positions and the registry
    --
@@ -78,6 +102,73 @@ package body Lua is
 
    function Status (L : Lua_State) return Thread_Status is
       (Int_To_Thread_Status(Internal.lua_status(L.L)));
+
+   -- The Stream_Lua_Writer is an internal Lua_Writer where the userdata pointer
+   -- is a Stream_Access type from Ada.Streams.Stream_IO. It should therefore
+   -- support writing to and from any type of stream.
+
+   function Stream_Lua_Writer (L : void_ptr;
+                               p : void_ptr;
+                               sz : C.size_t;
+                               ud : void_ptr)
+                               return C.int with Convention => C;
+
+   function Stream_Lua_Writer (L : void_ptr;
+                               p : void_ptr;
+                               sz : C.size_t;
+                               ud : void_ptr)
+                               return C.int  is
+
+      pragma Unreferenced (L);
+
+      use Ada.Streams;
+      use Ada.Streams.Stream_IO;
+
+      Output_Stream_Access : constant Stream_Access
+        := Address_To_Stream_Access(ud);
+
+      Output_Data_Access : constant Void_Ptr_To_Stream_Array.Pointer
+        := Address_To_Stream_Element_Access(p);
+
+      Output_Data_Length : constant C.ptrdiff_t := C.ptrdiff_t(sz);
+
+      Output_Data : constant Stream_Element_Array
+        := Void_Ptr_To_Stream_Array.Value(Ref => Output_Data_Access,
+                                          Length => Output_Data_Length);
+
+   begin
+      Output_Stream_Access.Write(Item => Output_Data);
+      return 0;
+   exception
+      when Status_Error | Mode_Error | Device_Error  =>
+         return 1;
+         -- Other exceptions are deliberately not handled as they are more
+         -- likely to indicate serious internal problems, for example being
+         -- sent a null pointer as the data to write.
+   end Stream_Lua_Writer;
+
+   procedure DumpFile(L : in Lua_State;
+                      Name : in String;
+                      Strip : in Boolean := False) is
+
+      use Ada.Streams.Stream_IO;
+
+      Output_File : File_Type;
+      Output_Stream_Access : Stream_Access;
+      Result : C.int;
+
+   begin
+      Create(File => Output_File, Mode => Out_File, Name => Name);
+      Output_Stream_Access := Stream(Output_File);
+      Result := Internal.lua_dump(L.L,
+                                  Stream_Lua_Writer'Access,
+                                  Stream_Access_To_Address(Output_Stream_Access),
+                                  (if Strip then 1 else 0));
+      Close(Output_File);
+      if Result /= 0 then
+         raise Lua_Error with "Could not dump Lua chunk to file";
+      end if;
+   end DumpFile;
 
    function LoadString (L : in Lua_State;
                         S : in String)
