@@ -97,12 +97,6 @@ package body Lua is
    -- *** Basic state control
    --
 
-   function Version (L : Lua_State) return Long_Float is
-      (Long_Float(Internal.lua_version(L.L).all));
-
-   function Status (L : Lua_State) return Thread_Status is
-      (Int_To_Thread_Status(Internal.lua_status(L.L)));
-
    -- The Stream_Lua_Writer is an internal Lua_Writer where the userdata pointer
    -- is a Stream_Access type from Ada.Streams.Stream_IO. It should therefore
    -- support writing to and from any type of stream.
@@ -200,6 +194,12 @@ package body Lua is
       C.Strings.Free(C_Mode);
       return Int_To_Thread_Status(Result);
    end LoadFile;
+
+   function Status (L : Lua_State) return Thread_Status is
+      (Int_To_Thread_Status(Internal.lua_status(L.L)));
+
+   function Version (L : Lua_State) return Long_Float is
+      (Long_Float(Internal.lua_version(L.L).all));
 
    --
    -- *** Calling, yielding and functions

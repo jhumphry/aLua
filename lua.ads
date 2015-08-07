@@ -36,32 +36,8 @@ package Lua is
    subtype Lua_Number is Long_Float;
    subtype Lua_Integer is Long_Long_Integer;
 
-   -- *
-   -- ** Enumerations
-   -- *
-
-   type Thread_Status is (OK, YIELD, ERRRUN, ERRSYNTAX,
-                          ERRMEM, ERRGCMM, ERRERR, ERRFILE);
-
-   type Arith_Op is (OPADD, OPSUB, OPMUL, OPMOD, OPPOW, OPDIV, OPIDIV, OPBAND,
-                     OPBOR, OPBXOR, OPSHL, OPSHR, OPUNM, OPBNOT);
-
-   type Comparison_Op is (OPEQ, OPLT, OPLE);
-
-   type GC_Inputs is (GCSTOP, GCRESTART, GCCOLLECT, GCCOUNT,
-                      GCCOUNTB, GCSTEP, GCSETPAUSE, GCSETSTEPMUL, GCISRUNNING);
-   for GC_Inputs use (GCSTOP => 0, GCRESTART => 1, GCCOLLECT => 2,
-                      GCCOUNT => 3, GCCOUNTB => 4, GCSTEP => 5,
-                      GCSETPAUSE => 6, GCSETSTEPMUL => 7, GCISRUNNING => 9);
-
-   subtype GC_Op is GC_Inputs range GCSTOP..GCSTEP;
-   subtype GC_Param is GC_Inputs range GCSETPAUSE..GCSETSTEPMUL;
-   subtype GC_Queries is GC_Inputs range GCISRUNNING..GCISRUNNING;
-
    type Lua_Type is (TNONE, TNIL, TBOOLEAN, TLIGHTUSERDATA, TNUMBER, TSTRING,
                      TTABLE, TFUNCTION, TUSERDATA, TTHREAD, TNUMTAGS);
-
-   type Lua_ChunkMode is (Binary, Text, Binary_and_Text);
 
    -- *
    -- ** Exceptions
@@ -98,15 +74,8 @@ package Lua is
 
    type Lua_Thread;
 
-   -- This function retrieves the version of the C Lua interpreter that the
-   -- program has been compiled against.
-   -- Returns a Long_Float value consisting of the Major version * 100 plus the
-   -- minor version, so version 5.3 of Lua will return 503.0.
-   function Version (L : in Lua_State) return Long_Float;
-
-   -- Status returns the status of a particular interpreter state or thread
-   -- using a custom enumeration type.
-   function Status (L : in Lua_State) return Thread_Status;
+   type Thread_Status is (OK, YIELD, ERRRUN, ERRSYNTAX,
+                          ERRMEM, ERRGCMM, ERRERR, ERRFILE);
 
    -- Dumps the function at the top of the stack to the file with the given name
    -- as a binary chunk. Does not pop the function from the stack. If Strip is
@@ -120,12 +89,24 @@ package Lua is
    function LoadString (L : in Lua_State;
                         S : in String) return Thread_Status;
 
+   type Lua_ChunkMode is (Binary, Text, Binary_and_Text);
+
    -- Loads and runs a file of a given Name. The Mode parameter allows
    -- specification of whether the file can be in Binary, Text or either format.
    function LoadFile (L : in Lua_State;
                       Name : in String;
                       Mode : in Lua_ChunkMode := Binary_and_Text)
                       return Thread_Status;
+
+   -- Status returns the status of a particular interpreter state or thread
+   -- using a custom enumeration type.
+   function Status (L : in Lua_State) return Thread_Status;
+
+   -- This function retrieves the version of the C Lua interpreter that the
+   -- program has been compiled against.
+   -- Returns a Long_Float value consisting of the Major version * 100 plus the
+   -- minor version, so version 5.3 of Lua will return 503.0.
+   function Version (L : in Lua_State) return Long_Float;
 
    -- *
    -- ** Calling, yielding and functions
@@ -273,10 +254,15 @@ package Lua is
    -- ** Operations on values
    -- *
 
+   type Arith_Op is (OPADD, OPSUB, OPMUL, OPMOD, OPPOW, OPDIV, OPIDIV, OPBAND,
+                     OPBOR, OPBXOR, OPSHL, OPSHR, OPUNM, OPBNOT);
+
    -- Carry out the specified arithmetical or bitwise operation on the top
    -- one or two values on the stack. If the values have special metamethods
    -- defined, they will be used.
    procedure Arith (L : in Lua_State; op : in Arith_Op) with Inline;
+
+   type Comparison_Op is (OPEQ, OPLT, OPLE);
 
    -- Carry out the specified comparison between the two indicated indexes on
    -- the stack. If the values have special metamethods defined, they will be
@@ -308,6 +294,16 @@ package Lua is
    -- *
    -- ** Garbage Collector control
    -- *
+
+   type GC_Inputs is (GCSTOP, GCRESTART, GCCOLLECT, GCCOUNT,
+                      GCCOUNTB, GCSTEP, GCSETPAUSE, GCSETSTEPMUL, GCISRUNNING);
+   for GC_Inputs use (GCSTOP => 0, GCRESTART => 1, GCCOLLECT => 2,
+                      GCCOUNT => 3, GCCOUNTB => 4, GCSTEP => 5,
+                      GCSETPAUSE => 6, GCSETSTEPMUL => 7, GCISRUNNING => 9);
+
+   subtype GC_Op is GC_Inputs range GCSTOP..GCSTEP;
+   subtype GC_Param is GC_Inputs range GCSETPAUSE..GCSETSTEPMUL;
+   subtype GC_Queries is GC_Inputs range GCISRUNNING..GCISRUNNING;
 
    -- Instruct the garbage collector to carry out the specified operation.
    procedure GC (L : in Lua_State; what : in GC_Op);
