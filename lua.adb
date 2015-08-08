@@ -8,7 +8,7 @@ with Ada.Streams, Ada.Streams.Stream_IO;
 
 with Interfaces; use Interfaces;
 with Interfaces.C;
-use type Interfaces.C.int, Interfaces.C.size_t;
+use type Interfaces.C.int, Interfaces.C.size_t, Interfaces.C.ptrdiff_t;
 with Interfaces.C.Strings;
 use type Interfaces.C.Strings.chars_ptr;
 with Interfaces.C.Pointers;
@@ -124,7 +124,14 @@ package body Lua is
       Output_Data_Access : constant Void_Ptr_To_Stream_Array.Pointer
         := Address_To_Stream_Element_Access(p);
 
-      Output_Data_Length : constant C.ptrdiff_t := C.ptrdiff_t(sz);
+      -- This calculation is intended to deal with (most) cases in which
+      -- Stream_Element is not a single byte. Why anyone would do that I
+      -- don't know, but it seems possible according to the RM. Cases in which
+      -- Stream_Element is a fractional number of bytes will not work, but
+      -- I can't see how an Ada system using such a convention could ever
+      -- be expected to interoperate with C code.
+      Output_Data_Length : constant C.ptrdiff_t
+        := (C.ptrdiff_t(sz) * 8) / Stream_Element'Size;
 
       Output_Data : constant Stream_Element_Array
         := Void_Ptr_To_Stream_Array.Value(Ref => Output_Data_Access,
