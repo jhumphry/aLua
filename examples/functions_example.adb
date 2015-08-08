@@ -20,7 +20,7 @@ procedure Functions_Example is
    R : Lua_Reference;
 
    LF : Character renames Ada.Characters.Latin_1.LF;
-   Coroutine_Source : constant String := "" &
+   Coroutine_Source : aliased constant String := "" &
      "function co (x) " & LF &
      " for i = 1, x do " & LF &
      "  yield(i) " & LF &
@@ -38,7 +38,7 @@ begin
    New_Line; New_Line;
 
    Put_Line("Loading chunk: function f (x) return 2*x end");
-   Success := L.LoadString("function f (x) return 2*x end");
+   Success := L.LoadString_By_Copy("function f (x) return 2*x end");
    Put_Line("Load" & (if Success /= OK then " not" else "") & " successful.");
    L.Call(nargs => 0, nresults =>0);
    Put_Line("Compiled chunk.");
@@ -84,7 +84,7 @@ begin
    L.SetTop(0);
    Put_Line("Registering an AdaFunction foobar in Lua");
    L.Register("foobar", AdaFunction'(Example_AdaFunctions.FooBar'Access));
-   Success := L.LoadString("baz = foobar(5.0)");
+   Success := L.LoadString_By_Copy("baz = foobar(5.0)");
    Put_Line("Loading code snippet 'baz = foobar(5.0)'" &
             (if Success /= OK then " not" else "") & " successful.");
    Put_Line("Calling 'baz = foobar(5.0)' from Lua");

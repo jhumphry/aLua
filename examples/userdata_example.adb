@@ -62,15 +62,15 @@ begin
    New_Line;
 
    Put_Line("Calling 'foo:toggle()' in Lua");
-   Discard := L.LoadString("foo:toggle()");
+   Discard := L.LoadString_By_Copy("foo:toggle()");
    L.Call(nargs => 0, nresults => 0);
    New_Line;
    Put_Line("Calling 'bar:toggle()' in Lua");
-   Discard := L.LoadString("bar:toggle()");
+   Discard := L.LoadString_By_Copy("bar:toggle()");
    L.Call(nargs => 0, nresults => 0);
    New_Line;
    Put_Line("Calling 'bar:increment()' in Lua");
-   Discard := L.LoadString("bar:increment()");
+   Discard := L.LoadString_By_Copy("bar:increment()");
    L.Call(nargs => 0, nresults => 0);
    New_Line;
 

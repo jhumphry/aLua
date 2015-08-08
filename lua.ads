@@ -92,12 +92,26 @@ package Lua is
                         Stream : in Ada.Streams.Stream_IO.Stream_Access;
                         Strip : in Boolean := False);
 
-   -- Loads and runs a string containing code. Currently makes a duplicate to
-   -- cope with the Ada-C mismatch, so very, very large strings may not work.
-   function LoadString (L : in Lua_State;
-                        S : in String) return Thread_Status;
-
    type Lua_ChunkMode is (Binary, Text, Binary_and_Text);
+
+   -- Loads and runs a string containing code. Chunkname gives the name to the
+   -- chunk which can be used in error messages. Mode indicates if the file can
+   -- be in Binary, Text or either format. The return value indicates whether
+   -- the load was successful.
+   function LoadString (L : in Lua_State;
+                        S : aliased String;
+                        ChunkName : in String := "";
+                        Mode : Lua_ChunkMode := Binary_and_Text)
+                        return Thread_Status;
+
+   -- Loads and runs a string containing code. Makes an aliased duplicate of
+   -- the string first, so this is more convenient for short snippets of code
+   -- but possibly wastes memory for larger chunks of code.
+   function LoadString_By_Copy (L : in Lua_State;
+                                S : in String;
+                                ChunkName : in String := "";
+                                Mode : Lua_ChunkMode := Binary_and_Text)
+                                return Thread_Status;
 
    -- Loads and runs a file of a given Name. The Mode parameter allows
    -- specification of whether the file can be in Binary, Text or either format.

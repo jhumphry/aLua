@@ -24,6 +24,17 @@ package body Lua is
    -- *** Types only used internally
    --
 
+   type String_Access_Constant is not null access constant String;
+
+   -- Used by String_Lua_Reader to read strings
+   type String_Details is
+      record
+         S : String_Access_Constant;
+         Readable : Boolean := False;
+      end record;
+
+   type String_Details_Access is access String_Details;
+
    --
    -- *** Conversions between Ada enumerations and C integer constants
    --
@@ -68,6 +79,14 @@ package body Lua is
     function Address_To_Stream_Access is new
      Ada.Unchecked_Conversion(Source => System.Address,
                               Target => Ada.Streams.Stream_IO.Stream_Access);
+
+   function Address_To_String_Details_Access is new
+     Ada.Unchecked_Conversion(Source => System.Address,
+                              Target => String_Details_Access);
+
+   function String_Access_To_Chars_Ptr is new
+     Ada.Unchecked_Conversion(Source => String_Access_Constant,
+                              Target => C.Strings.chars_ptr);
 
    --
    -- *** Conversions between a C void * and a Stream_Element_Array
@@ -185,17 +204,63 @@ package body Lua is
       end if;
    end DumpStream;
 
-   function LoadString (L : in Lua_State;
-                        S : in String)
-                        return Thread_Status is
-      CS : C.Strings.chars_ptr;
-      Result : C.int;
+   function String_Lua_Reader (L : void_ptr;
+                               data : void_ptr;
+                               size : access C.size_t)
+                               return C.Strings.chars_ptr
+     with Convention => C;
+
+   function String_Lua_Reader (L : void_ptr;
+                               data : void_ptr;
+                               size : access C.size_t)
+                               return C.Strings.chars_ptr is
+      pragma Unreferenced (L);
+      SDA : constant String_Details_Access := Address_To_String_Details_Access(data);
    begin
-      CS := C.Strings.New_String(S);
-      Result := AuxInternal.luaL_loadstring(L.L, CS);
-      C.Strings.Free(CS);
+      if SDA.Readable then
+         SDA.Readable := False;
+         size.all := C.size_t(SDA.S.all'Length * String'Component_Size / 8);
+         return String_Access_To_Chars_Ptr(SDA.S);
+      else
+         size.all := 0;
+         return C.Strings.Null_Ptr;
+      end if;
+   end String_Lua_Reader;
+
+   function LoadString (L : in Lua_State;
+                        S : aliased String;
+                        ChunkName : in String := "";
+                        Mode : Lua_ChunkMode := Binary_and_Text)
+                        return Thread_Status is
+      Result : C.int;
+      C_ChunkName : C.Strings.chars_ptr := C.Strings.New_String(ChunkName);
+      C_Mode : C.Strings.chars_ptr
+        := C.Strings.New_String(case Mode is
+                                   when Binary => "b",
+                                   when Text => "t",
+                                   when Binary_and_Text => "bt"
+                               );
+      To_Load : aliased String_Details := (S => S'Access, Readable => True);
+   begin
+      Result := Internal.lua_load(L.L,
+                                  String_Lua_Reader'Access,
+                                  To_Load'Address,
+                                  C_ChunkName,
+                                  C_Mode);
+      C.Strings.Free(C_ChunkName);
+      C.Strings.Free(C_Mode);
       return Int_To_Thread_Status(Result);
    end LoadString;
+
+   function LoadString_By_Copy (L : in Lua_State;
+                                S : in String;
+                                ChunkName : in String := "";
+                                Mode : Lua_ChunkMode := Binary_and_Text)
+                                return Thread_Status is
+      String_Copy : aliased constant String := S;
+   begin
+      return LoadString(L, String_Copy, ChunkName, Mode);
+   end;
 
    function LoadFile (L : in Lua_State;
                       Name : in String;
