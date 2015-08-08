@@ -23,6 +23,7 @@
 -- SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 with Ada.Finalization;
+with Ada.Streams.Stream_IO;
 
 private with System;
 private with Interfaces.C;
@@ -83,6 +84,13 @@ package Lua is
    procedure DumpFile(L : in Lua_State;
                       Name : in String;
                       Strip : in Boolean := False);
+
+   -- Dumps the function at the top of the stack to the stream given as a binary
+   -- chunk. Does not pop the function from the stack. If Strip is set some
+   -- debug information removed from the generated chunk to save space.
+   procedure DumpStream(L : in Lua_State;
+                        Stream : in Ada.Streams.Stream_IO.Stream_Access;
+                        Strip : in Boolean := False);
 
    -- Loads and runs a string containing code. Currently makes a duplicate to
    -- cope with the Ada-C mismatch, so very, very large strings may not work.

@@ -4,7 +4,7 @@
 -- Copyright (c) 2015, James Humphry - see LICENSE.md for terms
 
 with Ada.Unchecked_Conversion, Ada.Unchecked_Deallocation;
-with Ada.Streams, Ada.Streams.Stream_IO;
+with Ada.Streams;
 
 with Interfaces; use Interfaces;
 with Interfaces.C;
@@ -170,6 +170,20 @@ package body Lua is
          raise Lua_Error with "Could not dump Lua chunk to file";
       end if;
    end DumpFile;
+
+   procedure DumpStream(L : in Lua_State;
+                        Stream : in Ada.Streams.Stream_IO.Stream_Access;
+                        Strip : in Boolean := False)  is
+      Result : C.int;
+   begin
+      Result := Internal.lua_dump(L.L,
+                                  Stream_Lua_Writer'Access,
+                                  Stream_Access_To_Address(Stream),
+                                  (if Strip then 1 else 0));
+      if Result /= 0 then
+         raise Lua_Error with "Could not dump Lua chunk to stream";
+      end if;
+   end DumpStream;
 
    function LoadString (L : in Lua_State;
                         S : in String)
