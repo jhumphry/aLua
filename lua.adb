@@ -178,7 +178,7 @@ package body Lua is
       Result : C.int;
    begin
       CS := C.Strings.New_String(S);
-      Result := AuxInternal.luaL_loadstring(L.L, C.Strings.New_String(S));
+      Result := AuxInternal.luaL_loadstring(L.L, CS);
       C.Strings.Free(CS);
       return Int_To_Thread_Status(Result);
    end LoadString;
