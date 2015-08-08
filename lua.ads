@@ -97,16 +97,21 @@ package Lua is
    -- Loads and runs a string containing code. Chunkname gives the name to the
    -- chunk which can be used in error messages. Mode indicates if the file can
    -- be in Binary, Text or either format. The return value indicates whether
-   -- the load was successful.
+   -- the load was successful. Program_Error may be raised if C and Ada
+   -- conventions on this system for strings are too dissimilar to allow for
+   -- loading strings without copying - in this case LoadString_By_Copy can
+   -- be used.
    function LoadString (L : in Lua_State;
                         S : aliased String;
                         ChunkName : in String := "";
                         Mode : Lua_ChunkMode := Binary_and_Text)
                         return Thread_Status;
 
-   -- Loads and runs a string containing code. Makes an aliased duplicate of
-   -- the string first, so this is more convenient for short snippets of code
-   -- but possibly wastes memory for larger chunks of code.
+   -- Loads and runs a string containing code. Makes an aliased duplicate of the
+   -- string first, so this is more convenient for short snippets of code but
+   -- possibly wastes memory for larger chunks of code. If C and Ada conventions
+   -- for strings are different on this system, a conversion will be done rather
+   -- just an aliased duplicate.
    function LoadString_By_Copy (L : in Lua_State;
                                 S : in String;
                                 ChunkName : in String := "";

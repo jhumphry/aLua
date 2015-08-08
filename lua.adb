@@ -242,6 +242,11 @@ package body Lua is
                                );
       To_Load : aliased String_Details := (S => S'Access, Readable => True);
    begin
+      if C.char_array'Component_Size /= String'Component_Size then
+         raise Program_Error with
+           "Ada and C strings are not sufficiently compatible for direct " &
+           "loading - only LoadString_By_Copy can be used on this system.";
+      end if;
       Result := Internal.lua_load(L.L,
                                   String_Lua_Reader'Access,
                                   To_Load'Address,
@@ -257,9 +262,25 @@ package body Lua is
                                 ChunkName : in String := "";
                                 Mode : Lua_ChunkMode := Binary_and_Text)
                                 return Thread_Status is
-      String_Copy : aliased constant String := S;
+
    begin
-      return LoadString(L, String_Copy, ChunkName, Mode);
+      if C.char_array'Component_Size /= String'Component_Size then
+         declare
+            String_Copy : aliased constant String := S;
+         begin
+            return LoadString(L, String_Copy, ChunkName, Mode);
+         end;
+      else
+         declare
+            CS : C.Strings.chars_ptr;
+            Result : C.int;
+         begin
+            CS := C.Strings.New_String(S);
+            Result := AuxInternal.luaL_loadstring(L.L, CS);
+            C.Strings.Free(CS);
+            return Int_To_Thread_Status(Result);
+         end;
+      end if;
    end;
 
    function LoadFile (L : in Lua_State;
