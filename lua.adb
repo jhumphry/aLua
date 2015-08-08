@@ -4,6 +4,7 @@
 -- Copyright (c) 2015, James Humphry - see LICENSE.md for terms
 
 with Ada.Unchecked_Conversion, Ada.Unchecked_Deallocation;
+with System.Address_To_Access_Conversions;
 with Ada.Streams;
 
 with Interfaces; use Interfaces;
@@ -32,8 +33,6 @@ package body Lua is
          S : String_Access_Constant;
          Readable : Boolean := False;
       end record;
-
-   type String_Details_Access is access String_Details;
 
    --
    -- *** Conversions between Ada enumerations and C integer constants
@@ -72,17 +71,11 @@ package body Lua is
      Ada.Unchecked_Conversion(Source => System.Address,
                               Target => AdaFunction);
 
-    function Stream_Access_To_Address is new
-     Ada.Unchecked_Conversion(Source => Ada.Streams.Stream_IO.Stream_Access,
-                              Target => System.Address);
+   package Stream_Access_Conversions is new
+     System.Address_To_Access_Conversions(Ada.Streams.Root_Stream_Type'Class);
 
-    function Address_To_Stream_Access is new
-     Ada.Unchecked_Conversion(Source => System.Address,
-                              Target => Ada.Streams.Stream_IO.Stream_Access);
-
-   function Address_To_String_Details_Access is new
-     Ada.Unchecked_Conversion(Source => System.Address,
-                              Target => String_Details_Access);
+   package String_Details_Access_Conversions is new
+     System.Address_To_Access_Conversions(String_Details);
 
    function String_Access_To_Chars_Ptr is new
      Ada.Unchecked_Conversion(Source => String_Access_Constant,
@@ -98,9 +91,8 @@ package body Lua is
                             Element_Array => Ada.Streams.Stream_Element_Array,
                             Default_Terminator => 0);
 
-   function Address_To_Stream_Element_Access is new
-     Ada.Unchecked_Conversion(Source => System.Address,
-                              Target => Void_Ptr_To_Stream_Array.Pointer);
+   package Stream_Element_Access_Conversions is new
+     System.Address_To_Access_Conversions(Ada.Streams.Stream_Element);
 
    --
    -- *** Special stack positions and the registry
@@ -138,10 +130,15 @@ package body Lua is
       use Ada.Streams.Stream_IO;
 
       Output_Stream_Access : constant Stream_Access
-        := Address_To_Stream_Access(ud);
+        := Stream_Access(Stream_Access_Conversions.To_Pointer(ud));
 
+      -- First we need to convert the address of the data to dump to an access
+      -- value using System.Address_To_Access_Conversions, then we need to
+      -- convert this to the equivalent access value in Interfaces.C.Pointers.
+      -- Once we know the length of the array, we can then convert it back to a
+      -- true Ada array.
       Output_Data_Access : constant Void_Ptr_To_Stream_Array.Pointer
-        := Address_To_Stream_Element_Access(p);
+        := Void_Ptr_To_Stream_Array.Pointer(Stream_Element_Access_Conversions.To_Pointer(p));
 
       -- This calculation is intended to deal with (most) cases in which
       -- Stream_Element is not a single byte. Why anyone would do that I
@@ -174,15 +171,15 @@ package body Lua is
       use Ada.Streams.Stream_IO;
 
       Output_File : File_Type;
-      Output_Stream_Access : Stream_Access;
+      Output_Stream_Pointer : Stream_Access_Conversions.Object_Pointer;
       Result : C.int;
 
    begin
       Create(File => Output_File, Mode => Out_File, Name => Name);
-      Output_Stream_Access := Stream(Output_File);
+      Output_Stream_Pointer := Stream_Access_Conversions.Object_Pointer(Stream(Output_File));
       Result := Internal.lua_dump(L.L,
                                   Stream_Lua_Writer'Access,
-                                  Stream_Access_To_Address(Output_Stream_Access),
+                                  Stream_Access_Conversions.To_Address(Output_Stream_Pointer),
                                   (if Strip then 1 else 0));
       Close(Output_File);
       if Result /= 0 then
@@ -194,10 +191,12 @@ package body Lua is
                         Stream : in Ada.Streams.Stream_IO.Stream_Access;
                         Strip : in Boolean := False)  is
       Result : C.int;
+      Stream_Pointer : constant Stream_Access_Conversions.Object_Pointer
+        := Stream_Access_Conversions.Object_Pointer(Stream);
    begin
       Result := Internal.lua_dump(L.L,
                                   Stream_Lua_Writer'Access,
-                                  Stream_Access_To_Address(Stream),
+                                  Stream_Access_Conversions.To_Address(Stream_Pointer),
                                   (if Strip then 1 else 0));
       if Result /= 0 then
          raise Lua_Error with "Could not dump Lua chunk to stream";
@@ -215,7 +214,8 @@ package body Lua is
                                size : access C.size_t)
                                return C.Strings.chars_ptr is
       pragma Unreferenced (L);
-      SDA : constant String_Details_Access := Address_To_String_Details_Access(data);
+      SDA : constant access String_Details
+        := String_Details_Access_Conversions.To_Pointer(data);
    begin
       if SDA.Readable then
          SDA.Readable := False;
