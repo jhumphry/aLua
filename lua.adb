@@ -786,6 +786,9 @@ package body Lua is
       C.Strings.Value(Internal.lua_typename(L.L, C.int(Lua_Type_To_Int(tp))))
      );
 
+   function TypeName (L : in Lua_State; index : in Integer) return String is
+     (TypeName(L, TypeInfo(L, index)));
+
    function Userdata_Name (L : in Lua_State; index : in Integer) return String is
       Has_Metatable : Boolean;
       Name_Field_Type : Lua_Type;

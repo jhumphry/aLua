@@ -411,24 +411,80 @@ package Lua is
    -- ** Type information
    -- *
 
-   function IsAdaFunction (L : in Lua_State; index : in Integer) return Boolean;
-   function IsBoolean (L : in Lua_State; index : in Integer) return Boolean;
-   function IsCFunction (L : in Lua_State; index : in Integer) return Boolean;
-   function IsFunction (L : in Lua_State; index : in Integer) return Boolean;
-   function IsInteger (L : in Lua_State; index : in Integer) return Boolean;
-   function IsLightuserdata (L : in Lua_State; index : in Integer) return Boolean;
-   function IsNil (L : in Lua_State; index : in Integer) return Boolean;
-   function IsNone (L : in Lua_State; index : in Integer) return Boolean;
-   function IsNoneOrNil (L : in Lua_State; index : in Integer) return Boolean;
-   function IsNumber (L : in Lua_State; index : in Integer) return Boolean;
-   function IsString (L : in Lua_State; index : in Integer) return Boolean;
-   function IsTable (L : in Lua_State; index : in Integer) return Boolean;
-   function IsThread (L : in Lua_State; index : in Integer) return Boolean;
-   function IsUserdata (L : in Lua_State; index : in Integer) return Boolean;
-   function TypeInfo (L : in Lua_State; index : in Integer) return Lua_Type;
-   function TypeName (L : in Lua_State; tp : in Lua_Type) return String;
-   function TypeName (L : in Lua_State; index : in Integer) return String is
-     (TypeName(L, TypeInfo(L, index)));
+   -- Indicate whether the value at the given index is an AdaFunction.
+   function IsAdaFunction (L : in Lua_State; index : in Integer)
+                           return Boolean with Inline;
+
+   -- Indicate whether the value at the given index is a Boolean.
+   function IsBoolean (L : in Lua_State; index : in Integer)
+                       return Boolean with Inline;
+
+   -- Indicate whether the value at the given index is a CFunction.
+   function IsCFunction (L : in Lua_State; index : in Integer)
+                         return Boolean with Inline;
+
+   -- Indicate whether the value at the given index is a function of any sort
+   -- (Lua, C or Ada).
+   function IsFunction (L : in Lua_State; index : in Integer)
+                        return Boolean with Inline;
+
+   -- Indicate whether the value at the given index is a number that can be
+   -- represented as an Integer.
+   function IsInteger (L : in Lua_State; index : in Integer)
+                       return Boolean with Inline;
+
+   -- Indicate whether the value at the given index is a Light Userdata.
+   function IsLightuserdata (L : in Lua_State; index : in Integer)
+                             return Boolean with Inline;
+
+   -- Indicate whether the value at the given index is Nil.
+   function IsNil (L : in Lua_State; index : in Integer)
+                   return Boolean with Inline;
+
+   -- Indicate whether the value at the given index is None.
+   function IsNone (L : in Lua_State; index : in Integer)
+                    return Boolean with Inline;
+
+   -- Indicate whether the value at the given index is None or Nil.
+   function IsNoneOrNil (L : in Lua_State; index : in Integer)
+                         return Boolean with Inline;
+
+   -- Indicate whether the value at the given index is a Number or a String
+   -- convertible to a Number.
+   function IsNumber (L : in Lua_State; index : in Integer)
+                      return Boolean with Inline;
+
+   -- Indicate whether the value at the given index is a String or a Number (as
+   -- all Numebers are convertible to Strings).
+   function IsString (L : in Lua_State; index : in Integer)
+                      return Boolean with Inline;
+
+   -- Indicate whether the value at the given index is a Table.
+   function IsTable (L : in Lua_State; index : in Integer)
+                     return Boolean with Inline;
+
+   -- Indicate whether the value at the given index is a Thread.
+   function IsThread (L : in Lua_State; index : in Integer)
+                      return Boolean with Inline;
+
+   -- Indicate whether the value at the given index is a Userdata.
+   function IsUserdata (L : in Lua_State; index : in Integer)
+                        return Boolean with Inline;
+
+   -- Return the Lua_Type of the value at the given index.
+   function TypeInfo (L : in Lua_State; index : in Integer)
+                      return Lua_Type with Inline;
+
+   -- Return the name of the given Lua_Type  .
+   function TypeName (L : in Lua_State; tp : in Lua_Type)
+                      return String with Inline;
+
+   -- Return the name of the type of the value at the given index.
+   function TypeName (L : in Lua_State; index : in Integer)
+                      return String with Inline;
+
+   -- Return the name of the tagged type from which the Ada Userdata at the
+   -- given index was created, or "" if it is not an Ada Userdata.
    function Userdata_Name (L : in Lua_State; index : in Integer) return String;
 
    -- *
