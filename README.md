@@ -64,10 +64,11 @@ problems for continued execution.
 
 ### Loading and saving Lua code
 
-The routines `DumpFile`, `LoadFile` and `LoadString` can be used to
-save Lua code in pre-compiled as pre-compiled binary chunks and to load
-Lua code as either text or binary format. Note that the format for
-pre-compiled chunks may change between Lua versions.
+The routines `DumpFile`, `DumpStream`, `LoadFile`, `LoadStream`,
+`LoadString` and `LoadString_By_Copy` can be used to save Lua code as
+pre-compiled binary chunks and to load Lua code in either text or
+binary format. Note that the format for pre-compiled binary chunks may
+change between Lua versions and compatibility is not guaranteed.
 
 The `LoadString` routine relies on some consistency in the way strings
 are stored in Ada and C, so that a second C-style version of the string
