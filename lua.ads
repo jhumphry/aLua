@@ -89,7 +89,7 @@ package Lua is
    -- chunk. Does not pop the function from the stack. If Strip is set some
    -- debug information removed from the generated chunk to save space.
    procedure DumpStream(L : in Lua_State;
-                        Stream : in Ada.Streams.Stream_IO.Stream_Access;
+                        Output_Stream : in Ada.Streams.Stream_IO.Stream_Access;
                         Strip : in Boolean := False);
 
    type Lua_ChunkMode is (Binary, Text, Binary_and_Text);
