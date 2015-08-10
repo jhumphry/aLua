@@ -185,24 +185,15 @@ package body Lua is
    procedure DumpFile(L : in Lua_State;
                       Name : in String;
                       Strip : in Boolean := False) is
-      package SAC renames Stream_Access_Conversions;
       use Ada.Streams.Stream_IO;
 
       Output_File : File_Type;
-      Output_Stream_Pointer : SAC.Object_Pointer;
-      Result : C.int;
-
    begin
       Create(File => Output_File, Mode => Out_File, Name => Name);
-      Output_Stream_Pointer := SAC.Object_Pointer(Stream(Output_File));
-      Result := Internal.lua_dump(L.L,
-                                  Stream_Lua_Writer'Access,
-                                  SAC.To_Address(Output_Stream_Pointer),
-                                  (if Strip then 1 else 0));
+      DumpStream(L => L,
+                 Output_Stream => Stream(Output_File),
+                 Strip => Strip);
       Close(Output_File);
-      if Result /= 0 then
-         raise Lua_Error with "Could not dump Lua chunk to file";
-      end if;
    end DumpFile;
 
    procedure DumpStream(L : in Lua_State;
@@ -343,32 +334,22 @@ package body Lua is
                       Mode : in Lua_ChunkMode := Binary_and_Text;
                       Buffer_Size : in Positive := 256)
                       return Thread_Status is
-      use Ada.Streams, Ada.Streams.Stream_IO;
+      use Ada.Streams.Stream_IO;
 
-      C_ChunkName : C.Strings.chars_ptr := C.Strings.New_String(ChunkName);
-      C_Mode : C.Strings.chars_ptr
-        := C.Strings.New_String(case Mode is
-                                   when Binary => "b",
-                                   when Text => "t",
-                                   when Binary_and_Text => "bt"
-                               );
       Input_File : File_Type;
-      Stream_Detail : aliased Stream_Details(Stream_Element_Count(Buffer_Size));
-      Result : C.int;
+      Result : Thread_Status;
 
    begin
       Open(File => Input_File,
            Mode => In_File,
            Name => Name);
-      Stream_Detail.S := Stream(Input_File);
-      Result := Internal.lua_load(L.L,
-                                  Stream_Lua_Reader'Access,
-                                  Stream_Detail'Address,
-                                  C_ChunkName,
-                                  C_Mode);
-      C.Strings.Free(C_ChunkName);
-      C.Strings.Free(C_Mode);
-      return Int_To_Thread_Status(Result);
+      Result := LoadStream(L => L,
+                           Input_Stream => Stream(Input_File),
+                           ChunkName => ChunkName,
+                           Mode => Mode,
+                           Buffer_Size => Buffer_Size);
+      Close(Input_File);
+      return Result;
    end LoadFile;
 
    function LoadStream (L : in Lua_State;
