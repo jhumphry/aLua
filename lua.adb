@@ -34,6 +34,15 @@ package body Lua is
          Readable : Boolean := False;
       end record;
 
+   type Stream_Details(Buffer_Size : Ada.Streams.Stream_Element_Count) is
+      record
+         S : access Ada.Streams.Root_Stream_Type'Class;
+         Buffer : aliased Ada.Streams.Stream_Element_Array(1..Buffer_Size)
+           with Convention => C;
+      end record;
+
+   type Stream_Element_Access is not null access all Ada.Streams.Stream_Element;
+
    --
    -- *** Conversions between Ada enumerations and C integer constants
    --
@@ -79,6 +88,13 @@ package body Lua is
 
    function String_Access_To_Chars_Ptr is new
      Ada.Unchecked_Conversion(Source => String_Access_Constant,
+                              Target => C.Strings.chars_ptr);
+
+   package Stream_Details_Access_Conversions is new
+     System.Address_To_Access_Conversions(Stream_Details);
+
+   function Stream_Element_Access_To_Chars_Ptr is new
+     Ada.Unchecked_Conversion(Source => Stream_Element_Access,
                               Target => C.Strings.chars_ptr);
 
    --
@@ -286,24 +302,104 @@ package body Lua is
       end if;
    end;
 
+   function Stream_Lua_Reader (L : void_ptr;
+                               data : void_ptr;
+                               size : access C.size_t)
+                               return C.Strings.chars_ptr
+     with Convention => C;
+
+   function Stream_Lua_Reader (L : void_ptr;
+                               data : void_ptr;
+                               size : access C.size_t)
+                               return C.Strings.chars_ptr is
+      pragma Unreferenced (L);
+
+      use Ada.Streams;
+      use Ada.Streams.Stream_IO;
+
+      Stream_Detail : access Stream_Details
+        := Stream_Details_Access_Conversions.To_Pointer(data);
+
+      Buffer_Ptr :constant C.Strings.chars_ptr
+        := Stream_Element_Access_To_Chars_Ptr(Stream_Detail.Buffer(1)'Access);
+
+      Last_Read : Stream_Element_Offset;
+   begin
+      Read(Stream => Stream_Detail.S.all,
+           Item => Stream_Detail.Buffer,
+           Last => Last_Read);
+      if Last_Read /= 0 then
+         size.all := C.size_t(Last_Read * Stream_Element'Size / 8);
+         return Buffer_Ptr;
+      else
+         size.all := 0;
+         return C.Strings.Null_Ptr;
+      end if;
+   end Stream_Lua_Reader;
+
    function LoadFile (L : in Lua_State;
                       Name : in String;
-                      Mode : in Lua_ChunkMode := Binary_and_Text)
+                      ChunkName : in String := "";
+                      Mode : in Lua_ChunkMode := Binary_and_Text;
+                      Buffer_Size : in Positive := 256)
                       return Thread_Status is
-      C_Name : C.Strings.chars_ptr := C.Strings.New_String(Name);
+      use Ada.Streams, Ada.Streams.Stream_IO;
+
+      C_ChunkName : C.Strings.chars_ptr := C.Strings.New_String(ChunkName);
       C_Mode : C.Strings.chars_ptr
         := C.Strings.New_String(case Mode is
                                    when Binary => "b",
                                    when Text => "t",
                                    when Binary_and_Text => "bt"
                                );
+      Input_File : File_Type;
+      Stream_Detail : aliased Stream_Details(Stream_Element_Count(Buffer_Size));
       Result : C.int;
+
    begin
-      Result := AuxInternal.luaL_loadfilex(L.L, C_Name, C_Mode);
-      C.Strings.Free(C_Name);
+      Open(File => Input_File,
+           Mode => In_File,
+           Name => Name);
+      Stream_Detail.S := Stream(Input_File);
+      Result := Internal.lua_load(L.L,
+                                  Stream_Lua_Reader'Access,
+                                  Stream_Detail'Address,
+                                  C_ChunkName,
+                                  C_Mode);
+      C.Strings.Free(C_ChunkName);
       C.Strings.Free(C_Mode);
       return Int_To_Thread_Status(Result);
    end LoadFile;
+
+   function LoadStream (L : in Lua_State;
+                        Input_Stream : in Ada.Streams.Stream_IO.Stream_Access;
+                        ChunkName : in String := "";
+                        Mode : in Lua_ChunkMode := Binary_and_Text;
+                        Buffer_Size : in Positive := 256)
+                        return Thread_Status is
+      use Ada.Streams, Ada.Streams.Stream_IO;
+
+      C_ChunkName : C.Strings.chars_ptr := C.Strings.New_String(ChunkName);
+      C_Mode : C.Strings.chars_ptr
+        := C.Strings.New_String(case Mode is
+                                   when Binary => "b",
+                                   when Text => "t",
+                                   when Binary_and_Text => "bt"
+                               );
+      Stream_Detail : aliased Stream_Details(Stream_Element_Count(Buffer_Size));
+      Result : C.int;
+
+   begin
+      Stream_Detail.S := Input_Stream;
+      Result := Internal.lua_load(L.L,
+                                  Stream_Lua_Reader'Access,
+                                  Stream_Detail'Address,
+                                  C_ChunkName,
+                                  C_Mode);
+      C.Strings.Free(C_ChunkName);
+      C.Strings.Free(C_Mode);
+      return Int_To_Thread_Status(Result);
+   end LoadStream;
 
    function Status (L : Lua_State) return Thread_Status is
       (Int_To_Thread_Status(Internal.lua_status(L.L)));

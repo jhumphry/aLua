@@ -118,12 +118,27 @@ package Lua is
                                 Mode : Lua_ChunkMode := Binary_and_Text)
                                 return Thread_Status;
 
-   -- Loads and runs a file of a given Name. The Mode parameter allows
+   -- Loads and runs a file of a given Name. Chunkname gives the name to the
+   -- chunk which can be used in error messages. The Mode parameter allows
    -- specification of whether the file can be in Binary, Text or either format.
+   -- Buffer_Size specifies the size of the temporary buffer used.
    function LoadFile (L : in Lua_State;
                       Name : in String;
-                      Mode : in Lua_ChunkMode := Binary_and_Text)
+                      ChunkName : in String := "";
+                      Mode : in Lua_ChunkMode := Binary_and_Text;
+                      Buffer_Size : in Positive := 256)
                       return Thread_Status;
+
+   -- Loads and runs a file from a given Input_Stream. Chunkname gives the
+   -- name to the chunk which can be used in error messages. The Mode parameter
+   -- allows specification of whether the file can be in Binary, Text or either
+   -- format. Buffer_Size specifies the size of the temporary buffer used.
+   function LoadStream (L : in Lua_State;
+                        Input_Stream : in Ada.Streams.Stream_IO.Stream_Access;
+                        ChunkName : in String := "";
+                        Mode : in Lua_ChunkMode := Binary_and_Text;
+                        Buffer_Size : in Positive := 256)
+                        return Thread_Status;
 
    -- Status returns the status of a particular interpreter state or thread
    -- using a custom enumeration type.
