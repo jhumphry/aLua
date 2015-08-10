@@ -113,9 +113,7 @@ package Lua is
    -- for strings are different on this system, a conversion will be done rather
    -- just an aliased duplicate.
    function LoadString_By_Copy (L : in Lua_State;
-                                S : in String;
-                                ChunkName : in String := "";
-                                Mode : Lua_ChunkMode := Binary_and_Text)
+                                S : in String)
                                 return Thread_Status;
 
    -- Loads and runs a file of a given Name. Chunkname gives the name to the

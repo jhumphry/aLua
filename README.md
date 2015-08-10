@@ -69,6 +69,12 @@ save Lua code in pre-compiled as pre-compiled binary chunks and to load
 Lua code as either text or binary format. Note that the format for
 pre-compiled chunks may change between Lua versions.
 
+The `LoadString` routine relies on some consistency in the way strings
+are stored in Ada and C, so that a second C-style version of the string
+does not have to be created to be fed to the Lua interpreter. If this
+is not possible, the `LoadString_By_Copy` routine should still work, as
+this always does a conversion.
+
 The semantics for loading text files can cause confusion. Consider the
 following file:
 

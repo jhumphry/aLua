@@ -268,29 +268,15 @@ package body Lua is
    end LoadString;
 
    function LoadString_By_Copy (L : in Lua_State;
-                                S : in String;
-                                ChunkName : in String := "";
-                                Mode : Lua_ChunkMode := Binary_and_Text)
+                                S : in String)
                                 return Thread_Status is
-
+      CS : C.Strings.chars_ptr;
+      Result : C.int;
    begin
-      if C.char_array'Component_Size /= String'Component_Size then
-         declare
-            String_Copy : aliased constant String := S with Convention => C;
-         begin
-            return LoadString(L, String_Copy, ChunkName, Mode);
-         end;
-      else
-         declare
-            CS : C.Strings.chars_ptr;
-            Result : C.int;
-         begin
-            CS := C.Strings.New_String(S);
-            Result := AuxInternal.luaL_loadstring(L.L, CS);
-            C.Strings.Free(CS);
-            return Int_To_Thread_Status(Result);
-         end;
-      end if;
+      CS := C.Strings.New_String(S);
+      Result := AuxInternal.luaL_loadstring(L.L, CS);
+      C.Strings.Free(CS);
+      return Int_To_Thread_Status(Result);
    end;
 
    function Stream_Lua_Reader (L : void_ptr;
