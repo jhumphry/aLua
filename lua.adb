@@ -266,7 +266,7 @@ package body Lua is
    begin
       if C.char_array'Component_Size /= String'Component_Size then
          declare
-            String_Copy : aliased constant String := S;
+            String_Copy : aliased constant String := S with Convention => C;
          begin
             return LoadString(L, String_Copy, ChunkName, Mode);
          end;
