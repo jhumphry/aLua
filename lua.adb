@@ -123,22 +123,24 @@ package body Lua is
                                sz : C.size_t;
                                ud : void_ptr)
                                return C.int  is
-
       pragma Unreferenced (L);
 
+      package SAC renames Stream_Access_Conversions;
+      package SEAC renames Stream_Element_Access_Conversions;
+      package VPTSA renames Void_Ptr_To_Stream_Array;
       use Ada.Streams;
       use Ada.Streams.Stream_IO;
 
       Output_Stream_Access : constant Stream_Access
-        := Stream_Access(Stream_Access_Conversions.To_Pointer(ud));
+        := Stream_Access(SAC.To_Pointer(ud));
 
       -- First we need to convert the address of the data to dump to an access
       -- value using System.Address_To_Access_Conversions, then we need to
       -- convert this to the equivalent access value in Interfaces.C.Pointers.
       -- Once we know the length of the array, we can then convert it back to a
       -- true Ada array.
-      Output_Data_Access : constant Void_Ptr_To_Stream_Array.Pointer
-        := Void_Ptr_To_Stream_Array.Pointer(Stream_Element_Access_Conversions.To_Pointer(p));
+      Output_Data_Access : constant VPTSA.Pointer
+        := VPTSA.Pointer(SEAC.To_Pointer(p));
 
       -- This calculation is intended to deal with (most) cases in which
       -- Stream_Element is not a single byte. Why anyone would do that I
@@ -150,8 +152,8 @@ package body Lua is
         := (C.ptrdiff_t(sz) * 8) / Stream_Element'Size;
 
       Output_Data : constant Stream_Element_Array
-        := Void_Ptr_To_Stream_Array.Value(Ref => Output_Data_Access,
-                                          Length => Output_Data_Length);
+        := VPTSA.Value(Ref => Output_Data_Access,
+                       Length => Output_Data_Length);
 
    begin
       Output_Stream_Access.Write(Item => Output_Data);
@@ -167,19 +169,19 @@ package body Lua is
    procedure DumpFile(L : in Lua_State;
                       Name : in String;
                       Strip : in Boolean := False) is
-
+      package SAC renames Stream_Access_Conversions;
       use Ada.Streams.Stream_IO;
 
       Output_File : File_Type;
-      Output_Stream_Pointer : Stream_Access_Conversions.Object_Pointer;
+      Output_Stream_Pointer : SAC.Object_Pointer;
       Result : C.int;
 
    begin
       Create(File => Output_File, Mode => Out_File, Name => Name);
-      Output_Stream_Pointer := Stream_Access_Conversions.Object_Pointer(Stream(Output_File));
+      Output_Stream_Pointer := SAC.Object_Pointer(Stream(Output_File));
       Result := Internal.lua_dump(L.L,
                                   Stream_Lua_Writer'Access,
-                                  Stream_Access_Conversions.To_Address(Output_Stream_Pointer),
+                                  SAC.To_Address(Output_Stream_Pointer),
                                   (if Strip then 1 else 0));
       Close(Output_File);
       if Result /= 0 then
@@ -188,15 +190,16 @@ package body Lua is
    end DumpFile;
 
    procedure DumpStream(L : in Lua_State;
-                        Stream : in Ada.Streams.Stream_IO.Stream_Access;
+                        Output_Stream : in Ada.Streams.Stream_IO.Stream_Access;
                         Strip : in Boolean := False)  is
+      package SAC renames Stream_Access_Conversions;
       Result : C.int;
-      Stream_Pointer : constant Stream_Access_Conversions.Object_Pointer
-        := Stream_Access_Conversions.Object_Pointer(Stream);
+      Stream_Pointer : constant SAC.Object_Pointer
+        := SAC.Object_Pointer(Output_Stream);
    begin
       Result := Internal.lua_dump(L.L,
                                   Stream_Lua_Writer'Access,
-                                  Stream_Access_Conversions.To_Address(Stream_Pointer),
+                                  SAC.To_Address(Stream_Pointer),
                                   (if Strip then 1 else 0));
       if Result /= 0 then
          raise Lua_Error with "Could not dump Lua chunk to stream";
