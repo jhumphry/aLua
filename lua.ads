@@ -706,13 +706,6 @@ private
      := (Ada.Finalization.Limited_Controlled with L => System.Null_Address);
 
    -- *
-   -- ** Trampolines
-   -- *
-
-   function CFunction_Trampoline (L : System.Address) return Interfaces.C.int
-     with Convention => C;
-
-   -- *
    -- ** References
    -- *
 

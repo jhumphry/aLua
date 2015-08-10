@@ -22,6 +22,31 @@ with Lua.Internal, Lua.AuxInternal;
 package body Lua is
 
    --
+   -- *** Routines only used internally
+   --
+
+   function Stream_Lua_Writer (L : void_ptr;
+                               p : void_ptr;
+                               sz : C.size_t;
+                               ud : void_ptr)
+                               return C.int with Convention => C;
+
+   function String_Lua_Reader (L : void_ptr;
+                               data : void_ptr;
+                               size : access C.size_t)
+                               return C.Strings.chars_ptr
+     with Convention => C;
+
+   function Stream_Lua_Reader (L : void_ptr;
+                               data : void_ptr;
+                               size : access C.size_t)
+                               return C.Strings.chars_ptr
+     with Convention => C;
+
+   function CFunction_Trampoline (L : System.Address) return Interfaces.C.int
+     with Convention => C;
+
+   --
    -- *** Types only used internally
    --
 
@@ -132,12 +157,6 @@ package body Lua is
                                p : void_ptr;
                                sz : C.size_t;
                                ud : void_ptr)
-                               return C.int with Convention => C;
-
-   function Stream_Lua_Writer (L : void_ptr;
-                               p : void_ptr;
-                               sz : C.size_t;
-                               ud : void_ptr)
                                return C.int  is
       pragma Unreferenced (L);
 
@@ -216,12 +235,6 @@ package body Lua is
    function String_Lua_Reader (L : void_ptr;
                                data : void_ptr;
                                size : access C.size_t)
-                               return C.Strings.chars_ptr
-     with Convention => C;
-
-   function String_Lua_Reader (L : void_ptr;
-                               data : void_ptr;
-                               size : access C.size_t)
                                return C.Strings.chars_ptr is
       pragma Unreferenced (L);
       SDA : constant access String_Details
@@ -278,12 +291,6 @@ package body Lua is
       C.Strings.Free(CS);
       return Int_To_Thread_Status(Result);
    end;
-
-   function Stream_Lua_Reader (L : void_ptr;
-                               data : void_ptr;
-                               size : access C.size_t)
-                               return C.Strings.chars_ptr
-     with Convention => C;
 
    function Stream_Lua_Reader (L : void_ptr;
                                data : void_ptr;
@@ -722,18 +729,12 @@ package body Lua is
    --
 
    function IsAdaFunction (L : in Lua_State; index : in Integer) return Boolean is
+      use Lua.Internal;
    begin
-      if IsCFunction(L, index) then
-         if Internal.lua_getupvalue(L.L, C.int(index),1) /= C.Strings.Null_Ptr then
-            Internal.lua_settop(L.L, -2);
-            return True;
-         else
-            Internal.lua_settop(L.L, -2);
-            return False;
-         end if;
-      else
-         return False;
-      end if;
+      return lua_tocfunction(L.L, C.int(index)) = CFunction_Trampoline'Access;
+        -- As CFunction_Trampoline is not visible outside this body, and this
+        -- package will always create closure correctly, it is not necessary
+        -- to check that the required upvalue exists.
    end IsAdaFunction;
 
    function IsBoolean (L : in Lua_State; index : in Integer) return Boolean is
