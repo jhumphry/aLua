@@ -18,7 +18,7 @@ procedure Userdata_Example is
    Counter : Integer;
    Discard :Thread_Status;
 
-   Example_Object : aliased Parent := (Flag => True);
+   Parent_Object : aliased Parent := (Flag => True);
    Child_Object : aliased Child := (Counter => 3, Flag => False);
 
 begin
@@ -38,58 +38,60 @@ begin
    -- Register the "toggle" and "increment" operations in the metatables.
    Register_Operations(L);
 
-   Put_Line("Pushing an 'Parent' value (Flag => True) to the stack as an Grandparent'Class userdata.");
-   Grandparent_Userdata.Push_Class(L, Example_Object'Unchecked_Access);
-   Put_Line("Saving a copy of the userdata in global variable 'foo'");
+   Put_Line("Pushing an 'Parent' value (Flag => True) to the stack as a Grandparent'Class userdata.");
+   Grandparent_Userdata.Push_Class(L, Parent_Object'Unchecked_Access);
+   Put_Line("Saving a copy of the userdata in global variable 'parent_foo'");
    L.PushValue(-1);
-   L.SetGlobal("foo");
+   L.SetGlobal("parent_foo");
    Print_Stack(L);
    Put_Line("Retrieving the value of 'Flag' from the value at the top of the stack.");
    Result := Grandparent_Userdata.ToUserdata(L, -1).Flag;
-   Put_Line((if Result then "Foo.Flag is now true"
-            else "Foo.Flag is now false"));
+   Put_Line((if Result then "parent_foo.Flag is now true"
+            else "parent_foo.Flag is now false"));
    New_Line;
 
-   Put_Line("Pushing an 'Child' value (Counter => 3, Flag => False) to the stack as an Child userdata.");
+   Put_Line("Pushing an 'Child' value (Counter => 3, Flag => False) to the stack as a Child userdata.");
    Child_Userdata.Push(L, Child_Object'Unchecked_Access);
    Print_Stack(L);
-   Put_Line("Saving the userdata at the top of the stack in global variable 'bar'");
-   L.SetGlobal("bar");
+   Put_Line("Saving the userdata at the top of the stack in global variable 'child_bar'");
+   L.SetGlobal("child_bar");
    New_Line;
 
    Put_Line("Clearing the stack");
    L.SetTop(0);
    New_Line;
 
-   Put_Line("Calling 'foo:toggle()' in Lua");
-   Discard := L.LoadString_By_Copy("foo:toggle()");
+   Put_Line("Calling 'parent_foo:toggle()' in Lua");
+   Discard := L.LoadString_By_Copy("parent_foo:toggle()");
    L.Call(nargs => 0, nresults => 0);
    New_Line;
-   Put_Line("Calling 'bar:toggle()' in Lua");
-   Discard := L.LoadString_By_Copy("bar:toggle()");
+   Put_Line("Calling 'child_bar:toggle()' in Lua");
+   Discard := L.LoadString_By_Copy("child_bar:toggle()");
    L.Call(nargs => 0, nresults => 0);
    New_Line;
-   Put_Line("Calling 'bar:increment()' in Lua");
-   Discard := L.LoadString_By_Copy("bar:increment()");
+   Put_Line("Calling 'child_bar:increment()' in Lua");
+   Discard := L.LoadString_By_Copy("child_bar:increment()");
    L.Call(nargs => 0, nresults => 0);
    New_Line;
 
    New_Line;
 
-   Put_Line("Retrieving the value of 'Flag' from foo and bar, treating them as Grandparent values.");
-   L.GetGlobal("foo");
+   Put_Line("Retrieving the value of 'Flag' from parent_foo and child_bar, " &
+              "treating them as Grandparent values.");
+   L.GetGlobal("parent_foo");
    Result := Grandparent_Userdata.ToUserdata(L, -1).Flag;
-   Put_Line((if Result then "foo.Flag is now true"
-            else "foo.Flag is now false"));
+   Put_Line((if Result then "parent_foo.Flag is now true"
+            else "parent_foo.Flag is now false"));
    L.SetTop(0);
-   L.GetGlobal("bar");
+   L.GetGlobal("child_bar");
    Result := Grandparent_Userdata.ToUserdata(L, -1).Flag;
-   Put_Line((if Result then "bar.Flag is now true"
-            else "bar.Flag is now false"));
+   Put_Line((if Result then "child_bar.Flag is now true"
+            else "child_bar.Flag is now false"));
 
-   Put_Line("Retrieving the value of 'Counter' from bar, treating it as an Child value.");
+   Put_Line("Retrieving the value of 'Counter' from child_bar, " &
+              "treating it as a Child value.");
    Counter := Child_Userdata.ToUserdata(L, -1).Counter;
-   Put_Line("bar.Counter = " & Integer'Image(Counter));
+   Put_Line("child_bar.Counter = " & Integer'Image(Counter));
    New_Line;
 
 end Userdata_Example;
