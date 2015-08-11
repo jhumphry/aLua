@@ -335,18 +335,12 @@ package Lua is
    -- ** Garbage Collector control
    -- *
 
-   type GC_Inputs is (GCSTOP, GCRESTART, GCCOLLECT, GCCOUNT,
-                      GCCOUNTB, GCSTEP, GCSETPAUSE, GCSETSTEPMUL, GCISRUNNING);
-   for GC_Inputs use (GCSTOP => 0, GCRESTART => 1, GCCOLLECT => 2,
-                      GCCOUNT => 3, GCCOUNTB => 4, GCSTEP => 5,
-                      GCSETPAUSE => 6, GCSETSTEPMUL => 7, GCISRUNNING => 9);
-
-   subtype GC_Op is GC_Inputs range GCSTOP..GCSTEP;
-   subtype GC_Param is GC_Inputs range GCSETPAUSE..GCSETSTEPMUL;
-   subtype GC_Queries is GC_Inputs range GCISRUNNING..GCISRUNNING;
+   type GC_Op is (GCSTOP, GCRESTART, GCCOLLECT, GCCOUNT, GCCOUNTB, GCSTEP);
 
    -- Instruct the garbage collector to carry out the specified operation.
    procedure GC (L : in Lua_State; what : in GC_Op);
+
+   type GC_Param is (GCSETPAUSE, GCSETSTEPMUL);
 
    -- Set a given parameter of the garbage collector and return the previous
    -- value.
@@ -714,17 +708,30 @@ private
 
    for Thread_Status use (OK => 0, YIELD => 1, ERRRUN => 2, ERRSYNTAX => 3,
                           ERRMEM => 4, ERRGCMM => 5, ERRERR => 6, ERRFILE => 7);
+   for Thread_Status'Size use Interfaces.C.int'Size;
 
    for Arith_Op use (OPADD => 0, OPSUB => 1, OPMUL => 2, OPMOD => 3, OPPOW => 4,
                      OPDIV => 5, OPIDIV => 6, OPBAND => 7, OPBOR => 8,
                      OPBXOR => 9, OPSHL => 10, OPSHR => 11, OPUNM => 12,
                      OPBNOT => 13);
+   for Arith_Op'Size use Interfaces.C.int'Size;
 
    for Comparison_Op use (OPEQ => 0, OPLT => 1, OPLE => 2);
+   for Comparison_Op'Size use Interfaces.C.int'Size;
+
+   for GC_Op use (GCSTOP => 0, GCRESTART => 1, GCCOLLECT => 2,
+                  GCCOUNT => 3, GCCOUNTB => 4, GCSTEP => 5);
+   for GC_Op'Size use Interfaces.C.int'Size;
+
+   for GC_Param use (GCSETPAUSE => 6, GCSETSTEPMUL => 7);
+   for GC_Param'Size use Interfaces.C.int'Size;
+
+   GCISRUNNING : constant := 9;
 
    for Lua_Type use (TNONE => -1, TNIL => 0, TBOOLEAN => 1, TLIGHTUSERDATA => 2,
                      TNUMBER => 3, TSTRING => 4, TTABLE => 5, TFUNCTION => 6,
                      TUSERDATA => 7, TTHREAD => 8, TNUMTAGS => 9);
+   for Lua_Type'Size use Interfaces.C.int'Size;
 
    -- *
    -- ** Deferred constants

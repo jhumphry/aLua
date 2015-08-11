@@ -83,8 +83,12 @@ package body Lua is
      Ada.Unchecked_Conversion(Source => Comparison_Op,
                               Target => C.int);
 
-   function GC_Inputs_To_Int is new
-     Ada.Unchecked_Conversion(Source => GC_Inputs,
+   function GC_Op_To_Int is new
+     Ada.Unchecked_Conversion(Source => GC_Op,
+                              Target => C.int);
+
+   function GC_Param_To_Int is new
+     Ada.Unchecked_Conversion(Source => GC_Param,
                               Target => C.int);
 
    function Lua_Type_To_Int is new Ada.Unchecked_Conversion(Source => Lua_Type,
@@ -659,15 +663,15 @@ package body Lua is
    begin
       -- For the operations within subtype GC_Op, this will not return anything
       -- interesting
-      Discard := Internal.lua_gc(L.L, GC_Inputs_To_Int(what), 0);
+      Discard := Internal.lua_gc(L.L, GC_Op_To_Int(what), 0);
    end GC;
 
    function GC (L : in Lua_State; what : in GC_Param; data : in Integer)
                 return Integer is
-      (Integer(Internal.lua_gc(L.L, GC_Inputs_To_Int(what), C.int(data))));
+      (Integer(Internal.lua_gc(L.L, GC_Param_To_Int(what), C.int(data))));
 
    function GC_IsRunning (L : in Lua_State) return Boolean is
-       (Internal.lua_gc(L.L, GC_Inputs_To_Int(GCISRUNNING), 0) /= 0);
+       (Internal.lua_gc(L.L, GCISRUNNING, 0) /= 0);
 
    --
    -- *** Stack manipulation and information
