@@ -4,7 +4,7 @@
 -- Copyright (c) 2015, James Humphry - see LICENSE for terms
 
 generic
-   type T is abstract tagged private;
+   type T is abstract tagged limited private;
 package Lua.Userdata is
 
    type Access_Userdata is not null access all T;
