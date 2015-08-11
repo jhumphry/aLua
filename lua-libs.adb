@@ -7,26 +7,29 @@ with Interfaces; use Interfaces;
 with Interfaces.C;
 with Interfaces.C.Strings; use Interfaces.C.Strings;
 
+with Ada.Strings, Ada.Strings.Fixed;
+
 with Lua.Internal, Lua.AuxInternal, Lua.LibInternal;
 use Lua.LibInternal;
 
 package body Lua.Libs is
 
-   function NS(S : String) return chars_ptr renames New_String;
+   subtype Lib_Name is String(1..9);
 
-   LibNames : constant array (Lua_Standard_Library) of chars_ptr :=
+   LibNames : constant array (Lua_Standard_Library)
+     of Lib_Name :=
      (
-      Base_Lib => NS(""),
-      Package_Lib => NS("package"),
-      Coroutine_Lib => NS("coroutine"),
-      String_Lib => NS("string"),
-      UTF8_Lib => NS("utf8"),
-      Table_Lib => NS("table"),
-      Math_Lib => NS("math"),
-      IO_Lib => NS("io"),
-      OS_Lib => NS("os"),
-      Debug_Lib => NS("debug"),
-      Bit32_Lib => NS("bit32")
+      Base_Lib => "         ",
+      Package_Lib => "package  ",
+      Coroutine_Lib => "coroutine",
+      String_Lib => "string   ",
+      UTF8_Lib => "utf8     ",
+      Table_Lib => "table    ",
+      Math_Lib => "math     ",
+      IO_Lib => "io       ",
+      OS_Lib => "os       ",
+      Debug_Lib => "debug    ",
+      Bit32_Lib => "bit32    "
      );
 
    LibFunctions : constant array (Lua_Standard_Library)
@@ -54,11 +57,15 @@ package body Lua.Libs is
                                        Library : in Lua_Standard_Library;
                                        Set_Global : in Boolean := True) is
       glb : constant C.int := C.int((if Set_Global then 1 else 0));
+      C_libname : C.Strings.chars_ptr
+        := C.Strings.New_String(Ada.Strings.Fixed.Trim(LibNames(Library),
+                                Ada.Strings.Right));
    begin
       Lua.AuxInternal.luaL_requiref(L.L,
-                                LibNames(Library),
-                                LibFunctions(Library),
-                                glb);
+                                    C_libname,
+                                    LibFunctions(Library),
+                                    glb);
+      C.Strings.Free(C_libname);
    end Require_Standard_Library;
 
    procedure Add_Yield_Function (L : in Lua_State) is
