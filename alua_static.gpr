@@ -1,7 +1,7 @@
 -- Lua
 -- an Ada 2012 interface to Lua
 
--- Copyright (c) 2015, James Humphry - see LICENSE.md for terms
+-- Copyright (c) 2015, James Humphry - see LICENSE for terms
 
 -- This library project file will not recompile libalua.a, and assumes
 -- that the existing library is up-to-date and compiled with suitable

@@ -7,7 +7,7 @@
 -- Derived from the original Lua work
 -- Copyright (C) 1994-2015 Lua.org, PUC-Rio.
 
--- See LICENSE.md for details
+-- See LICENSE for details
 
 with Interfaces.C; use Interfaces.C;
 with System;

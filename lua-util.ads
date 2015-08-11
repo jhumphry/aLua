@@ -1,7 +1,7 @@
 -- Lua.Util
 -- Utility routines to go with the Ada 2012 Lua interface
 
--- Copyright (c) 2015, James Humphry - see LICENSE.md for terms
+-- Copyright (c) 2015, James Humphry - see LICENSE for terms
 
 package Lua.Util is
 

@@ -1,7 +1,7 @@
 -- Functions_Example
 -- A example of using the Ada 2012 interface to Lua for functions / closures etc
 
--- Copyright (c) 2015, James Humphry - see LICENSE.md for terms
+-- Copyright (c) 2015, James Humphry - see LICENSE for terms
 
 with Ada.IO_Exceptions;
 with Ada.Text_IO; use Ada.Text_IO;

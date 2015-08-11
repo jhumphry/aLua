@@ -1,7 +1,7 @@
 -- Lua.Userdata
 -- Adding Ada objects of a specified tagged type to the Lua environment
 
--- Copyright (c) 2015, James Humphry - see LICENSE.md for terms
+-- Copyright (c) 2015, James Humphry - see LICENSE for terms
 
 generic
    type T is abstract tagged private;

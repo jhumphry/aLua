@@ -1,7 +1,7 @@
 -- Lua
 -- an Ada 2012 interface to Lua
 
--- Copyright (c) 2015, James Humphry - see LICENSE.md for terms
+-- Copyright (c) 2015, James Humphry - see LICENSE for terms
 
 with Ada.Unchecked_Conversion, Ada.Unchecked_Deallocation;
 with System.Address_To_Access_Conversions;

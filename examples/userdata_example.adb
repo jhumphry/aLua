@@ -1,7 +1,7 @@
 -- Userdata_Example
 -- A example of using the Ada values in Lua via UserData values
 
--- Copyright (c) 2015, James Humphry - see LICENSE.md for terms
+-- Copyright (c) 2015, James Humphry - see LICENSE for terms
 
 with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Long_Float_Text_IO; use Ada.Long_Float_Text_IO;

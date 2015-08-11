@@ -1,6 +1,6 @@
 -- Examples of using Lua from Ada2012
 
--- Copyright (c) 2015, James Humphry - see LICENSE.md for terms
+-- Copyright (c) 2015, James Humphry - see LICENSE for terms
 
 with "alua";
 

@@ -1,7 +1,7 @@
 -- Lua.Lib
 -- Supporting the Lua standard libraries
 
--- Copyright (c) 2015, James Humphry - see LICENSE.md for terms
+-- Copyright (c) 2015, James Humphry - see LICENSE for terms
 
 package Lua.Libs is
 
