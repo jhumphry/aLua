@@ -50,12 +50,11 @@ package body Lua is
    -- *** Types only used internally
    --
 
-   type String_Access_Constant is not null access constant String;
-
    -- Used by String_Lua_Reader to read strings
    type String_Details is
       record
-         S : String_Access_Constant;
+         S_Address : System.Address;
+         S_Length : Natural;
          Readable : Boolean := False;
       end record;
 
@@ -115,8 +114,11 @@ package body Lua is
    package String_Details_Access_Conversions is new
      System.Address_To_Access_Conversions(String_Details);
 
-   function String_Access_To_Chars_Ptr is new
-     Ada.Unchecked_Conversion(Source => String_Access_Constant,
+   package Char_Access_Conversions is new
+     System.Address_To_Access_Conversions(C.char);
+
+   function Char_Object_Pointer_To_Chars_Ptr is new
+     Ada.Unchecked_Conversion(Source => Char_Access_Conversions.Object_Pointer,
                               Target => C.Strings.chars_ptr);
 
    package Stream_Details_Access_Conversions is new
@@ -243,11 +245,17 @@ package body Lua is
       pragma Unreferenced (L);
       SDA : constant access String_Details
         := String_Details_Access_Conversions.To_Pointer(data);
+
+      S_Object_Ptr : constant Char_Access_Conversions.Object_Pointer
+        := Char_Access_Conversions.To_Pointer(SDA.S_Address);
+
+      S_chars_ptr : constant C.Strings.chars_ptr
+        := Char_Object_Pointer_To_Chars_Ptr(S_Object_Ptr);
    begin
       if SDA.Readable then
          SDA.Readable := False;
-         size.all := C.size_t(SDA.S.all'Length * String'Component_Size / 8);
-         return String_Access_To_Chars_Ptr(SDA.S);
+         size.all := C.size_t(SDA.S_Length * String'Component_Size / 8);
+         return S_chars_ptr;
       else
          size.all := 0;
          return C.Strings.Null_Ptr;
@@ -267,7 +275,9 @@ package body Lua is
                                    when Text => "t",
                                    when Binary_and_Text => "bt"
                                );
-      To_Load : aliased String_Details := (S => S'Access, Readable => True);
+      To_Load : aliased String_Details := (S_Address => S'Address,
+                                           S_Length => S'Length,
+                                           Readable => True);
    begin
       if C.char_array'Component_Size /= String'Component_Size then
          raise Program_Error with
