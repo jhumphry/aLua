@@ -101,6 +101,8 @@ package Lua is
    -- conventions on this system for strings are too dissimilar to allow for
    -- loading strings without copying - in this case LoadString_By_Copy can
    -- be used.
+   -- Note: malicious binary chunks can be created that bypass the Lua sandbox.
+   -- If untrusted input is being loaded, ensure only Text mode is permitted.
    function LoadString (L : in Lua_State;
                         S : aliased String;
                         ChunkName : in String := "";
@@ -112,6 +114,8 @@ package Lua is
    -- possibly wastes memory for larger chunks of code. If C and Ada conventions
    -- for strings are different on this system, a conversion will be done rather
    -- just an aliased duplicate.
+   -- Note: malicious binary chunks can be created that bypass the Lua sandbox.
+   -- This function is therefore not suitable for untrusted input.
    function LoadString_By_Copy (L : in Lua_State;
                                 S : in String)
                                 return Thread_Status;
@@ -120,6 +124,8 @@ package Lua is
    -- chunk which can be used in error messages. The Mode parameter allows
    -- specification of whether the file can be in Binary, Text or either format.
    -- Buffer_Size specifies the size of the temporary buffer used.
+   -- Note: malicious binary chunks can be created that bypass the Lua sandbox.
+   -- If untrusted input is being loaded, ensure only Text mode is permitted.
    function LoadFile (L : in Lua_State;
                       Name : in String;
                       ChunkName : in String := "";
@@ -131,6 +137,8 @@ package Lua is
    -- name to the chunk which can be used in error messages. The Mode parameter
    -- allows specification of whether the file can be in Binary, Text or either
    -- format. Buffer_Size specifies the size of the temporary buffer used.
+   -- Note: malicious binary chunks can be created that bypass the Lua sandbox.
+   -- If untrusted input is being loaded, ensure only Text mode is permitted.
    function LoadStream (L : in Lua_State;
                         Input_Stream : in Ada.Streams.Stream_IO.Stream_Access;
                         ChunkName : in String := "";
