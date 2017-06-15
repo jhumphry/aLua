@@ -127,15 +127,6 @@ private package Lua.Internal is
          nsize : Interfaces.C.size_t) return System.Address;
    pragma Convention (C, lua_Alloc);  -- /usr/include/lua.h:124
 
-  --** generic extra include file
-  --
-
-  --** RCS ident string
-  --
-
-   lua_ident : aliased Interfaces.C.char_array (size_t);  -- /usr/include/lua.h:139
-   pragma Import (C, lua_ident, "lua_ident");
-
   --** state manipulation
   --
 
