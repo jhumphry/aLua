@@ -1,6 +1,6 @@
 -- Examples of using Lua from Ada2012
 
--- Copyright (c) 2015, James Humphry - see LICENSE for terms
+-- Copyright (c) 2015-2021, James Humphry - see LICENSE for terms
 
 with "alua";
 
@@ -45,11 +45,11 @@ project alua_examples is
    package Linker is
       case Mode is
          when "debug" =>
-               for Default_Switches ("ada") use ("-llua");
+               for Default_Switches ("ada") use ("-llua5.3");
          when "memdebug" =>
-               for Default_Switches ("ada") use ("-llua", "-lgmem");
+               for Default_Switches ("ada") use ("-llua5.3", "-lgmem");
          when "optimize" =>
-               for Default_Switches ("ada") use ("-llua");
+               for Default_Switches ("ada") use ("-llua5.3");
       end case;
    end Linker;
 
