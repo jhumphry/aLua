@@ -1,7 +1,7 @@
 -- Lua.Userdata
 -- Adding Ada objects of a specified tagged type to the Lua environment
 
--- Copyright (c) 2015, James Humphry - see LICENSE for terms
+-- Copyright (c) 2015-2021, James Humphry - see LICENSE for terms
 
 with Ada.Tags;
 
@@ -14,7 +14,6 @@ with Lua.Internal, Lua.AuxInternal;
 
 package body Lua.Userdata is
 
-   use type Ada.Tags.Tag;
    use type C.int;
    use type C.size_t;
 

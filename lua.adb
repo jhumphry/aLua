@@ -1,7 +1,7 @@
 -- Lua
 -- an Ada 2012 interface to Lua
 
--- Copyright (c) 2015, James Humphry - see LICENSE for terms
+-- Copyright (c) 2015-2021, James Humphry - see LICENSE for terms
 
 with Ada.Unchecked_Conversion, Ada.Unchecked_Deallocation;
 with System.Address_To_Access_Conversions;
@@ -313,7 +313,6 @@ package body Lua is
       pragma Unreferenced (L);
 
       use Ada.Streams;
-      use Ada.Streams.Stream_IO;
 
       Stream_Detail : access Stream_Details
         := Stream_Details_Access_Conversions.To_Pointer(data);
@@ -365,7 +364,7 @@ package body Lua is
                         Mode : in Lua_ChunkMode := Binary_and_Text;
                         Buffer_Size : in Positive := 256)
                         return Thread_Status is
-      use Ada.Streams, Ada.Streams.Stream_IO;
+      use Ada.Streams;
 
       C_ChunkName : C.Strings.chars_ptr := C.Strings.New_String(ChunkName);
       C_Mode : C.Strings.chars_ptr
